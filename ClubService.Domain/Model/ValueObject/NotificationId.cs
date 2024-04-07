@@ -1,15 +1,17 @@
-namespace ClubService.Domain.Model;
+namespace ClubService.Domain.Model.ValueObject;
 
-public class MemberId
+public class NotificationId
 {
     public string Id { get; private set; }
 
-    public MemberId(string id)
+    private NotificationId() { }
+    
+    public NotificationId(string id)
     {
         Id = id;
     }
 
-    protected bool Equals(MemberId other)
+    protected bool Equals(NotificationId other)
     {
         return Id == other.Id;
     }
@@ -19,7 +21,7 @@ public class MemberId
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((MemberId)obj);
+        return Equals((NotificationId)obj);
     }
 
     public override int GetHashCode()

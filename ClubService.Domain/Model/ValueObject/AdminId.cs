@@ -1,4 +1,4 @@
-namespace ClubService.Domain.Model;
+namespace ClubService.Domain.Model.ValueObject;
 
 public class AdminId
 {

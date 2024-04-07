@@ -1,4 +1,6 @@
-namespace ClubService.Domain.Model;
+using ClubService.Domain.Model.ValueObject;
+
+namespace ClubService.Domain.Model.Entity;
 
 public class SubscriptionTier
 {
