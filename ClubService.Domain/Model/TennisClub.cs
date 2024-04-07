@@ -23,4 +23,22 @@ public class TennisClub
     {
         return new TennisClub(id, name, isLocked, subscriptionTierId);
     }
+
+    protected bool Equals(TennisClub other)
+    {
+        return Id.Equals(other.Id);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((TennisClub)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }
