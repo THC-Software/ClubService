@@ -1,13 +1,8 @@
 namespace ClubService.Domain.Model.ValueObject;
 
-public class TennisClubId
+public class TennisClubId(string id)
 {
-    public string Id { get; }
-
-    public TennisClubId(string id)
-    {
-        Id = id;
-    }
+    public string Id { get; } = id;
 
     protected bool Equals(TennisClubId other)
     {

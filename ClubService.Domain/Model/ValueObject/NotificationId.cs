@@ -1,15 +1,8 @@
 namespace ClubService.Domain.Model.ValueObject;
 
-public class NotificationId
+public class NotificationId(string id)
 {
-    public string Id { get; private set; }
-
-    private NotificationId() { }
-    
-    public NotificationId(string id)
-    {
-        Id = id;
-    }
+    public string Id { get; private set; } = id;
 
     protected bool Equals(NotificationId other)
     {

@@ -4,9 +4,9 @@ namespace ClubService.Domain.Model.Entity;
 
 public class Notification
 {
-    public NotificationId Id { get; private set; }
-    public string Title { get; private set; }
-    public string Text { get; private set; }
+    public NotificationId Id { get; }
+    public string Title { get; }
+    public string Text { get; }
     
     private Notification() { }
 

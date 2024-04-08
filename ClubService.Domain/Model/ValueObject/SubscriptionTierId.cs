@@ -1,13 +1,8 @@
 namespace ClubService.Domain.Model.ValueObject;
 
-public class SubscriptionTierId
+public class SubscriptionTierId(string id)
 {
-    public string Id { get; private set; }
-
-    public SubscriptionTierId(string id)
-    {
-        Id = id;
-    }
+    public string Id { get; } = id;
 
     protected bool Equals(SubscriptionTierId other)
     {

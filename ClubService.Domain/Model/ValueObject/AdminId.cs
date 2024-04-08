@@ -1,13 +1,8 @@
 namespace ClubService.Domain.Model.ValueObject;
 
-public class AdminId
+public class AdminId(string id)
 {
-    public string Id { get; private set; }
-
-    public AdminId(string id)
-    {
-        Id = id;
-    }
+    public string Id { get; } = id;
 
     protected bool Equals(AdminId other)
     {

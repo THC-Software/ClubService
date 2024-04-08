@@ -4,9 +4,9 @@ namespace ClubService.Domain.Model.Entity;
 
 public class SubscriptionTier
 {
-    public SubscriptionTierId Id { get; private set; }
-    public string Name { get; private set; }
-    public int MaxMemberCount { get; private set; }
+    public SubscriptionTierId Id { get; }
+    public string Name { get; }
+    public int MaxMemberCount { get; }
 
     private SubscriptionTier() { }
 

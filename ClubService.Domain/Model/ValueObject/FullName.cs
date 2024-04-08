@@ -1,15 +1,9 @@
 namespace ClubService.Domain.Model.ValueObject;
 
-public class FullName
+public class FullName(string firstName, string lastName)
 {
-    public string FirstName { get; private set; }
-    public string LastName { get; private set; }
-
-    public FullName(string firstName, string lastName)
-    {
-        LastName = lastName;
-        FirstName = firstName;
-    }
+    public string FirstName { get; } = firstName;
+    public string LastName { get; } = lastName;
 
     protected bool Equals(FullName other)
     {

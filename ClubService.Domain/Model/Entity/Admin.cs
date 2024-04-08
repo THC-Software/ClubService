@@ -4,10 +4,10 @@ namespace ClubService.Domain.Model.Entity;
 
 public class Admin
 {
-    public AdminId Id { get; private set; }
-    public string Username { get; private set; }
-    public FullName Name { get; private set; }
-    public TennisClubId TennisClubId { get; private set; }
+    public AdminId Id { get; }
+    public string Username { get; }
+    public FullName Name { get; }
+    public TennisClubId TennisClubId { get; }
 
     private Admin() { }
 

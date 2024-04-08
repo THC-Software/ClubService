@@ -4,11 +4,11 @@ namespace ClubService.Domain.Model.Entity;
 
 public class TennisClub
 {
-    public TennisClubId Id { get; private set; }
-    public string Name { get; private set; }
-    public bool IsLocked { get; private set; }
-    public SubscriptionTierId SubscriptionTierId { get; private set; }
-    public List<MemberId> Members { get; private set; }
+    public TennisClubId Id { get; }
+    public string Name { get; }
+    public bool IsLocked { get; }
+    public SubscriptionTierId SubscriptionTierId { get; }
+    public List<MemberId> Members { get; }
     
     private TennisClub() { }
 

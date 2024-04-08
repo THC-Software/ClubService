@@ -1,13 +1,8 @@
 namespace ClubService.Domain.Model.ValueObject;
 
-public class MemberId
+public class MemberId(string id)
 {
-    public string Id { get; private set; }
-
-    public MemberId(string id)
-    {
-        Id = id;
-    }
+    public string Id { get; } = id;
 
     protected bool Equals(MemberId other)
     {
