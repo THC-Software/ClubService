@@ -8,8 +8,6 @@ public class SubscriptionTier
     public string Name { get; }
     public int MaxMemberCount { get; }
 
-    private SubscriptionTier() { }
-
     private SubscriptionTier(SubscriptionTierId id, string name, int maxMemberCount)
     {
         Id = id;

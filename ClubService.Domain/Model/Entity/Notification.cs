@@ -7,8 +7,6 @@ public class Notification
     public NotificationId Id { get; }
     public string Title { get; }
     public string Text { get; }
-    
-    private Notification() { }
 
     private Notification(NotificationId id, string title, string text)
     {

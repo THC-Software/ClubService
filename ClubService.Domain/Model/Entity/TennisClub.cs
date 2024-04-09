@@ -8,9 +8,7 @@ public class TennisClub
     public string Name { get; }
     public bool IsLocked { get; }
     public SubscriptionTierId SubscriptionTierId { get; }
-    public List<MemberId> Members { get; }
-    
-    private TennisClub() { }
+    public List<MemberId> MemberIds { get; }
 
     private TennisClub(TennisClubId id, string name, bool isLocked, SubscriptionTierId subscriptionTierId)
     {
@@ -18,7 +16,7 @@ public class TennisClub
         Name = name;
         IsLocked = isLocked;
         SubscriptionTierId = subscriptionTierId;
-        Members = new List<MemberId>();
+        MemberIds = new List<MemberId>();
     }
 
     public static TennisClub Create(TennisClubId id, string name, bool isLocked, SubscriptionTierId subscriptionTierId)

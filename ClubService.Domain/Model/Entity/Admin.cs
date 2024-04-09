@@ -9,8 +9,6 @@ public class Admin
     public FullName Name { get; }
     public TennisClubId TennisClubId { get; }
 
-    private Admin() { }
-
     private Admin(AdminId id, string username, FullName name, TennisClubId tennisClubId)
     {
         Id = id;

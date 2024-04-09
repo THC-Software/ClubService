@@ -9,8 +9,6 @@ public class Member
     public string Email { get; }
     public bool IsLocked { get; }
     public TennisClubId TennisClubId { get; }
-    
-    private Member() { }
 
     private Member(MemberId id, FullName name, string email, bool isLocked, TennisClubId tennisClubId)
     {
