@@ -1,10 +1,12 @@
+using Asp.Versioning;
 using ClubService.Application.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
 
-[Route("api/v1/subscriptionTiers")]
+[Route("api/v{version:apiVersion}/subscriptionTiers")]
 [ApiController]
+[ApiVersion("1.0")]
 public class SubscriptionTierController
 {
     [HttpGet]

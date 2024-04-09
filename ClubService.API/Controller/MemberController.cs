@@ -1,10 +1,12 @@
+using Asp.Versioning;
 using ClubService.Application.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
 
+[Route("api/v{version:apiVersion}/members")]
 [ApiController]
-[Route("api/v1/members")]
+[ApiVersion("1.0")]
 public class MemberController : ControllerBase
 {
     [HttpGet("{memberId}")]
