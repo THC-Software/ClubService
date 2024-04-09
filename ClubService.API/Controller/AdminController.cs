@@ -13,7 +13,7 @@ public class AdminController
         return await Task.FromResult("");
     }
     
-    [HttpDelete("/{adminId}")]
+    [HttpDelete("{adminId}")]
     public async Task<ActionResult<string>> DeleteAdmin(string adminId)
     {
         return await Task.FromResult("");

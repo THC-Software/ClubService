@@ -7,13 +7,7 @@ namespace ClubService.API.Controller;
 [ApiController]
 public class ClubController : ControllerBase
 {
-    [HttpPost("{clubId}/notifyAllMembers")]
-    public async Task<IActionResult> NotifyAllMembers(string clubId, [FromBody] NotificationDto notificationDto)
-    {
-        return await Task.FromResult(Ok());
-    }
-
-    [HttpGet("/{clubId}/members")]
+    [HttpGet("{clubId}/members")]
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByClub(string clubId)
     {
         var memberDtos = new List<MemberDto>();
@@ -26,7 +20,7 @@ public class ClubController : ControllerBase
         return await Task.FromResult(Ok());
     }
     
-    [HttpPut("/{clubId}")]
+    [HttpPut("{clubId}")]
     public async Task<ActionResult<string>> UpdateTennisClub(string clubId, [FromBody] ClubCreateUpdateDto clubCreateUpdateDto)
     {
         return await Task.FromResult(Ok());

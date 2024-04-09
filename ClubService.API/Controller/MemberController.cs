@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
 
-[Route("api/v1/members")]
 [ApiController]
+[Route("api/v1/members")]
 public class MemberController : ControllerBase
 {
-    [HttpGet("/{memberId}")]
+    [HttpGet("{memberId}")]
     [ProducesResponseType(typeof(MemberDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MemberDto>> GetMemberById(string memberId)
@@ -28,20 +28,20 @@ public class MemberController : ControllerBase
         return await Task.FromResult("");
     }
     
-    [HttpDelete("/{memberId}")]
+    [HttpDelete("{memberId}")]
     public async Task<ActionResult<string>> DeleteMember(string memberId)
     {
         return await Task.FromResult("");
     }
     
-    [HttpPost("/{memberId}/lock")]
-    public async Task<IActionResult> LockMember(string memberId)
+    [HttpPost("{memberId}/lock")]
+    public async Task<ActionResult<string>> LockMember(string memberId)
     {
         return await Task.FromResult(Ok());
     }
     
-    [HttpPost("/{memberId}/unlock")]
-    public async Task<IActionResult> UnlockMember(string memberId)
+    [HttpDelete("{memberId}/lock")]
+    public async Task<ActionResult<string>> UnlockMember(string memberId)
     {
         return await Task.FromResult(Ok());
     }
