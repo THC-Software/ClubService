@@ -8,18 +8,20 @@ public class Admin
     public string Username { get; }
     public FullName Name { get; }
     public TennisClubId TennisClubId { get; }
+    public bool IsDeleted { get; }
 
-    private Admin(AdminId id, string username, FullName name, TennisClubId tennisClubId)
+    private Admin(AdminId id, string username, FullName name, TennisClubId tennisClubId, bool isDeleted)
     {
         Id = id;
         Username = username;
         Name = name;
         TennisClubId = tennisClubId;
+        IsDeleted = isDeleted;
     }
 
     public static Admin Create(AdminId id, string username, FullName name, TennisClubId tennisClubId)
     {
-        return new Admin(id, username, name, tennisClubId);
+        return new Admin(id, username, name, tennisClubId, isDeleted: false);
     }
 
     protected bool Equals(Admin other)

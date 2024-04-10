@@ -9,19 +9,21 @@ public class Member
     public string Email { get; }
     public bool IsLocked { get; }
     public TennisClubId TennisClubId { get; }
-
-    private Member(MemberId id, FullName name, string email, bool isLocked, TennisClubId tennisClubId)
+    public bool IsDeleted { get; }
+    
+    private Member(MemberId id, FullName name, string email, bool isLocked, TennisClubId tennisClubId, bool isDeleted)
     {
         Id = id;
         Name = name;
         Email = email;
         IsLocked = isLocked;
         TennisClubId = tennisClubId;
+        IsDeleted = isDeleted;
     }
 
-    public static Member Create(MemberId id, FullName name, string email, bool isLocked, TennisClubId tennisClubId)
+    public static Member Create(MemberId id, FullName name, string email, TennisClubId tennisClubId)
     {
-        return new Member(id, name, email, isLocked, tennisClubId);
+        return new Member(id, name, email, isLocked: false, tennisClubId, isDeleted: false);
     }
 
     protected bool Equals(Member other)
