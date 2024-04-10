@@ -1,8 +1,8 @@
 namespace ClubService.Domain.Model.ValueObject;
 
-public class TennisClubId(string id)
+public class TennisClubId(Guid id)
 {
-    public string Id { get; } = id;
+    public Guid Id { get; } = id;
 
     protected bool Equals(TennisClubId other)
     {
