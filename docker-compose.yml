@@ -1,0 +1,10 @@
+﻿services:
+  clubservice:
+    image: clubservice
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
