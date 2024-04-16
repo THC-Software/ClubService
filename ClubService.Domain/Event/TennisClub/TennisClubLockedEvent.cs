@@ -1,10 +1,6 @@
 namespace ClubService.Domain.Event.TennisClub;
 
-public class TennisClubLockedEvent(
-    Guid eventId, 
-    Guid entityId, 
-    EventType eventType, 
-    EntityType entityType)
-    : Event(eventId, entityId, eventType, entityType)
+public class TennisClubLockedEvent : ITennisClubDomainEvent
 {
 }
+
