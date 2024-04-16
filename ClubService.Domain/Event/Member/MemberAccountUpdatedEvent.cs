@@ -1,14 +1,9 @@
 namespace ClubService.Domain.Event.Member;
 
 public class MemberAccountUpdatedEvent(
-    Guid eventId,
-    Guid entityId,
-    EventType eventType,
-    EntityType entityType,
     string firstName,
     string lastName,
-    string email)
-    : Event(eventId, entityId, eventType, entityType)
+    string email) : IMemberDomainEvent
 {
     public string FirstName { get; } = firstName;
     public string LastName { get; } = lastName;
