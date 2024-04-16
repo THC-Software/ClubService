@@ -24,8 +24,8 @@ public class MemberController : ControllerBase
         return await Task.FromResult("");
     }
     
-    [HttpPut]
-    public async Task<ActionResult<string>> UpdateMember(MemberCreateUpdateDto memberCreateUpdateDto)
+    [HttpPut("{memberId}")]
+    public async Task<ActionResult<string>> UpdateMember(string memberId, MemberCreateUpdateDto memberCreateUpdateDto)
     {
         return await Task.FromResult("");
     }
