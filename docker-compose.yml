@@ -1,0 +1,6 @@
+﻿services:
+  clubservice:
+    image: clubservice
+    build:
+      context: .
+      dockerfile: ./Dockerfile
