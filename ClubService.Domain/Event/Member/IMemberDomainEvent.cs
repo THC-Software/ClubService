@@ -1,6 +1,6 @@
 namespace ClubService.Domain.Event.Member;
 
-public interface IMemberDomainEvent
+public interface IMemberDomainEvent : IDomainEvent
 {
     
 }
