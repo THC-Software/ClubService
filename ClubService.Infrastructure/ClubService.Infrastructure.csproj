@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ClubService.Domain\ClubService.Domain.csproj" />
+        <ProjectReference Include="..\ClubService.Domain\ClubService.Domain.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="StackExchange.Redis" Version="2.7.33"/>
     </ItemGroup>
 
 </Project>

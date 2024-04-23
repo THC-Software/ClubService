@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
 
-[Route("api/v{version:apiVersion}/clubs")]
+[Route("api/v{version:apiVersion}/tennisClubs")]
 [ApiController]
 [ApiVersion("1.0")]
 public class TennisClubController(IRegisterTennisClubService registerTennisClubService) : ControllerBase
@@ -17,15 +17,17 @@ public class TennisClubController(IRegisterTennisClubService registerTennisClubS
         var memberDtos = new List<MemberDto>();
         return await Task.FromResult(memberDtos);
     }
-    
+
     [HttpPost]
-    public async Task<ActionResult<string>> RegisterTennisClub([FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
+    public async Task<ActionResult<string>> RegisterTennisClub(
+        [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         return await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
     }
-    
+
     [HttpPut("{clubId}")]
-    public async Task<ActionResult<string>> UpdateTennisClub(string clubId, [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
+    public async Task<ActionResult<string>> UpdateTennisClub(string clubId,
+        [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
         return await Task.FromResult(Ok());
     }
