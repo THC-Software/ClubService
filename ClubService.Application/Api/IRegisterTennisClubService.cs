@@ -4,5 +4,5 @@ namespace ClubService.Application.Api;
 
 public interface IRegisterTennisClubService
 {
-    Task<string> CreateTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand);
+    Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand);
 }

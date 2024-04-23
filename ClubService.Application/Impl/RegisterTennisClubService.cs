@@ -4,28 +4,27 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
+using ClubService.Domain.Repository;
 
 namespace ClubService.Application.Impl;
 
-public class RegisterTennisClubService : IRegisterTennisClubService
+public class RegisterTennisClubService(IEventRepository eventRepository) : IRegisterTennisClubService
 {
-    public Task<string> CreateTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
+    public Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         // TODO: Use Repository
-        Guid clubId = Guid.NewGuid();
-
-        // Create empty tennis club with id
+        var clubId = Guid.NewGuid();
+        
         var tennisClub = TennisClub.Create(new TennisClubId(clubId));
-
-        // Call process with command on tennis club object
+        
         List<DomainEnvelope<ITennisClubDomainEvent>> tennisClubDomainEvents = 
             tennisClub.ProcessTennisClubRegisterCommand(tennisClubRegisterCommand.Name, tennisClubRegisterCommand.SubscriptionTier);
         
-        // Apply events on tennis club object and store event in database
         foreach (var tennisClubDomainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(tennisClubDomainEvent);
-            // TODO: Save and publish event
+            eventRepository.Save(tennisClubDomainEvent);
+            // TODO: Publish event
         }
         
         return Task.FromResult(clubId.ToString());

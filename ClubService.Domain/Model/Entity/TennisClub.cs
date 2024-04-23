@@ -22,18 +22,19 @@ public class TennisClub
         return new TennisClub(id);
     }
 
-    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(string name, string subscriptionTierIdStr)
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(string name,
+        string subscriptionTierIdStr)
     {
         var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
         var memberIds = new List<MemberId>();
 
-        TennisClubRegisteredEvent tennisClubRegisteredEvent =
+        var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(TennisClubId, name, false, subscriptionTierId, memberIds);
 
-        DomainEnvelope<ITennisClubDomainEvent> domainEnvelope =
+        var domainEnvelope =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), TennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, tennisClubRegisteredEvent);
-        
+
         return [domainEnvelope];
     }
 
@@ -62,7 +63,7 @@ public class TennisClub
                 throw new ArgumentOutOfRangeException();
         }
     }
-    
+
     private void Apply(TennisClubRegisteredEvent tennisClubRegisteredEvent)
     {
         TennisClubId = tennisClubRegisteredEvent.TennisClubId;

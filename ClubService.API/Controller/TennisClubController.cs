@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Application.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/clubs")]
 [ApiController]
 [ApiVersion("1.0")]
-public class ClubController : ControllerBase
+public class TennisClubController(IRegisterTennisClubService registerTennisClubService) : ControllerBase
 {
     [HttpGet("{clubId}/members")]
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByClub(string clubId)
@@ -18,9 +19,9 @@ public class ClubController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<ActionResult<string>> CreateTennisClub([FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
+    public async Task<ActionResult<string>> RegisterTennisClub([FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
-        return await Task.FromResult(Ok());
+        return await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
     }
     
     [HttpPut("{clubId}")]
