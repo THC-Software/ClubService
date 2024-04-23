@@ -1,4 +1,4 @@
-namespace ClubService.Application.Dto;
+namespace ClubService.Application.Dtos;
 
 public class MemberDto(string memberId, string firstName, string lastName, string email, bool isLocked)
 {

@@ -1,5 +1,6 @@
 using Asp.Versioning;
-using ClubService.Application.Dto;
+using ClubService.Application.Commands;
+using ClubService.Application.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -19,13 +20,13 @@ public class MemberController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> CreateMember(MemberCreateUpdateDto memberCreateUpdateDto)
+    public async Task<ActionResult<string>> CreateMember(MemberRegisterCommand memberRegisterCommand)
     {
         return await Task.FromResult("");
     }
     
     [HttpPut("{memberId}")]
-    public async Task<ActionResult<string>> UpdateMember(string memberId, MemberCreateUpdateDto memberCreateUpdateDto)
+    public async Task<ActionResult<string>> UpdateMember(string memberId, MemberUpdateCommand memberUpdateCommand)
     {
         return await Task.FromResult("");
     }
