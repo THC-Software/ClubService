@@ -6,10 +6,10 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.Impl;
 
-public class RegisterTennisClubService(IEventRepository eventRepository, IEventPublisher eventPublisher)
+public class RegisterTennisClubService(IEventRepository eventRepository)
     : IRegisterTennisClubService
 {
-    public async Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
+    public Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         // TODO: Use Repository
         var clubId = Guid.NewGuid();
@@ -24,9 +24,8 @@ public class RegisterTennisClubService(IEventRepository eventRepository, IEventP
         {
             tennisClub.Apply(tennisClubDomainEvent);
             eventRepository.Save(tennisClubDomainEvent);
-            await eventPublisher.PublishEvent(tennisClubDomainEvent);
         }
 
-        return clubId.ToString();
+        return Task.FromResult(clubId.ToString());
     }
 }

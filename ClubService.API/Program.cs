@@ -7,12 +7,8 @@ using ClubService.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Read values from appsettings
-var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
-
 // Repositories
 builder.Services.AddScoped<IEventRepository, MockEventRepository>();
-builder.Services.AddSingleton<IEventPublisher>(new RedisEventPublisher(redisConnectionString));
 
 // Services
 builder.Services.AddScoped<IRegisterTennisClubService, RegisterTennisClubService>();
