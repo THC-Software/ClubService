@@ -4,8 +4,15 @@ using ClubService.Application.Api;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("postgres-connection"));
+});
 
 // Repositories
 builder.Services.AddScoped<IEventRepository, MockEventRepository>();
