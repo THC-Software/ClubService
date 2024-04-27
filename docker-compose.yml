@@ -1,10 +1,17 @@
 ﻿services:
   clubservice:
     image: clubservice
+    container_name: "club-service"
     build:
       context: .
       dockerfile: ./Dockerfile
   redis:
     image: redis
+    container_name: "club-service-redis"
     ports:
       - "6379:6379"
+  debezium-postgres:
+    image: debezium/postgres
+    container_name: "club-service-postgres"
+    ports:
+      - "5432:5432"
