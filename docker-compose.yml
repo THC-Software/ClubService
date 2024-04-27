@@ -13,5 +13,9 @@
   debezium-postgres:
     image: debezium/postgres
     container_name: "club-service-postgres"
+    environment:
+      POSTGRES_USERNAME: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: club-service
     ports:
       - "5432:5432"
