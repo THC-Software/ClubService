@@ -3,10 +3,17 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Infrastructure;
 
-public class PostgresEventRepository : IEventRepository
+public class PostgresEventRepository(ApplicationDbContext applicationDbContext) : IEventRepository
 {
-    public void Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
+    public async Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
     {
-        throw new NotImplementedException();
+        await applicationDbContext.DomainEvents.AddAsync(new DomainEnvelope<IDomainEvent>(
+            domainEnvelope.EventId, 
+            domainEnvelope.EntityId,
+            domainEnvelope.EventType, 
+            domainEnvelope.EntityType, 
+            domainEnvelope.DomainEvent
+        ));
+        await applicationDbContext.SaveChangesAsync();
     }
 }

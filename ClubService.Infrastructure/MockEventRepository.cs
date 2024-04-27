@@ -7,7 +7,7 @@ public class MockEventRepository : IEventRepository
 {
     private static List<DomainEnvelope<IDomainEvent>> EVENTS = new();
 
-    public void Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
+    public Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
     {
         EVENTS.Add(new DomainEnvelope<IDomainEvent>(
             domainEnvelope.EventId, 
@@ -16,5 +16,6 @@ public class MockEventRepository : IEventRepository
             domainEnvelope.EntityType, 
             domainEnvelope.DomainEvent
         ));
+        return Task.FromResult("");
     }
 }

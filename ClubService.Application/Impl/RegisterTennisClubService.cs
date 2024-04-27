@@ -18,7 +18,7 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
 
         var tennisClubDomainEvents =
             tennisClub.ProcessTennisClubRegisterCommand(tennisClubRegisterCommand.Name,
-                tennisClubRegisterCommand.SubscriptionTier);
+                tennisClubRegisterCommand.SubscriptionTierId);
 
         foreach (var tennisClubDomainEvent in tennisClubDomainEvents)
         {

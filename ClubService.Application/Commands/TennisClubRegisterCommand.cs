@@ -1,7 +1,7 @@
 namespace ClubService.Application.Commands;
 
-public class TennisClubRegisterCommand(string name, string subscriptionTier)
+public class TennisClubRegisterCommand(string name, string subscriptionTierId)
 {
     public string Name { get; } = name;
-    public string SubscriptionTier { get; } = subscriptionTier;
+    public string SubscriptionTierId { get; } = subscriptionTierId;
 }

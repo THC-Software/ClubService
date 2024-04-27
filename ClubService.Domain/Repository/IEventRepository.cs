@@ -4,5 +4,5 @@ namespace ClubService.Domain.Repository;
 
 public interface IEventRepository
 {
-    void Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent;
+    Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent;
 }
