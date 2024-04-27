@@ -37,6 +37,5 @@ public class DomainEnvelopeConfiguration : IEntityTypeConfiguration<DomainEnvelo
             .HasConversion<string>(
                 v => JsonConvert.SerializeObject(v),
                 v => JsonConvert.DeserializeObject<IDomainEvent>(v));
-
     }
 }
