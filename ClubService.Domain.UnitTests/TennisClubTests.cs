@@ -5,7 +5,8 @@ using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.UnitTests;
 
-public class Tests
+[TestFixture]
+public class TennisClubTests
 {
     [Test]
     public void
