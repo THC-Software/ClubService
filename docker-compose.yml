@@ -11,7 +11,7 @@
     ports:
       - "6379:6379"
   debezium-postgres:
-    image: debezium/postgres
+    image: debezium/postgres:16-alpine
     container_name: "club-service-postgres"
     environment:
       POSTGRES_USER: user

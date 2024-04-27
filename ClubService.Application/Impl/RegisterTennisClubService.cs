@@ -9,7 +9,7 @@ namespace ClubService.Application.Impl;
 public class RegisterTennisClubService(IEventRepository eventRepository)
     : IRegisterTennisClubService
 {
-    public Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
+    public async Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         // TODO: Use Repository
         var clubId = Guid.NewGuid();
@@ -23,9 +23,9 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
         foreach (var tennisClubDomainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(tennisClubDomainEvent);
-            eventRepository.Save(tennisClubDomainEvent);
+            await eventRepository.Save(tennisClubDomainEvent);
         }
 
-        return Task.FromResult(clubId.ToString());
+        return clubId.ToString();
     }
 }
