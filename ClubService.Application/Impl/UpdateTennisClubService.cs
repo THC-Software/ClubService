@@ -13,29 +13,29 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
     {
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = TennisClub.Create(tennisClubId);
-
+        
         var existingDomainEvents =
             eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-
+        
         if (existingDomainEvents.Count == 0)
         {
             // TODO: Throw NotFoundException
-            throw new ArgumentException();
+            throw new ArgumentException("No events found!");
         }
-
+        
         foreach (var domainEvent in existingDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
-
+        
         var domainEvents = tennisClub.ProcessTennisClubLockCommand();
-
+        
         foreach (var domainEvent in domainEvents)
         {
             tennisClub.Apply(domainEvent);
             await eventRepository.Save(domainEvent);
         }
-
+        
         return clubId;
     }
 }
