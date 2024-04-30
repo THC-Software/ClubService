@@ -11,6 +11,7 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
 {
     public async Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
     {
+        // TODO: Validate command
         // TODO: Use Repository
         var clubId = Guid.NewGuid();
 
