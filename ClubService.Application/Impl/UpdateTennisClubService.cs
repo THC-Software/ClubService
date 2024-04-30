@@ -18,10 +18,17 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var domainEvents = eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
 
         if (domainEvents.Count == 0)
+        {
             // TODO: Throw NotFoundException
             throw new ArgumentException();
+        }
 
         // Apply all events on tennisClub
+        foreach (var domainEvent in domainEvents)
+        {
+            tennisClub.Apply(domainEvent);
+        }
+
         // Process LockTennisClub
         // Apply returned event
         // Check if there was no new event since the events were loaded

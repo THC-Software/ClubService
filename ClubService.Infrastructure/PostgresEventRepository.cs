@@ -24,10 +24,10 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
         await applicationDbContext.SaveChangesAsync();
     }
 
-    public List<DomainEnvelope<IDomainEvent>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
+    public List<DomainEnvelope<T>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
     {
         var sql = "SELECT * FROM \"DomainEvent\" WHERE \"entityId\" = @entityId";
-        var events = new List<DomainEnvelope<IDomainEvent>>();
+        var events = new List<DomainEnvelope<T>>();
 
         using (var command = applicationDbContext.Database.GetDbConnection().CreateCommand())
         {
@@ -47,9 +47,9 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                     var eventDataJson = result.GetString(result.GetOrdinal("EventData"));
 
                     // Determine the type of event and deserialize accordingly
-                    var eventData = DeserializeEventData(eventType, eventDataJson);
+                    var eventData = DeserializeEventData<T>(eventType, eventDataJson);
 
-                    events.Add(new DomainEnvelope<IDomainEvent>(
+                    events.Add(new DomainEnvelope<T>(
                         result.GetGuid(result.GetOrdinal("EventId")),
                         entityId,
                         eventType,
@@ -64,36 +64,108 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
         return events;
     }
 
-    private IDomainEvent DeserializeEventData(EventType eventType, string eventDataJson)
+    private T DeserializeEventData<T>(EventType eventType, string eventDataJson) where T : IDomainEvent
     {
         switch (eventType)
         {
             case EventType.TENNIS_CLUB_REGISTERED:
-                return JsonConvert.DeserializeObject<TennisClubRegisteredEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<TennisClubRegisteredEvent>(eventDataJson) is T
+                    tennisClubRegisteredEvent)
+                {
+                    return tennisClubRegisteredEvent;
+                }
+
+                break;
             case EventType.MEMBER_ACCOUNT_CREATED:
-                return JsonConvert.DeserializeObject<MemberAccountDomainEvent>(eventDataJson);
+                if (JsonConvert
+                        .DeserializeObject<MemberAccountDomainEvent>(eventDataJson) is T memberAccountDomainEvent)
+                {
+                    return memberAccountDomainEvent;
+                }
+
+                break;
             case EventType.MEMBER_ACCOUNT_LIMIT_EXCEEDED:
-                return JsonConvert.DeserializeObject<TennisClubMemberAccountLimitExceededEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<TennisClubMemberAccountLimitExceededEvent>(eventDataJson) is T
+                    tennisClubMemberAccountLimitExceededEvent)
+                {
+                    return tennisClubMemberAccountLimitExceededEvent;
+                }
+
+                break;
             case EventType.MEMBER_ACCOUNT_DELETED:
-                return JsonConvert.DeserializeObject<MemberAccountDeletedEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<MemberAccountDeletedEvent>(eventDataJson) is T
+                    memberAccountDeletedEvent)
+                {
+                    return memberAccountDeletedEvent;
+                }
+
+                break;
             case EventType.ADMIN_ACCOUNT_CREATED:
-                return JsonConvert.DeserializeObject<AdminAccountCreatedEvent>(eventDataJson);
+                if (JsonConvert
+                        .DeserializeObject<AdminAccountCreatedEvent>(eventDataJson) is T adminAccountCreatedEvent)
+                {
+                    return adminAccountCreatedEvent;
+                }
+
+                break;
             case EventType.ADMIN_ACCOUNT_DELETED:
-                return JsonConvert.DeserializeObject<AdminAccountDeletedEvent>(eventDataJson);
+                if (JsonConvert
+                        .DeserializeObject<AdminAccountDeletedEvent>(eventDataJson) is T adminAccountDeletedEvent)
+                {
+                    return adminAccountDeletedEvent;
+                }
+
+                break;
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
-                return JsonConvert.DeserializeObject<TennisClubSubscriptionTierChangedEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<TennisClubSubscriptionTierChangedEvent>(eventDataJson) is T
+                    tennisClubSubscriptionTierChangedEvent)
+                {
+                    return tennisClubSubscriptionTierChangedEvent;
+                }
+
+                break;
             case EventType.MEMBER_ACCOUNT_LOCKED:
-                return JsonConvert.DeserializeObject<MemberAccountLockedEvent>(eventDataJson);
+                if (JsonConvert
+                        .DeserializeObject<MemberAccountLockedEvent>(eventDataJson) is T memberAccountLockedEvent)
+                {
+                    return memberAccountLockedEvent;
+                }
+
+                break;
             case EventType.MEMBER_ACCOUNT_UNLOCKED:
-                return JsonConvert.DeserializeObject<MemberAccountUnlockedEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<MemberAccountUnlockedEvent>(eventDataJson) is T
+                    memberAccountUnlockedEvent)
+                {
+                    return memberAccountUnlockedEvent;
+                }
+
+                break;
             case EventType.MEMBER_ACCOUNT_UPDATED:
-                return JsonConvert.DeserializeObject<MemberAccountUpdatedEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<MemberAccountUpdatedEvent>(eventDataJson) is T
+                    memberAccountUpdatedEvent)
+                {
+                    return memberAccountUpdatedEvent;
+                }
+
+                break;
             case EventType.TENNIS_CLUB_LOCKED:
-                return JsonConvert.DeserializeObject<TennisClubLockedEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<TennisClubLockedEvent>(eventDataJson) is T tennisClubLockedEvent)
+                {
+                    return tennisClubLockedEvent;
+                }
+
+                break;
             case EventType.TENNIS_CLUB_UNLOCKED:
-                return JsonConvert.DeserializeObject<TennisClubUnlockedEvent>(eventDataJson);
+                if (JsonConvert.DeserializeObject<TennisClubUnlockedEvent>(eventDataJson) is T tennisClubUnlockedEvent)
+                {
+                    return tennisClubUnlockedEvent;
+                }
+
+                break;
             default:
                 throw new InvalidOperationException($"Unknown event type: {eventType}");
         }
+
+        throw new InvalidCastException($"Failed to cast deserialized object to type {typeof(T)}");
     }
 }

@@ -20,10 +20,8 @@ public class MockEventRepository : IEventRepository
         return Task.FromResult("");
     }
 
-    public List<DomainEnvelope<IDomainEvent>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
+    public List<DomainEnvelope<T>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
     {
-        return EVENTS
-            .Where(domainEvent => domainEvent.EntityId == entityId)
-            .ToList();
+        throw new NotImplementedException();
     }
 }
