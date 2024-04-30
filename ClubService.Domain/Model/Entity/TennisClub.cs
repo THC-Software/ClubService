@@ -28,12 +28,22 @@ public class TennisClub
         var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
         var memberIds = new List<MemberId>();
 
-        var tennisClubRegisteredEvent =
-            new TennisClubRegisteredEvent(TennisClubId, name, false, subscriptionTierId, memberIds);
+        var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
+            TennisClubId,
+            name,
+            false,
+            subscriptionTierId,
+            memberIds
+        );
 
-        var domainEnvelope =
-            new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), TennisClubId.Id,
-                EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, tennisClubRegisteredEvent);
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_REGISTERED,
+            EntityType.TENNIS_CLUB,
+            DateTime.Now,
+            tennisClubRegisteredEvent
+        );
 
         return [domainEnvelope];
     }

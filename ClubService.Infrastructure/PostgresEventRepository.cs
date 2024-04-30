@@ -12,6 +12,7 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
             domainEnvelope.EntityId,
             domainEnvelope.EventType, 
             domainEnvelope.EntityType, 
+            domainEnvelope.Timestamp,
             domainEnvelope.DomainEvent
         ));
         await applicationDbContext.SaveChangesAsync();

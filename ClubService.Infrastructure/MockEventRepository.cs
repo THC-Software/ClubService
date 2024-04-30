@@ -14,6 +14,7 @@ public class MockEventRepository : IEventRepository
             domainEnvelope.EntityId,
             domainEnvelope.EventType, 
             domainEnvelope.EntityType, 
+            domainEnvelope.Timestamp,
             domainEnvelope.DomainEvent
         ));
         return Task.FromResult("");
