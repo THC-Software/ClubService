@@ -6,7 +6,7 @@ public class DomainEnvelope<T>(
     EventType eventType,
     EntityType entityType,
     DateTime timestamp,
-    T domainEvent) where T : IDomainEvent
+    T eventData) where T : IDomainEvent
 {
     public long Id { get; }
     public Guid EventId { get; } = eventId;
@@ -14,5 +14,5 @@ public class DomainEnvelope<T>(
     public EventType EventType { get; } = eventType;
     public EntityType EntityType { get; } = entityType;
     public DateTime Timestamp { get; } = timestamp;
-    public T DomainEvent { get; } = domainEvent;
+    public T EventData { get; } = eventData;
 }

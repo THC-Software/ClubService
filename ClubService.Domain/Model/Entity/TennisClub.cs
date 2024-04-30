@@ -6,16 +6,16 @@ namespace ClubService.Domain.Model.Entity;
 
 public class TennisClub
 {
+    private TennisClub(TennisClubId tennisClubId)
+    {
+        TennisClubId = tennisClubId;
+    }
+
     public TennisClubId TennisClubId { get; private set; }
     public string Name { get; private set; }
     public bool IsLocked { get; private set; }
     public SubscriptionTierId SubscriptionTierId { get; private set; }
     public List<MemberId> MemberIds { get; private set; }
-
-    private TennisClub(TennisClubId tennisClubId)
-    {
-        TennisClubId = tennisClubId;
-    }
 
     public static TennisClub Create(TennisClubId id)
     {
@@ -41,7 +41,7 @@ public class TennisClub
             TennisClubId.Id,
             EventType.TENNIS_CLUB_REGISTERED,
             EntityType.TENNIS_CLUB,
-            DateTime.Now,
+            DateTime.UtcNow,
             tennisClubRegisteredEvent
         );
 
@@ -53,7 +53,7 @@ public class TennisClub
         switch (domainEnvelope.EventType)
         {
             case EventType.TENNIS_CLUB_REGISTERED:
-                Apply((TennisClubRegisteredEvent)domainEnvelope.DomainEvent);
+                Apply((TennisClubRegisteredEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
                 break;
@@ -92,7 +92,7 @@ public class TennisClub
     {
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((TennisClub)obj);
     }
 

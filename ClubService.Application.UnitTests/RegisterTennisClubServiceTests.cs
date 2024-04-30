@@ -32,6 +32,6 @@ public class RegisterTennisClubServiceTests
         eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_REGISTERED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
-            e.DomainEvent.GetType() == typeof(TennisClubRegisteredEvent))), Times.Once);
+            e.EventData.GetType() == typeof(TennisClubRegisteredEvent))), Times.Once);
     }
 }

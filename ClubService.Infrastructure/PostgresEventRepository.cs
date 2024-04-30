@@ -8,12 +8,12 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
     public async Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
     {
         await applicationDbContext.DomainEvents.AddAsync(new DomainEnvelope<IDomainEvent>(
-            domainEnvelope.EventId, 
+            domainEnvelope.EventId,
             domainEnvelope.EntityId,
-            domainEnvelope.EventType, 
-            domainEnvelope.EntityType, 
+            domainEnvelope.EventType,
+            domainEnvelope.EntityType,
             domainEnvelope.Timestamp,
-            domainEnvelope.DomainEvent
+            domainEnvelope.EventData
         ));
         await applicationDbContext.SaveChangesAsync();
     }

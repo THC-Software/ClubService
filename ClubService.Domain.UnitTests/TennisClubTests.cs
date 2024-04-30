@@ -33,7 +33,7 @@ public class TennisClubTests
         Assert.That(domainEnvelope.EventType, Is.EqualTo(EventType.TENNIS_CLUB_REGISTERED));
         Assert.That(domainEnvelope.EntityType, Is.EqualTo(EntityType.TENNIS_CLUB));
 
-        var tennisClubRegisteredEvent = domainEnvelope.DomainEvent as TennisClubRegisteredEvent;
+        var tennisClubRegisteredEvent = domainEnvelope.EventData as TennisClubRegisteredEvent;
         Assert.That(tennisClubRegisteredEvent, Is.Not.Null);
         Assert.That(tennisClubRegisteredEvent.TennisClubId, Is.EqualTo(tennisClubIdExpected));
         Assert.That(tennisClubRegisteredEvent.Name, Is.EqualTo(nameExpected));
@@ -59,7 +59,7 @@ public class TennisClubTests
 
         var domainEnvelope =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubIdExpected.Id,
-                EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, tennisClubRegisteredEvent);
+                EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
 
         // When
         tennisClub.Apply(domainEnvelope);

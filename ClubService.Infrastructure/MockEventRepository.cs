@@ -5,17 +5,17 @@ namespace ClubService.Infrastructure;
 
 public class MockEventRepository : IEventRepository
 {
-    private static List<DomainEnvelope<IDomainEvent>> EVENTS = new();
+    private static readonly List<DomainEnvelope<IDomainEvent>> EVENTS = new();
 
     public Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
     {
         EVENTS.Add(new DomainEnvelope<IDomainEvent>(
-            domainEnvelope.EventId, 
+            domainEnvelope.EventId,
             domainEnvelope.EntityId,
-            domainEnvelope.EventType, 
-            domainEnvelope.EntityType, 
+            domainEnvelope.EventType,
+            domainEnvelope.EntityType,
             domainEnvelope.Timestamp,
-            domainEnvelope.DomainEvent
+            domainEnvelope.EventData
         ));
         return Task.FromResult("");
     }
