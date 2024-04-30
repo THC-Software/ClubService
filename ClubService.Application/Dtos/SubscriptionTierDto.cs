@@ -1,4 +1,4 @@
-namespace ClubService.Application.Dto;
+namespace ClubService.Application.Dtos;
 
 public class SubscriptionTierDto(string subscriptionTierId, string name, int maxMemberCount)
 {

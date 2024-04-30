@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ClubService.Application.Dto;
+namespace ClubService.Application.Commands;
 
-public class MemberCreateUpdateDto(string firstName, string lastName, string email)
+public class MemberRegisterCommand(string firstName, string lastName, string email)
 {
     [Required] public string FirstName { get; } = firstName;
 

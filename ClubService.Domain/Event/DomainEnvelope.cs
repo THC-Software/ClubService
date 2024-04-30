@@ -1,5 +1,3 @@
-using ClubService.Domain.Event;
-
 namespace ClubService.Domain.Event;
 
 public class DomainEnvelope<T>(
@@ -7,11 +5,14 @@ public class DomainEnvelope<T>(
     Guid entityId,
     EventType eventType,
     EntityType entityType,
-    T domainEvent) where T : IDomainEvent
+    DateTime timestamp,
+    T eventData) where T : IDomainEvent
 {
+    public long Id { get; }
     public Guid EventId { get; } = eventId;
     public Guid EntityId { get; } = entityId;
     public EventType EventType { get; } = eventType;
     public EntityType EntityType { get; } = entityType;
-    public T DomainEvent { get; } = domainEvent;
+    public DateTime Timestamp { get; } = timestamp;
+    public T EventData { get; } = eventData;
 }

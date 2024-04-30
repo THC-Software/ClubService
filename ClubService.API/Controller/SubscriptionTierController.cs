@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using ClubService.Application.Dto;
+using ClubService.Application.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;

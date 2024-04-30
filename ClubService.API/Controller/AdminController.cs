@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using ClubService.Application.Dto;
+using ClubService.Application.Commands;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -10,7 +10,7 @@ namespace ClubService.API.Controller;
 public class AdminController
 {
     [HttpPost]
-    public async Task<ActionResult<string>> CreateAdmin(AdminCreateDto adminCreateDto)
+    public async Task<ActionResult<string>> CreateAdmin(AdminRegisterCommand adminRegisterCommand)
     {
         return await Task.FromResult("");
     }
