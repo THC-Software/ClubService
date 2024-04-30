@@ -8,30 +8,33 @@ namespace ClubService.Application.Impl;
 
 public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdateTennisClubService
 {
-    public string LockTennisClub(string clubId)
+    // TODO: Ensure that there were no other events added during processing locking the tennis club
+    public async Task<string> LockTennisClub(string clubId)
     {
-        // Create blank tennis club with given id
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = TennisClub.Create(tennisClubId);
 
-        // Get events for tennis club with tennisClubId
-        var domainEvents = eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+        var existingDomainEvents =
+            eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
 
-        if (domainEvents.Count == 0)
+        if (existingDomainEvents.Count == 0)
         {
             // TODO: Throw NotFoundException
             throw new ArgumentException();
         }
 
-        // Apply all events on tennisClub
-        foreach (var domainEvent in domainEvents)
+        foreach (var domainEvent in existingDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
 
-        // Process LockTennisClub
-        // Apply returned event
-        // Check if there was no new event since the events were loaded
+        var domainEvents = tennisClub.ProcessTennisClubLockCommand();
+
+        foreach (var domainEvent in domainEvents)
+        {
+            tennisClub.Apply(domainEvent);
+            await eventRepository.Save(domainEvent);
+        }
 
         return clubId;
     }

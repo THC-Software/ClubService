@@ -28,7 +28,8 @@ public class TennisClubController(
     }
 
     [HttpPut("{clubId}")]
-    public async Task<ActionResult<string>> UpdateTennisClub(string clubId,
+    public async Task<ActionResult<string>> UpdateTennisClub(
+        string clubId,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
         return await Task.FromResult(Ok());
@@ -37,6 +38,6 @@ public class TennisClubController(
     [HttpPost("{clubId}/lock")]
     public async Task<ActionResult<string>> LockTennisClub(string clubId)
     {
-        return await Task.FromResult(updateTennisClubService.LockTennisClub(clubId));
+        return await updateTennisClubService.LockTennisClub(clubId);
     }
 }

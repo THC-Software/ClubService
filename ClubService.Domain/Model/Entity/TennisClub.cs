@@ -48,6 +48,22 @@ public class TennisClub
         return [domainEnvelope];
     }
 
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubLockCommand()
+    {
+        var tennisClubLockedEvent = new TennisClubLockedEvent();
+
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_LOCKED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            tennisClubLockedEvent
+        );
+
+        return [domainEnvelope];
+    }
+
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -58,6 +74,7 @@ public class TennisClub
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
                 break;
             case EventType.TENNIS_CLUB_LOCKED:
+                Apply((TennisClubLockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_UNLOCKED:
                 break;
@@ -81,6 +98,12 @@ public class TennisClub
         IsLocked = tennisClubRegisteredEvent.IsLocked;
         SubscriptionTierId = tennisClubRegisteredEvent.SubscriptionTierId;
         MemberIds = tennisClubRegisteredEvent.MemberIds;
+    }
+
+    private void Apply(TennisClubLockedEvent tennisClubLockedEvent)
+    {
+        // Paremeter is only in method signature to distinguish the Apply method from the others
+        IsLocked = true;
     }
 
     protected bool Equals(TennisClub other)
