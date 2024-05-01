@@ -6,4 +6,7 @@ public interface IEventRepository
 {
     Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent;
     List<DomainEnvelope<T>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent;
+    Task BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
 }

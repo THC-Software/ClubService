@@ -1,4 +1,5 @@
 using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
@@ -8,7 +9,6 @@ namespace ClubService.Application.Impl;
 
 public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdateTennisClubService
 {
-    // TODO: Ensure that there were no other events added during processing locking the tennis club
     public async Task<string> LockTennisClub(string clubId)
     {
         var tennisClubId = new TennisClubId(new Guid(clubId));
@@ -19,9 +19,10 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         
         if (existingDomainEvents.Count == 0)
         {
-            // TODO: Throw NotFoundException
-            throw new ArgumentException("No events found!");
+            throw new TennisClubNotFoundException("No events found!");
         }
+        
+        var initialEventCount = existingDomainEvents.Count;
         
         foreach (var domainEvent in existingDomainEvents)
         {
@@ -30,10 +31,31 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         
         var domainEvents = tennisClub.ProcessTennisClubLockCommand();
         
-        foreach (var domainEvent in domainEvents)
+        try
         {
-            tennisClub.Apply(domainEvent);
-            await eventRepository.Save(domainEvent);
+            await eventRepository.BeginTransactionAsync();
+            
+            foreach (var domainEvent in domainEvents)
+            {
+                tennisClub.Apply(domainEvent);
+                await eventRepository.Save(domainEvent);
+            }
+            
+            existingDomainEvents =
+                eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            
+            if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
+            {
+                throw new InvalidOperationException(
+                    "Additional events added during processing locking the tennis club!");
+            }
+            
+            await eventRepository.CommitTransactionAsync();
+        }
+        catch (InvalidOperationException)
+        {
+            await eventRepository.RollbackTransactionAsync();
+            throw;
         }
         
         return clubId;

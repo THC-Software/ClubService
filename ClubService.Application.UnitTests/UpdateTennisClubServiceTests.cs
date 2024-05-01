@@ -1,3 +1,4 @@
+using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Impl;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
@@ -33,17 +34,29 @@ public class UpdateTennisClubServiceTests
         var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(tennisClubId, name, isLocked,
                 subscriptionTierId, memberIds);
-        
-        var domainEnvelope =
+        var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
-        var existingDomainEvents = new List<DomainEnvelope<ITennisClubDomainEvent>>
+        
+        var tennisClubLockedEvent = new TennisClubLockedEvent();
+        var domainEnvelopeTennisClubLocked =
+            new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
+                EventType.TENNIS_CLUB_LOCKED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubLockedEvent);
+        
+        var existingDomainEventsBeforeLock = new List<DomainEnvelope<ITennisClubDomainEvent>>
         {
-            domainEnvelope
+            domainEnvelopeTennisClubRegistered
         };
         
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(existingDomainEvents);
+        var existingDomainEventsAfterLock = new List<DomainEnvelope<ITennisClubDomainEvent>>
+        {
+            domainEnvelopeTennisClubRegistered,
+            domainEnvelopeTennisClubLocked
+        };
+        
+        _eventRepositoryMock.SetupSequence(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+            .Returns(existingDomainEventsBeforeLock)
+            .Returns(existingDomainEventsAfterLock);
         
         // When
         _ = await _updateTennisClubService.LockTennisClub(tennisClubId.Id.ToString());
@@ -53,6 +66,8 @@ public class UpdateTennisClubServiceTests
             e.EventType == EventType.TENNIS_CLUB_LOCKED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubLockedEvent))), Times.Once);
+        _eventRepositoryMock.Verify(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id),
+            Times.Exactly(2));
     }
     
     [Test]
@@ -64,6 +79,6 @@ public class UpdateTennisClubServiceTests
             .Returns(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
         // When ... Then
-        Assert.ThrowsAsync<ArgumentException>(() => _updateTennisClubService.LockTennisClub(clubId));
+        Assert.ThrowsAsync<TennisClubNotFoundException>(() => _updateTennisClubService.LockTennisClub(clubId));
     }
 }
