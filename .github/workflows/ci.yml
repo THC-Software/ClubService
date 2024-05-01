@@ -20,6 +20,8 @@ jobs:
         
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Cache SonarCloud packages
       uses: actions/cache@v3
@@ -32,7 +34,7 @@ jobs:
       id: cache-sonar-scanner
       uses: actions/cache@v3
       with:
-        path: ./.sonar/scanner  # Updated path to Linux style
+        path: ./.sonar/scanner 
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
 
@@ -52,10 +54,10 @@ jobs:
       
     - name: Build and Test
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
-        ./.sonar/scanner/dotnet-sonarscanner begin /k:"THC-Software_ClubService" /o:"thc-software" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+        ./.sonar/scanner/dotnet-sonarscanner begin /k:"THC-Software_ClubService" /o:"thc-software" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/*.xml"
         dotnet build --no-restore
         dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
         ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
