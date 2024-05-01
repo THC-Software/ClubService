@@ -13,6 +13,8 @@ public class TennisClubTests
         GivenValidInputs_WhenProcessTennisClubRegisterCommand_ThenReturnsDomainEnvelopeWithTennisClubRegisteredEvent()
     {
         // Given
+        var eventTypeExpected = EventType.TENNIS_CLUB_REGISTERED;
+        var entityTypeExpected = EntityType.TENNIS_CLUB;
         var tennisClubIdExpected = new TennisClubId(Guid.NewGuid());
         var nameExpected = "Test Tennis Club";
         var isLockedExpected = false;
@@ -32,8 +34,8 @@ public class TennisClubTests
         Assert.Multiple(() =>
         {
             Assert.That(domainEnvelope.EntityId, Is.EqualTo(tennisClubIdExpected.Id));
-            Assert.That(domainEnvelope.EventType, Is.EqualTo(EventType.TENNIS_CLUB_REGISTERED));
-            Assert.That(domainEnvelope.EntityType, Is.EqualTo(EntityType.TENNIS_CLUB));
+            Assert.That(domainEnvelope.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(domainEnvelope.EntityType, Is.EqualTo(entityTypeExpected));
         });
         
         var tennisClubRegisteredEvent = domainEnvelope.EventData as TennisClubRegisteredEvent;
@@ -79,6 +81,51 @@ public class TennisClubTests
             Assert.That(tennisClub.SubscriptionTierId, Is.EqualTo(subscriptionTierIdExpected));
             Assert.That(tennisClub.MemberIds, Is.EqualTo(memberIdsExpected));
         });
+    }
+    
+    [Test]
+    public void GivenUnlockedTennisClub_WhenLockTennisClub_ThenTennisClubLockedEventIsReturned()
+    {
+        // Given
+        var eventTypeExpected = EventType.TENNIS_CLUB_LOCKED;
+        var entityTypeExpected = EntityType.TENNIS_CLUB;
+        var tennisClubIdExpected = new TennisClubId(Guid.NewGuid());
+        var name = "Test Tennis Club";
+        var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
+        var tennisClub = TennisClub.Create(tennisClubIdExpected);
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+            .ForEach(domainEvent => tennisClub.Apply(domainEvent));
+        
+        // When
+        var domainEnvelopes = tennisClub.ProcessTennisClubLockCommand();
+        
+        // Then
+        Assert.That(domainEnvelopes, Is.Not.Null);
+        Assert.That(domainEnvelopes, Has.Count.EqualTo(1));
+        
+        var domainEnvelope = domainEnvelopes[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(domainEnvelope.EntityId, Is.EqualTo(tennisClubIdExpected.Id));
+            Assert.That(domainEnvelope.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(domainEnvelope.EntityType, Is.EqualTo(entityTypeExpected));
+        });
+    }
+    
+    [Test]
+    public void GivenLockedTennisClub_WhenLockTennisClub_ThenExceptionIsThrown()
+    {
+        // Given
+        var tennisClubIdExpected = new TennisClubId(Guid.NewGuid());
+        var name = "Test Tennis Club";
+        var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
+        var tennisClub = TennisClub.Create(tennisClubIdExpected);
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+            .ForEach(domainEvent => tennisClub.Apply(domainEvent));
+        tennisClub.ProcessTennisClubLockCommand().ForEach(domainEvent => tennisClub.Apply(domainEvent));
+        
+        // When ... Then
+        Assert.Throws<InvalidOperationException>(() => tennisClub.ProcessTennisClubLockCommand());
     }
     
     [Test]
