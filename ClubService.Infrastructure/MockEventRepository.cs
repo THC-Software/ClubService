@@ -6,7 +6,7 @@ namespace ClubService.Infrastructure;
 public class MockEventRepository : IEventRepository
 {
     private static readonly List<DomainEnvelope<IDomainEvent>> EVENTS = new();
-
+    
     public Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
     {
         EVENTS.Add(new DomainEnvelope<IDomainEvent>(
@@ -18,5 +18,25 @@ public class MockEventRepository : IEventRepository
             domainEnvelope.EventData
         ));
         return Task.FromResult("");
+    }
+    
+    public List<DomainEnvelope<T>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
+    {
+        throw new NotImplementedException();
+    }
+    
+    public Task BeginTransactionAsync()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public Task CommitTransactionAsync()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public Task RollbackTransactionAsync()
+    {
+        throw new NotImplementedException();
     }
 }

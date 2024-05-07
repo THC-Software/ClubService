@@ -2,6 +2,7 @@ using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Event.Member;
 
+// TODO: RENAME!
 public class MemberAccountDomainEvent(
     MemberId id,
     FullName name,

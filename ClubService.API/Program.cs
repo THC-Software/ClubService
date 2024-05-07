@@ -21,6 +21,7 @@ builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
 
 // Services
 builder.Services.AddScoped<IRegisterTennisClubService, RegisterTennisClubService>();
+builder.Services.AddScoped<IUpdateTennisClubService, UpdateTennisClubService>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>

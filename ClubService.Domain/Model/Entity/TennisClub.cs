@@ -10,24 +10,25 @@ public class TennisClub
     {
         TennisClubId = tennisClubId;
     }
-
+    
     public TennisClubId TennisClubId { get; private set; }
     public string Name { get; private set; }
     public bool IsLocked { get; private set; }
     public SubscriptionTierId SubscriptionTierId { get; private set; }
     public List<MemberId> MemberIds { get; private set; }
-
+    
     public static TennisClub Create(TennisClubId id)
     {
         return new TennisClub(id);
     }
-
-    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(string name,
+    
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(
+        string name,
         string subscriptionTierIdStr)
     {
         var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
         var memberIds = new List<MemberId>();
-
+        
         var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
             TennisClubId,
             name,
@@ -35,7 +36,7 @@ public class TennisClub
             subscriptionTierId,
             memberIds
         );
-
+        
         var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
             Guid.NewGuid(),
             TennisClubId.Id,
@@ -44,10 +45,31 @@ public class TennisClub
             DateTime.UtcNow,
             tennisClubRegisteredEvent
         );
-
+        
         return [domainEnvelope];
     }
-
+    
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubLockCommand()
+    {
+        if (IsLocked)
+        {
+            throw new InvalidOperationException("Tennis Club is already locked!");
+        }
+        
+        var tennisClubLockedEvent = new TennisClubLockedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_LOCKED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            tennisClubLockedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -58,6 +80,7 @@ public class TennisClub
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
                 break;
             case EventType.TENNIS_CLUB_LOCKED:
+                Apply((TennisClubLockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_UNLOCKED:
                 break;
@@ -73,7 +96,7 @@ public class TennisClub
                 throw new ArgumentOutOfRangeException();
         }
     }
-
+    
     private void Apply(TennisClubRegisteredEvent tennisClubRegisteredEvent)
     {
         TennisClubId = tennisClubRegisteredEvent.TennisClubId;
@@ -82,12 +105,18 @@ public class TennisClub
         SubscriptionTierId = tennisClubRegisteredEvent.SubscriptionTierId;
         MemberIds = tennisClubRegisteredEvent.MemberIds;
     }
-
+    
+    private void Apply(TennisClubLockedEvent tennisClubLockedEvent)
+    {
+        // Paremeter is only in method signature to distinguish the Apply method from the others
+        IsLocked = true;
+    }
+    
     protected bool Equals(TennisClub other)
     {
         return TennisClubId.Equals(other.TennisClubId);
     }
-
+    
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
@@ -95,7 +124,7 @@ public class TennisClub
         if (obj.GetType() != GetType()) return false;
         return Equals((TennisClub)obj);
     }
-
+    
     public override int GetHashCode()
     {
         return TennisClubId.GetHashCode();
