@@ -70,6 +70,27 @@ public class TennisClub
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUnlockCommand()
+    {
+        if (!IsLocked)
+        {
+            throw new InvalidOperationException("Tennis Club needs to be locked!");
+        }
+        
+        var tennisClubUnlockedEvent = new TennisClubUnlockedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_UNLOCKED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            tennisClubUnlockedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -83,6 +104,7 @@ public class TennisClub
                 Apply((TennisClubLockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_UNLOCKED:
+                Apply((TennisClubUnlockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_ACCOUNT_CREATED:
             case EventType.MEMBER_ACCOUNT_LIMIT_EXCEEDED:
@@ -106,10 +128,16 @@ public class TennisClub
         MemberIds = tennisClubRegisteredEvent.MemberIds;
     }
     
+    // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(TennisClubLockedEvent tennisClubLockedEvent)
     {
-        // Paremeter is only in method signature to distinguish the Apply method from the others
         IsLocked = true;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(TennisClubUnlockedEvent tennisClubUnlockedEvent)
+    {
+        IsLocked = false;
     }
     
     protected bool Equals(TennisClub other)
@@ -119,9 +147,21 @@ public class TennisClub
     
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != GetType()) return false;
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+        
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+        
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+        
         return Equals((TennisClub)obj);
     }
     
