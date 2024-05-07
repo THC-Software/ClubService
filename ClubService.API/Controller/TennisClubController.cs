@@ -19,14 +19,14 @@ public class TennisClubController(
         var memberDtos = new List<MemberDto>();
         return await Task.FromResult(memberDtos);
     }
-
+    
     [HttpPost]
     public async Task<ActionResult<string>> RegisterTennisClub(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         return await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
     }
-
+    
     [HttpPut("{clubId}")]
     public async Task<ActionResult<string>> UpdateTennisClub(
         string clubId,
@@ -34,10 +34,16 @@ public class TennisClubController(
     {
         return await Task.FromResult(Ok());
     }
-
+    
     [HttpPost("{clubId}/lock")]
     public async Task<ActionResult<string>> LockTennisClub(string clubId)
     {
         return await updateTennisClubService.LockTennisClub(clubId);
+    }
+    
+    [HttpDelete("{clubId}/lock")]
+    public async Task<ActionResult<string>> UnlockTennisClub(string clubId)
+    {
+        return await updateTennisClubService.UnlockTennisClub(clubId);
     }
 }
