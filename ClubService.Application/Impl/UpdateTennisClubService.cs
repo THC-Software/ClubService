@@ -60,4 +60,9 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         
         return clubId;
     }
+    
+    public Task<string> UnlockTennisClub(string clubId)
+    {
+        throw new NotImplementedException();
+    }
 }
