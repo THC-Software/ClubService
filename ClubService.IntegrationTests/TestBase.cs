@@ -11,6 +11,7 @@ public class TestBase : WebApplicationFactory<Program>
     private WebApplicationFactory<Program> _factory;
     private PostgreSqlContainer _postgresContainer;
     protected HttpClient HttpClient;
+    protected PostgresEventRepository PostgresEventRepository;
     
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
@@ -36,6 +37,8 @@ public class TestBase : WebApplicationFactory<Program>
                     throw new Exception("Could not create Scope");
         _dbContext = scope.ServiceProvider.GetService<ApplicationDbContext>() ??
                      throw new Exception("Could not get ApplicationDbContext");
+        
+        PostgresEventRepository = new PostgresEventRepository(_dbContext);
     }
     
     [SetUp]
