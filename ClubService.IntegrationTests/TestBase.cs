@@ -7,6 +7,7 @@ namespace ClubService.IntegrationTests;
 
 public class TestBase : WebApplicationFactory<Program>
 {
+    private DataSeeder _dataSeeder;
     private ApplicationDbContext _dbContext;
     private WebApplicationFactory<Program> _factory;
     private PostgreSqlContainer _postgresContainer;
@@ -39,12 +40,14 @@ public class TestBase : WebApplicationFactory<Program>
                      throw new Exception("Could not get ApplicationDbContext");
         
         PostgresEventRepository = new PostgresEventRepository(_dbContext);
+        _dataSeeder = new DataSeeder(_dbContext);
     }
     
     [SetUp]
     public async Task Setup()
     {
         await _dbContext.Database.EnsureCreatedAsync();
+        await _dataSeeder.SeedTestData();
     }
     
     [OneTimeTearDown]
