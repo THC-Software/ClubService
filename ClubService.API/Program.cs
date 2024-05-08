@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
-
+    
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<ApplicationDbContext>();
@@ -58,3 +58,8 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.Run();
+
+// For integration tests
+public partial class Program
+{
+}
