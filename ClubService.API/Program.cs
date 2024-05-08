@@ -54,8 +54,6 @@ if (app.Environment.IsDevelopment())
     var dbContext = services.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.EnsureDeleted();
     dbContext.Database.EnsureCreated();
-    var dataSeeder = new DataSeeder(dbContext);
-    await dataSeeder.SeedTestData();
 }
 
 app.MapControllers();
