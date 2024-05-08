@@ -34,6 +34,27 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                     false,
                     new SubscriptionTierId(new Guid("20698bde-5b82-4129-a72f-145ea96d8be7")),
                     [])
+            ),
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("e3d63ccb-7f1d-43c1-b44e-2221dce70998"),
+                new Guid("6a463e1a-6b0f-4825-83c3-911f12f80076"),
+                EventType.TENNIS_CLUB_REGISTERED,
+                EntityType.TENNIS_CLUB,
+                DateTime.UtcNow,
+                new TennisClubRegisteredEvent(
+                    new TennisClubId(new Guid("6a463e1a-6b0f-4825-83c3-911f12f80076")),
+                    "Tennis CLub 2",
+                    false,
+                    new SubscriptionTierId(new Guid("20698bde-5b82-4129-a72f-145ea96d8be7")),
+                    [])
+            ),
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("b0457bfe-e8c5-4831-a10f-9e66490b4332"),
+                new Guid("6a463e1a-6b0f-4825-83c3-911f12f80076"),
+                EventType.TENNIS_CLUB_LOCKED,
+                EntityType.TENNIS_CLUB,
+                DateTime.UtcNow.AddHours(1),
+                new TennisClubLockedEvent()
             )
         );
     }
