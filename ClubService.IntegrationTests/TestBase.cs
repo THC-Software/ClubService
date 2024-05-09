@@ -45,18 +45,7 @@ public class TestBase : WebApplicationFactory<Program>
     [SetUp]
     public async Task Setup()
     {
-        // TODO: Fix Npgsql.PostgresException (0x80004005): 57P01: terminating connection due to administrator command
-        // With establishing new connection it works
-        try
-        {
-            await _dbContext.Database.EnsureCreatedAsync();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            await _dbContext.Database.CloseConnectionAsync();
-            await _dbContext.Database.EnsureCreatedAsync();
-        }
+        await _dbContext.Database.EnsureCreatedAsync();
     }
     
     [OneTimeTearDown]
@@ -71,6 +60,6 @@ public class TestBase : WebApplicationFactory<Program>
     [TearDown]
     public async Task TearDown()
     {
-        await _dbContext.Database.EnsureDeletedAsync();
+        await _dbContext.Database.ExecuteSqlRawAsync("DROP TABLE \"DomainEvent\"");
     }
 }
