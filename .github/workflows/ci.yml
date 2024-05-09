@@ -52,13 +52,20 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       
-    - name: Build and Test
+    - name: Start SonarScan
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        ./.sonar/scanner/dotnet-sonarscanner begin /k:"THC-Software_ClubService" /o:"thc-software" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="ClubService.*.*Tests/TestResults/**/*.xml"
-        dotnet build --no-restore
-        dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage;Format=opencover"
-        ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      run: ./.sonar/scanner/dotnet-sonarscanner begin /k:"THC-Software_ClubService" /o:"thc-software" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="ClubService.*.*Tests/TestResults/**/*.xml"
       
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage;Format=opencover"
+      
+    - name: End SonarScan
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
