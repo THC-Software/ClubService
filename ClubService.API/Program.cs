@@ -57,3 +57,8 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.Run();
+
+// For integration tests
+public abstract partial class Program
+{
+}

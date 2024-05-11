@@ -1,58 +1,13 @@
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.ValueObject;
-using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
+using ClubService.IntegrationTests.TestSetup;
 
-namespace ClubService.Infrastructure.IntegrationTests;
+namespace ClubService.IntegrationTests.Repository;
 
 [TestFixture]
-public class EventRepositoryTests
+public class EventRepositoryTests : TestBase
 {
-    [OneTimeSetUp]
-    public async Task OneTimeSetup()
-    {
-        _postgresContainer = new PostgreSqlBuilder()
-            .WithImage("debezium/postgres:16-alpine")
-            .WithUsername("user")
-            .WithPassword("password")
-            .WithDatabase("club-service")
-            .WithPortBinding(5432, true)
-            .Build();
-        
-        await _postgresContainer.StartAsync();
-        
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseNpgsql(_postgresContainer.GetConnectionString())
-            .Options;
-        
-        _dbContext = new ApplicationDbContext(options);
-        
-        _eventRepository = new PostgresEventRepository(_dbContext);
-    }
-    
-    [SetUp]
-    public async Task Setup()
-    {
-        await _dbContext.Database.EnsureCreatedAsync();
-    }
-    
-    [OneTimeTearDown]
-    public async Task OneTimeTearDown()
-    {
-        await _postgresContainer.StopAsync();
-    }
-    
-    [TearDown]
-    public async Task TearDown()
-    {
-        await _dbContext.Database.EnsureDeletedAsync();
-    }
-    
-    private PostgreSqlContainer _postgresContainer;
-    private ApplicationDbContext _dbContext;
-    private PostgresEventRepository _eventRepository;
-    
     [Test]
     public async Task GivenDomainEvent_WhenSave_ThenEventIsSavedInDatabase()
     {
@@ -67,10 +22,11 @@ public class EventRepositoryTests
                 tennisClubRegisteredEventExpected);
         
         // When
-        await _eventRepository.Save(domainEnvelopeExpected);
+        await EventRepository.Save(domainEnvelopeExpected);
         
         // Then
-        var savedEvents = _eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
+        var savedEvents =
+            EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
         Assert.That(savedEvents, Has.Count.EqualTo(1));
         
         var domainEnvelopeActual = savedEvents[0];
