@@ -12,8 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options
-        .UseNpgsql(builder.Configuration.GetConnectionString("postgres-connection"))
-        .UseCamelCaseNamingConvention();
+        .UseNpgsql(builder.Configuration.GetConnectionString("postgres-connection"));
 });
 
 // Repositories

@@ -10,6 +10,12 @@ namespace ClubService.Infrastructure;
 public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env) : DbContext(options)
 {
     public DbSet<DomainEnvelope<IDomainEvent>> DomainEvents { get; init; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.UseCamelCaseNamingConvention();
+    }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
