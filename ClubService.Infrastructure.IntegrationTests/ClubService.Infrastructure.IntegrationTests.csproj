@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ClubService.Infrastructure\ClubService.Infrastructure.csproj"/>
+        <ProjectReference Include="..\ClubService.IntegrationTests\ClubService.IntegrationTests.csproj"/>
     </ItemGroup>
 
 </Project>
