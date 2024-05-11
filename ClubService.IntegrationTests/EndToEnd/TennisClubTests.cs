@@ -2,9 +2,10 @@ using System.Text;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.IntegrationTests.TestSetup;
 using Newtonsoft.Json;
 
-namespace ClubService.IntegrationTests;
+namespace ClubService.IntegrationTests.EndToEnd;
 
 [TestFixture]
 public class TennisClubTests : TestBase
@@ -33,7 +34,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         
         var storedEvents =
-            PostgresEventRepository
+            EventRepository
                 .GetEventsForEntity<
                     ITennisClubDomainEvent>(
                     Guid.Parse(responseContent));
@@ -74,7 +75,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = PostgresEventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];
@@ -107,7 +108,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = PostgresEventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[2];

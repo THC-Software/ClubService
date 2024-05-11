@@ -1,21 +1,20 @@
+using ClubService.Domain.Repository;
 using ClubService.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 
-namespace ClubService.IntegrationTests;
+namespace ClubService.IntegrationTests.TestSetup;
 
-public class TestBase : WebApplicationFactory<Program>
+public class TestBase
 {
     private ApplicationDbContext _dbContext;
-    private WebApplicationFactory<Program> _factory;
+    private WebAppFactory _factory;
     private PostgreSqlContainer _postgresContainer;
+    protected IEventRepository EventRepository;
     protected HttpClient HttpClient;
-    protected PostgresEventRepository PostgresEventRepository;
     
-    [OneTimeSetUp]
-    public async Task OneTimeSetUp()
+    [SetUp]
+    public async Task Setup()
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
         
@@ -24,42 +23,32 @@ public class TestBase : WebApplicationFactory<Program>
             .WithUsername("user")
             .WithPassword("password")
             .WithDatabase("club-service-test")
-            .WithPortBinding(35053, 5432)
+            .WithPortBinding(5432, true)
             .Build();
         
         await _postgresContainer.StartAsync();
         
-        _factory = new WebApplicationFactory<Program>();
+        _factory = new WebAppFactory(_postgresContainer.GetConnectionString());
         HttpClient = _factory.CreateClient();
         
         var scopeFactory = _factory.Services.GetService<IServiceScopeFactory>() ??
                            throw new Exception("Scope factory not found");
         var scope = scopeFactory.CreateScope() ??
                     throw new Exception("Could not create Scope");
+        
         _dbContext = scope.ServiceProvider.GetService<ApplicationDbContext>() ??
                      throw new Exception("Could not get ApplicationDbContext");
-        
-        PostgresEventRepository = new PostgresEventRepository(_dbContext);
-    }
-    
-    [SetUp]
-    public async Task Setup()
-    {
+        EventRepository = scope.ServiceProvider.GetService<IEventRepository>() ??
+                          throw new Exception("Could not get EventRepository");
         await _dbContext.Database.EnsureCreatedAsync();
-    }
-    
-    [OneTimeTearDown]
-    public async Task OneTimeTearDown()
-    {
-        HttpClient.Dispose();
-        await _factory.DisposeAsync();
-        await _dbContext.DisposeAsync();
-        await _postgresContainer.StopAsync();
     }
     
     [TearDown]
     public async Task TearDown()
     {
-        await _dbContext.Database.ExecuteSqlRawAsync("DROP TABLE \"DomainEvent\"");
+        HttpClient.Dispose();
+        await _factory.DisposeAsync();
+        await _dbContext.DisposeAsync();
+        await _postgresContainer.StopAsync();
     }
 }

@@ -1,8 +1,9 @@
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.ValueObject;
+using ClubService.IntegrationTests.TestSetup;
 
-namespace ClubService.IntegrationTests;
+namespace ClubService.IntegrationTests.Repository;
 
 [TestFixture]
 public class EventRepositoryTests : TestBase
@@ -21,11 +22,11 @@ public class EventRepositoryTests : TestBase
                 tennisClubRegisteredEventExpected);
         
         // When
-        await PostgresEventRepository.Save(domainEnvelopeExpected);
+        await EventRepository.Save(domainEnvelopeExpected);
         
         // Then
         var savedEvents =
-            PostgresEventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
+            EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
         Assert.That(savedEvents, Has.Count.EqualTo(1));
         
         var domainEnvelopeActual = savedEvents[0];
