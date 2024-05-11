@@ -1,11 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.API", "ClubService.API\ClubService.API.csproj", "{3C883C3F-3EA2-4D02-B65C-A9B9813A07A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.API", "src\ClubService.API\ClubService.API.csproj", "{3C883C3F-3EA2-4D02-B65C-A9B9813A07A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Application", "ClubService.Application\ClubService.Application.csproj", "{E32783FE-DE70-47BD-BC38-4ABB740611E9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Application", "src\ClubService.Application\ClubService.Application.csproj", "{E32783FE-DE70-47BD-BC38-4ABB740611E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Domain", "ClubService.Domain\ClubService.Domain.csproj", "{3C3C989C-89B3-4383-95F4-7CD7B9F12E4C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Domain", "src\ClubService.Domain\ClubService.Domain.csproj", "{3C3C989C-89B3-4383-95F4-7CD7B9F12E4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Infrastructure", "ClubService.Infrastructure\ClubService.Infrastructure.csproj", "{F1E42F54-09B9-440C-8241-40FB92062C0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Infrastructure", "src\ClubService.Infrastructure\ClubService.Infrastructure.csproj", "{F1E42F54-09B9-440C-8241-40FB92062C0B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C8A51A56-BF26-4381-AE2A-8EB455052AF7}"
 EndProject
@@ -19,11 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E56459C7-70BB-4A4A-AD5D-6FF435800999}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Domain.UnitTests", "ClubService.Domain.UnitTests\ClubService.Domain.UnitTests.csproj", "{9FFED88B-78DC-4D01-A879-FBA8ED42EDD2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Domain.UnitTests", "tests\ClubService.Domain.UnitTests\ClubService.Domain.UnitTests.csproj", "{9FFED88B-78DC-4D01-A879-FBA8ED42EDD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Application.UnitTests", "ClubService.Application.UnitTests\ClubService.Application.UnitTests.csproj", "{EC5A1251-3EE4-4652-8F3E-47F75820DD20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.Application.UnitTests", "tests\ClubService.Application.UnitTests\ClubService.Application.UnitTests.csproj", "{EC5A1251-3EE4-4652-8F3E-47F75820DD20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.IntegrationTests", "ClubService.IntegrationTests\ClubService.IntegrationTests.csproj", "{4B2ECAA1-7519-4BD5-AB9D-71925549F439}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClubService.IntegrationTests", "tests\ClubService.IntegrationTests\ClubService.IntegrationTests.csproj", "{4B2ECAA1-7519-4BD5-AB9D-71925549F439}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

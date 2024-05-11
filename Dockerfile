@@ -7,10 +7,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ClubService.API/ClubService.API.csproj", "ClubService.API/"]
-COPY ["ClubService.Application/ClubService.Application.csproj", "ClubService.Application/"]
+COPY ["src/ClubService.API/ClubService.API.csproj", "ClubService.API/"]
+COPY ["src/ClubService.Application/ClubService.Application.csproj", "ClubService.Application/"]
 RUN dotnet restore "ClubService.API/ClubService.API.csproj"
-COPY . .
+COPY src .
 WORKDIR "/src/ClubService.API"
 RUN dotnet build "ClubService.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
