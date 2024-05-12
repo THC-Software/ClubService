@@ -1,3 +1,4 @@
+using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Application.Impl;
 using ClubService.Domain.Event;
@@ -21,9 +22,6 @@ public class RegisterTennisClubServiceTests
     
     private RegisterTennisClubService _registerTennisClubService;
     private Mock<IEventRepository> _eventRepositoryMock;
-    
-    // TODO: Add test if validation works
-    // TODO: Add test for the case that the subscription tier does not exist
     
     [Test]
     public async Task GivenValidInputs_WhenRegisterTennisClub_ThenRepoIsCalledWithExpectedEvent()
@@ -60,5 +58,46 @@ public class RegisterTennisClubServiceTests
             e.EventType == EventType.TENNIS_CLUB_REGISTERED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubRegisteredEvent))), Times.Once);
+    }
+    
+    [Test]
+    public void GivenInvalidName_WhenRegisterTennisClub_ThenExceptionIsThrown()
+    {
+        // Given
+        var tennisClubRegisterCommand =
+            new TennisClubRegisterCommand("", Guid.NewGuid().ToString());
+        
+        // When ... Then
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand));
+    }
+    
+    [Test]
+    public void GivenInvalidSubscriptionTierId_WhenRegisterTennisClub_ThenExceptionIsThrown()
+    {
+        // Given
+        var tennisClubRegisterCommand =
+            new TennisClubRegisterCommand("Test", "");
+        
+        // When ... Then
+        Assert.ThrowsAsync<ArgumentException>(async () =>
+            await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand));
+    }
+    
+    [Test]
+    public void GivenNonExistentSubscriptionTierId_WhenRegisterTennisClub_ThenExceptionIsThrown()
+    {
+        // Given
+        var subscriptionTierId = Guid.NewGuid();
+        var tennisClubRegisterCommand =
+            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId.ToString());
+        List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents = [];
+        
+        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))
+            .Returns(subscriptionTierDomainEvents);
+        
+        // When ... Then
+        Assert.ThrowsAsync<SubscriptionTierNotFoundException>(async () =>
+            await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand));
     }
 }
