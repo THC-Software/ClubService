@@ -21,7 +21,8 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_REGISTERED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubRegisteredEvent);
-        var registerTennisClubCommand = new TennisClubRegisterCommand("Test", Guid.NewGuid().ToString());
+        var subscriptionTierIdExpected = new Guid("38888969-d579-46ec-9cd6-0208569a077e");
+        var registerTennisClubCommand = new TennisClubRegisterCommand("Test", subscriptionTierIdExpected.ToString());
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerTennisClubCommand), Encoding.UTF8,
             "application/json");
         
@@ -33,11 +34,7 @@ public class TennisClubTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         
-        var storedEvents =
-            EventRepository
-                .GetEventsForEntity<
-                    ITennisClubDomainEvent>(
-                    Guid.Parse(responseContent));
+        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(Guid.Parse(responseContent));
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         var storedEvent = storedEvents[0];
         Assert.Multiple(() =>
@@ -51,8 +48,8 @@ public class TennisClubTests : TestBase
         {
             Assert.That(tennisClubRegisteredEventActual.Name, Is.EqualTo(registerTennisClubCommand.Name));
             Assert.That(tennisClubRegisteredEventActual.IsLocked, Is.False);
-            Assert.That(tennisClubRegisteredEventActual.SubscriptionTierId.Id.ToString(),
-                Is.EqualTo(registerTennisClubCommand.SubscriptionTierId));
+            Assert.That(tennisClubRegisteredEventActual.SubscriptionTierId.Id,
+                Is.EqualTo(subscriptionTierIdExpected));
         });
     }
     

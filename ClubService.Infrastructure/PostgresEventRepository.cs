@@ -1,6 +1,7 @@
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.Member;
+using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -177,6 +178,14 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 if (JsonConvert.DeserializeObject<TennisClubUnlockedEvent>(eventDataJson) is T tennisClubUnlockedEvent)
                 {
                     return tennisClubUnlockedEvent;
+                }
+                
+                break;
+            case EventType.SUBSCRIPTION_TIER_CREATED:
+                if (JsonConvert.DeserializeObject<SubscriptionTierCreatedEvent>(eventDataJson) is T
+                    subscriptionTierCreatedEvent)
+                {
+                    return subscriptionTierCreatedEvent;
                 }
                 
                 break;
