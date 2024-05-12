@@ -1,3 +1,5 @@
+using ClubService.Domain.Event;
+using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Model.Entity;
@@ -24,6 +26,16 @@ public class Admin
         return new Admin(id, username, name, tennisClubId, isDeleted: false);
     }
 
+    public void Apply(DomainEnvelope<IAdminDomainEvent> domainEnvelope)
+    {
+        switch (domainEnvelope.EventType)
+        {
+            case EventType.ADMIN_ACCOUNT_REGISTERED:
+                break;
+        }
+    }
+    
+    
     protected bool Equals(Admin other)
     {
         return Id.Equals(other.Id);

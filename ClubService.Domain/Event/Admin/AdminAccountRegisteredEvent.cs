@@ -2,7 +2,7 @@ using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Event.Admin;
 
-public class AdminAccountCreatedEvent(
+public class AdminAccountRegisteredEvent(
     AdminId id,
     string username,
     FullName name,

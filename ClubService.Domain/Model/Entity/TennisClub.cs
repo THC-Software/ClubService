@@ -64,7 +64,7 @@ public class TennisClub
             case EventType.MEMBER_ACCOUNT_CREATED:
             case EventType.MEMBER_ACCOUNT_LIMIT_EXCEEDED:
             case EventType.MEMBER_ACCOUNT_DELETED:
-            case EventType.ADMIN_ACCOUNT_CREATED:
+            case EventType.ADMIN_ACCOUNT_REGISTERED:
             case EventType.ADMIN_ACCOUNT_DELETED:
             case EventType.MEMBER_ACCOUNT_LOCKED:
             case EventType.MEMBER_ACCOUNT_UNLOCKED:

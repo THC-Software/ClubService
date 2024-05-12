@@ -1,5 +1,8 @@
 using Asp.Versioning;
 using ClubService.Application.Commands;
+using ClubService.Domain.Event;
+using ClubService.Domain.Model.Entity;
+using ClubService.Domain.Model.ValueObject;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
