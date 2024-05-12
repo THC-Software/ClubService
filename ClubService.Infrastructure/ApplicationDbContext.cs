@@ -61,7 +61,7 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 new SubscriptionTierCreatedEvent(
                     new SubscriptionTierId(new Guid("2bebd11c-bf8e-4448-886f-0cb8608af7ca")),
                     "Bronze Subscription Tier",
-                    150)
+                    100)
             ),
             // Tennis Clubs
             new DomainEnvelope<IDomainEvent>(
