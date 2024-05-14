@@ -1,6 +1,5 @@
 namespace ClubService.Application.Api.Exceptions;
 
-[Serializable]
 public class TennisClubNotFoundException : Exception
 {
     public TennisClubNotFoundException()
