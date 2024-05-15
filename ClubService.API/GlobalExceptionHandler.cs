@@ -13,7 +13,6 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
         var problemDetails = new ProblemDetails
         {
-            Type = exception.GetType().Name,
             Detail = exception.Message
         };
         
@@ -21,10 +20,12 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             case TennisClubNotFoundException:
             case SubscriptionTierNotFoundException:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.5";
                 problemDetails.Status = StatusCodes.Status404NotFound;
                 problemDetails.Title = exception.GetType().Name;
                 break;
             default:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
                 problemDetails.Status = StatusCodes.Status500InternalServerError;
                 problemDetails.Title = "Internal Server Error";
                 break;
