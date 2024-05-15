@@ -21,10 +21,13 @@ public class TennisClubController(
     }
     
     [HttpPost]
-    public async Task<ActionResult<string>> RegisterTennisClub(
+    [ProducesResponseType<string>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RegisterTennisClub(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
-        return await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
+        var registeredTennisClubId = await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
+        return Ok(registeredTennisClubId);
     }
     
     [HttpPut("{clubId}")]

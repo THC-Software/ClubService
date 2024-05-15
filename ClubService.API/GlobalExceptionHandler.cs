@@ -1,3 +1,4 @@
+using ClubService.Application.Api.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,24 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status500InternalServerError,
             Type = exception.GetType().Name,
-            Title = "An unhandled error occurred",
             Detail = exception.Message
         };
+        
+        switch (exception)
+        {
+            case TennisClubNotFoundException:
+            case SubscriptionTierNotFoundException:
+                problemDetails.Status = StatusCodes.Status404NotFound;
+                problemDetails.Title = exception.GetType().Name;
+                break;
+            default:
+                problemDetails.Status = StatusCodes.Status500InternalServerError;
+                problemDetails.Title = "Internal Server Error";
+                break;
+        }
+        
+        httpContext.Response.StatusCode = (int)problemDetails.Status;
         
         await httpContext
             .Response
