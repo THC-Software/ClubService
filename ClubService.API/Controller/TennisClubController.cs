@@ -28,7 +28,7 @@ public class TennisClubController(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         var registeredTennisClubId = await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
-        return Ok(registeredTennisClubId);
+        return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
     
     [HttpPut("{clubId}")]
