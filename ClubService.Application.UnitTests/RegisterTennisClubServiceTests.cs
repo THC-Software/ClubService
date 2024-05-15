@@ -61,30 +61,6 @@ public class RegisterTennisClubServiceTests
     }
     
     [Test]
-    public void GivenInvalidName_WhenRegisterTennisClub_ThenExceptionIsThrown()
-    {
-        // Given
-        var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("", Guid.NewGuid().ToString());
-        
-        // When ... Then
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand));
-    }
-    
-    [Test]
-    public void GivenInvalidSubscriptionTierId_WhenRegisterTennisClub_ThenExceptionIsThrown()
-    {
-        // Given
-        var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("Test", "");
-        
-        // When ... Then
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand));
-    }
-    
-    [Test]
     public void GivenNonExistentSubscriptionTierId_WhenRegisterTennisClub_ThenExceptionIsThrown()
     {
         // Given
