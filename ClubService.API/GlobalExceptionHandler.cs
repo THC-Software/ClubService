@@ -24,6 +24,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Status = StatusCodes.Status404NotFound;
                 problemDetails.Title = "Not Found";
                 break;
+            case ConcurrencyException:
             case ConflictException:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.10";
                 problemDetails.Status = StatusCodes.Status409Conflict;
