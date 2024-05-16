@@ -22,7 +22,12 @@ public class GlobalExceptionHandler : IExceptionHandler
             case SubscriptionTierNotFoundException:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.5";
                 problemDetails.Status = StatusCodes.Status404NotFound;
-                problemDetails.Title = exception.GetType().Name;
+                problemDetails.Title = "Not Found";
+                break;
+            case ConflictException:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.10";
+                problemDetails.Status = StatusCodes.Status409Conflict;
+                problemDetails.Title = "Conflict";
                 break;
             default:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
@@ -31,7 +36,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                 break;
         }
         
-        httpContext.Response.StatusCode = (int)problemDetails.Status;
+        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
         
         await httpContext
             .Response
