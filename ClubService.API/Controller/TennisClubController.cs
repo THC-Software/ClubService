@@ -24,6 +24,7 @@ public class TennisClubController(
     [ProducesResponseType<string>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegisterTennisClub(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
@@ -40,14 +41,24 @@ public class TennisClubController(
     }
     
     [HttpPost("{clubId}/lock")]
+    [ProducesResponseType<string>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<string>> LockTennisClub(string clubId)
     {
-        return await updateTennisClubService.LockTennisClub(clubId);
+        var lockedTennisClubId = await updateTennisClubService.LockTennisClub(clubId);
+        return Ok(lockedTennisClubId);
     }
     
     [HttpDelete("{clubId}/lock")]
+    [ProducesResponseType<string>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<string>> UnlockTennisClub(string clubId)
     {
-        return await updateTennisClubService.UnlockTennisClub(clubId);
+        var unlockedTennisClubId = await updateTennisClubService.UnlockTennisClub(clubId);
+        return Ok(unlockedTennisClubId);
     }
 }
