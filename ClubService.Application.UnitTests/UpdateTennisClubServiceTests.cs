@@ -11,8 +11,8 @@ namespace ClubService.Application.UnitTests;
 [TestFixture]
 public class UpdateTennisClubServiceTests
 {
-    [SetUp]
-    public void Setup()
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
         _updateTennisClubService = new UpdateTennisClubService(_eventRepositoryMock.Object);
@@ -148,5 +148,72 @@ public class UpdateTennisClubServiceTests
         
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() => _updateTennisClubService.UnlockTennisClub(clubId));
+    }
+    
+    [Test]
+    public async Task GivenDifferentSubscriptionTierId_WhenChangeSubscriptionTier_ThenRepoIsCalledWithExpectedEvent()
+    {
+        // Given
+        var tennisClubId = new TennisClubId(Guid.NewGuid());
+        var name = "Test Tennis Club";
+        var isLocked = false;
+        var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
+        var newSubscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
+        List<MemberId> memberIds = [];
+        
+        var tennisClubRegisteredEvent =
+            new TennisClubRegisteredEvent(tennisClubId, name, isLocked,
+                subscriptionTierId, memberIds);
+        var domainEnvelopeTennisClubRegistered =
+            new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
+                EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
+        
+        var tennisClubSubscriptionTierChangedEvent =
+            new TennisClubSubscriptionTierChangedEvent(newSubscriptionTierId);
+        var domainEnvelopeTennisClubSubscriptionTierChanged =
+            new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
+                EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED, EntityType.TENNIS_CLUB,
+                DateTime.UtcNow, tennisClubSubscriptionTierChangedEvent);
+        
+        var existingDomainEventsBefore = new List<DomainEnvelope<ITennisClubDomainEvent>>
+        {
+            domainEnvelopeTennisClubRegistered
+        };
+        
+        var existingDomainEventsAfter = new List<DomainEnvelope<ITennisClubDomainEvent>>
+        {
+            domainEnvelopeTennisClubRegistered,
+            domainEnvelopeTennisClubSubscriptionTierChanged
+        };
+        
+        _eventRepositoryMock.SetupSequence(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+            .Returns(existingDomainEventsBefore)
+            .Returns(existingDomainEventsAfter);
+        
+        // When
+        _ = await _updateTennisClubService.ChangeSubscriptionTier(tennisClubId.Id.ToString(),
+            newSubscriptionTierId.Id.ToString());
+        
+        // Then
+        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+            e.EventType == EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED &&
+            e.EntityType == EntityType.TENNIS_CLUB &&
+            e.EventData.GetType() == typeof(TennisClubSubscriptionTierChangedEvent))), Times.Once);
+        _eventRepositoryMock.Verify(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id),
+            Times.Exactly(2));
+    }
+    
+    [Test]
+    public void GivenNonExistentTennisClubId_WhenChangeSubscriptionTier_ThenExceptionIsThrown()
+    {
+        // Given
+        var clubId = Guid.NewGuid().ToString();
+        var subscriptionTierId = Guid.NewGuid().ToString();
+        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+            .Returns(new List<DomainEnvelope<ITennisClubDomainEvent>>());
+        
+        // When ... Then
+        Assert.ThrowsAsync<TennisClubNotFoundException>(() =>
+            _updateTennisClubService.ChangeSubscriptionTier(clubId, subscriptionTierId));
     }
 }
