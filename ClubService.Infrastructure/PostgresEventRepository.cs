@@ -95,15 +95,15 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
-            case EventType.MEMBER_ACCOUNT_CREATED:
+            case EventType.MEMBER_REGISTERED:
                 if (JsonConvert
-                        .DeserializeObject<MemberAccountDomainEvent>(eventDataJson) is T memberAccountDomainEvent)
+                        .DeserializeObject<MemberDomainEvent>(eventDataJson) is T memberAccountDomainEvent)
                 {
                     return memberAccountDomainEvent;
                 }
                 
                 break;
-            case EventType.MEMBER_ACCOUNT_LIMIT_EXCEEDED:
+            case EventType.MEMBER_LIMIT_EXCEEDED:
                 if (JsonConvert.DeserializeObject<TennisClubMemberAccountLimitExceededEvent>(eventDataJson) is T
                     tennisClubMemberAccountLimitExceededEvent)
                 {
@@ -111,25 +111,25 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
-            case EventType.MEMBER_ACCOUNT_DELETED:
-                if (JsonConvert.DeserializeObject<MemberAccountDeletedEvent>(eventDataJson) is T
+            case EventType.MEMBER_DELETED:
+                if (JsonConvert.DeserializeObject<MemberDeletedEvent>(eventDataJson) is T
                     memberAccountDeletedEvent)
                 {
                     return memberAccountDeletedEvent;
                 }
                 
                 break;
-            case EventType.ADMIN_ACCOUNT_CREATED:
+            case EventType.ADMIN_REGISTERED:
                 if (JsonConvert
-                        .DeserializeObject<AdminAccountCreatedEvent>(eventDataJson) is T adminAccountCreatedEvent)
+                        .DeserializeObject<AdminRegisteredEvent>(eventDataJson) is T adminAccountCreatedEvent)
                 {
                     return adminAccountCreatedEvent;
                 }
                 
                 break;
-            case EventType.ADMIN_ACCOUNT_DELETED:
+            case EventType.ADMIN_DELETED:
                 if (JsonConvert
-                        .DeserializeObject<AdminAccountDeletedEvent>(eventDataJson) is T adminAccountDeletedEvent)
+                        .DeserializeObject<AdminDeletedEvent>(eventDataJson) is T adminAccountDeletedEvent)
                 {
                     return adminAccountDeletedEvent;
                 }
@@ -143,24 +143,24 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
-            case EventType.MEMBER_ACCOUNT_LOCKED:
+            case EventType.MEMBER_LOCKED:
                 if (JsonConvert
-                        .DeserializeObject<MemberAccountLockedEvent>(eventDataJson) is T memberAccountLockedEvent)
+                        .DeserializeObject<MemberLockedEvent>(eventDataJson) is T memberAccountLockedEvent)
                 {
                     return memberAccountLockedEvent;
                 }
                 
                 break;
-            case EventType.MEMBER_ACCOUNT_UNLOCKED:
-                if (JsonConvert.DeserializeObject<MemberAccountUnlockedEvent>(eventDataJson) is T
+            case EventType.MEMBER_UNLOCKED:
+                if (JsonConvert.DeserializeObject<MemberUnlockedEvent>(eventDataJson) is T
                     memberAccountUnlockedEvent)
                 {
                     return memberAccountUnlockedEvent;
                 }
                 
                 break;
-            case EventType.MEMBER_ACCOUNT_UPDATED:
-                if (JsonConvert.DeserializeObject<MemberAccountUpdatedEvent>(eventDataJson) is T
+            case EventType.MEMBER_UPDATED:
+                if (JsonConvert.DeserializeObject<MemberUpdatedEvent>(eventDataJson) is T
                     memberAccountUpdatedEvent)
                 {
                     return memberAccountUpdatedEvent;

@@ -106,14 +106,14 @@ public class TennisClub
             case EventType.TENNIS_CLUB_UNLOCKED:
                 Apply((TennisClubUnlockedEvent)domainEnvelope.EventData);
                 break;
-            case EventType.MEMBER_ACCOUNT_CREATED:
-            case EventType.MEMBER_ACCOUNT_LIMIT_EXCEEDED:
-            case EventType.MEMBER_ACCOUNT_DELETED:
-            case EventType.ADMIN_ACCOUNT_REGISTERED:
-            case EventType.ADMIN_ACCOUNT_DELETED:
-            case EventType.MEMBER_ACCOUNT_LOCKED:
-            case EventType.MEMBER_ACCOUNT_UNLOCKED:
-            case EventType.MEMBER_ACCOUNT_UPDATED:
+            case EventType.MEMBER_REGISTERED:
+            case EventType.MEMBER_LIMIT_EXCEEDED:
+            case EventType.MEMBER_DELETED:
+            case EventType.ADMIN_REGISTERED:
+            case EventType.ADMIN_DELETED:
+            case EventType.MEMBER_LOCKED:
+            case EventType.MEMBER_UNLOCKED:
+            case EventType.MEMBER_UPDATED:
             default:
                 throw new ArgumentOutOfRangeException();
         }

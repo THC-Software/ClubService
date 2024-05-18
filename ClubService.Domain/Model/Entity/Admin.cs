@@ -30,7 +30,7 @@ public class Admin
     {
         switch (domainEnvelope.EventType)
         {
-            case EventType.ADMIN_ACCOUNT_REGISTERED:
+            case EventType.ADMIN_REGISTERED:
                 break;
         }
     }
