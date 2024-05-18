@@ -94,11 +94,6 @@ public class TennisClub
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeSubscriptionTierCommand(
         string subscriptionTierIdStr)
     {
-        if (IsLocked)
-        {
-            throw new InvalidOperationException("Tennis Club is locked!");
-        }
-        
         if (subscriptionTierIdStr.Equals(SubscriptionTierId.Id.ToString()))
         {
             throw new InvalidOperationException("This subscription tier is already set!");
