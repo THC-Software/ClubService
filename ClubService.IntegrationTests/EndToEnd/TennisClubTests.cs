@@ -14,7 +14,7 @@ public class TennisClubTests : TestBase
     
     [Test]
     public async Task
-        GivenRegisterTennisClubCommand_WhenRegisterTennisClub_ThenRegisterTennisClubEventExistsInRepository()
+        GivenRegisterTennisClubCommand_WhenRegisterTennisClub_ThenTennisClubRegisteredEventExistsInRepository()
     {
         // Given
         var numberOfEventsExpected = 1;
@@ -116,5 +116,46 @@ public class TennisClubTests : TestBase
             Assert.That(storedEvent.EntityId, Is.EqualTo(clubIdExpected));
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
+    }
+    
+    [Test]
+    public async Task
+        GivenUpdateTennisClubCommand_WhenUpdateTennisClub_ThenTennisClubSubscriptionTierChangedEventExistsInRepositoryAndIdIsReturned()
+    {
+        // Given
+        var numberOfEventsExpected = 2;
+        var clubIdExpected = new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3");
+        var eventTypeExpected = EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED;
+        var entityTypeExpected = EntityType.TENNIS_CLUB;
+        var eventDataTypeExpected = typeof(TennisClubSubscriptionTierChangedEvent);
+        var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, Guid.NewGuid().ToString());
+        var jsonContent = JsonConvert.SerializeObject(tennisClubUpdateCommand);
+        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        
+        // When
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected.ToString()}", content);
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
+        
+        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var storedEvent = storedEvents[1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
+            Assert.That(storedEvent.EntityId, Is.EqualTo(clubIdExpected));
+            Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
+        
+        var tennisClubSubscriptionTierChangedEventActual =
+            (TennisClubSubscriptionTierChangedEvent)storedEvent.EventData;
+        Assert.That(tennisClubSubscriptionTierChangedEventActual.SubscriptionTierId.Id.ToString(),
+            Is.EqualTo(tennisClubUpdateCommand.SubscriptionTierId));
     }
 }

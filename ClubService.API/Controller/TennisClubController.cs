@@ -33,13 +33,16 @@ public class TennisClubController(
     }
     
     [HttpPatch("{clubId}")]
-    public ActionResult<string> UpdateTennisClub(
+    public async Task<ActionResult<string>> UpdateTennisClub(
         string clubId,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
         if (tennisClubUpdateCommand.SubscriptionTierId != null)
         {
-            updateTennisClubService.ChangeSubscriptionTier(clubId, tennisClubUpdateCommand.SubscriptionTierId);
+            var updatedTennisClubId =
+                await updateTennisClubService.ChangeSubscriptionTier(clubId,
+                    tennisClubUpdateCommand.SubscriptionTierId);
+            return Ok(updatedTennisClubId);
         }
         
         if (tennisClubUpdateCommand.Name != null)
