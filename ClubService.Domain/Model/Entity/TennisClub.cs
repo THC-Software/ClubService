@@ -128,6 +128,7 @@ public class TennisClub
                 Apply((TennisClubRegisteredEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
+                Apply((TennisClubSubscriptionTierChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_LOCKED:
                 Apply((TennisClubLockedEvent)domainEnvelope.EventData);
@@ -143,6 +144,7 @@ public class TennisClub
             case EventType.MEMBER_ACCOUNT_LOCKED:
             case EventType.MEMBER_ACCOUNT_UNLOCKED:
             case EventType.MEMBER_ACCOUNT_UPDATED:
+            case EventType.SUBSCRIPTION_TIER_CREATED:
             default:
                 throw new ArgumentException(
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity TennisClub!");
@@ -168,6 +170,11 @@ public class TennisClub
     private void Apply(TennisClubUnlockedEvent tennisClubUnlockedEvent)
     {
         IsLocked = false;
+    }
+    
+    private void Apply(TennisClubSubscriptionTierChangedEvent tennisClubSubscriptionTierChangedEvent)
+    {
+        SubscriptionTierId = tennisClubSubscriptionTierChangedEvent.SubscriptionTierId;
     }
     
     protected bool Equals(TennisClub other)
