@@ -12,8 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options
-        .UseNpgsql(builder.Configuration.GetConnectionString("postgres-connection"))
-        .UseCamelCaseNamingConvention();
+        .UseNpgsql(builder.Configuration.GetConnectionString("postgres-connection"));
 });
 
 // Repositories
@@ -21,6 +20,7 @@ builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
 
 // Services
 builder.Services.AddScoped<IRegisterTennisClubService, RegisterTennisClubService>();
+builder.Services.AddScoped<IUpdateTennisClubService, UpdateTennisClubService>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -47,7 +47,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
-
+    
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<ApplicationDbContext>();
@@ -57,3 +57,8 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.Run();
+
+// For integration tests
+public abstract partial class Program
+{
+}
