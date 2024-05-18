@@ -94,7 +94,30 @@ public class TennisClub
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeSubscriptionTierCommand(
         string subscriptionTierIdStr)
     {
-        return [];
+        if (IsLocked)
+        {
+            throw new InvalidOperationException("Tennis Club is locked!");
+        }
+        
+        if (subscriptionTierIdStr.Equals(SubscriptionTierId.Id.ToString()))
+        {
+            throw new InvalidOperationException("This subscription tier is already set!");
+        }
+        
+        var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
+        
+        var subscriptionTierChangedEvent = new TennisClubSubscriptionTierChangedEvent(subscriptionTierId);
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            subscriptionTierChangedEvent
+        );
+        
+        return [domainEnvelope];
     }
     
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
