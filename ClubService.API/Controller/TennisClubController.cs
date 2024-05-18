@@ -32,12 +32,23 @@ public class TennisClubController(
         return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
     
-    [HttpPut("{clubId}")]
-    public async Task<ActionResult<string>> UpdateTennisClub(
+    [HttpPatch("{clubId}")]
+    public ActionResult<string> UpdateTennisClub(
         string clubId,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
-        return await Task.FromResult(Ok());
+        if (tennisClubUpdateCommand.SubscriptionTierId != null)
+        {
+            updateTennisClubService.ChangeSubscriptionTier(clubId, tennisClubUpdateCommand.SubscriptionTierId);
+        }
+        
+        if (tennisClubUpdateCommand.Name != null)
+        {
+            // TODO: Implement
+            throw new NotImplementedException("Currently it is not possible to update the name of a tennis club.");
+        }
+        
+        return Ok("");
     }
     
     [HttpPost("{clubId}/lock")]

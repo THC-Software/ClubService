@@ -91,6 +91,12 @@ public class TennisClub
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeSubscriptionTierCommand(
+        string subscriptionTierIdStr)
+    {
+        return [];
+    }
+    
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
