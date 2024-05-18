@@ -41,6 +41,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
+// Global Exception Handler
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -56,6 +60,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.UseExceptionHandler();
 app.Run();
 
 // For integration tests

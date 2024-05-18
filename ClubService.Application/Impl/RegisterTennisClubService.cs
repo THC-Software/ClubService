@@ -13,12 +13,6 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
 {
     public async Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
     {
-        if (string.IsNullOrWhiteSpace(tennisClubRegisterCommand.Name) ||
-            string.IsNullOrWhiteSpace(tennisClubRegisterCommand.SubscriptionTierId))
-        {
-            throw new ArgumentException("You have to provide a name and a subscription tier!");
-        }
-        
         var subscriptionTierId = new Guid(tennisClubRegisterCommand.SubscriptionTierId);
         var subscriptionTierDomainEvents =
             eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId);

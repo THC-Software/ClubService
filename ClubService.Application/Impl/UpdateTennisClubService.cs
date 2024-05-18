@@ -31,10 +31,10 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             tennisClub.Apply(domainEvent);
         }
         
-        var domainEvents = tennisClub.ProcessTennisClubLockCommand();
-        
         try
         {
+            var domainEvents = tennisClub.ProcessTennisClubLockCommand();
+            
             await eventRepository.BeginTransactionAsync();
             
             foreach (var domainEvent in domainEvents)
@@ -48,13 +48,17 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
-                throw new InvalidOperationException(
+                throw new ConcurrencyException(
                     "Additional events added during processing locking the tennis club!");
             }
             
             await eventRepository.CommitTransactionAsync();
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException ex)
+        {
+            throw new ConflictException(ex.Message, ex);
+        }
+        catch (ConcurrencyException)
         {
             await eventRepository.RollbackTransactionAsync();
             throw;
@@ -85,10 +89,10 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             tennisClub.Apply(domainEvent);
         }
         
-        var domainEvents = tennisClub.ProcessTennisClubUnlockCommand();
-        
         try
         {
+            var domainEvents = tennisClub.ProcessTennisClubUnlockCommand();
+            
             await eventRepository.BeginTransactionAsync();
             
             foreach (var domainEvent in domainEvents)
@@ -102,13 +106,17 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
-                throw new InvalidOperationException(
+                throw new ConcurrencyException(
                     "Additional events added during processing unlocking the tennis club!");
             }
             
             await eventRepository.CommitTransactionAsync();
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException ex)
+        {
+            throw new ConflictException(ex.Message, ex);
+        }
+        catch (ConcurrencyException)
         {
             await eventRepository.RollbackTransactionAsync();
             throw;
