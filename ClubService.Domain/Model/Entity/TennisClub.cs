@@ -115,7 +115,8 @@ public class TennisClub
             case EventType.MEMBER_UNLOCKED:
             case EventType.MEMBER_UPDATED:
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentException(
+                    $"{nameof(domainEnvelope.EventType)} is not supported for the entity TennisClub!");
         }
     }
     

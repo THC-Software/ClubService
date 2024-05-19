@@ -21,10 +21,15 @@ public class TennisClubController(
     }
     
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<string>> RegisterTennisClub(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
-        return await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
+        var registeredTennisClubId = await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
+        return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
     
     [HttpPut("{clubId}")]
@@ -36,14 +41,24 @@ public class TennisClubController(
     }
     
     [HttpPost("{clubId}/lock")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<string>> LockTennisClub(string clubId)
     {
-        return await updateTennisClubService.LockTennisClub(clubId);
+        var lockedTennisClubId = await updateTennisClubService.LockTennisClub(clubId);
+        return Ok(lockedTennisClubId);
     }
     
     [HttpDelete("{clubId}/lock")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<string>> UnlockTennisClub(string clubId)
     {
-        return await updateTennisClubService.UnlockTennisClub(clubId);
+        var unlockedTennisClubId = await updateTennisClubService.UnlockTennisClub(clubId);
+        return Ok(unlockedTennisClubId);
     }
 }
