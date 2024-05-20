@@ -77,15 +77,15 @@ public class Member
             case EventType.MEMBER_CREATED:
                 Apply((MemberCreatedEvent)domainEnvelope.EventData);
                 break;
-            case EventType.MEMBER_ACCOUNT_LIMIT_EXCEEDED:
+            case EventType.MEMBER_LIMIT_EXCEEDED:
                 break;
-            case EventType.MEMBER_ACCOUNT_DELETED:
+            case EventType.MEMBER_DELETED:
                 break;
-            case EventType.MEMBER_ACCOUNT_LOCKED:
+            case EventType.MEMBER_LOCKED:
                 break;
-            case EventType.MEMBER_ACCOUNT_UNLOCKED:
+            case EventType.MEMBER_UNLOCKED:
                 break;
-            case EventType.MEMBER_ACCOUNT_UPDATED:
+            case EventType.MEMBER_UPDATED:
                 break;
             case EventType.ADMIN_ACCOUNT_CREATED:
             case EventType.ADMIN_ACCOUNT_DELETED:
