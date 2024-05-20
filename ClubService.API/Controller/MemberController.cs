@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Application.Dtos;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/members")]
 [ApiController]
 [ApiVersion("1.0")]
-public class MemberController : ControllerBase
+public class MemberController(ICreateMemberService createMemberService) : ControllerBase
 {
     [HttpGet("{memberId}")]
     [ProducesResponseType(typeof(MemberDto), StatusCodes.Status200OK)]
@@ -20,9 +21,10 @@ public class MemberController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<string>> CreateMember(MemberRegisterCommand memberRegisterCommand)
+    public async Task<ActionResult<string>> CreateMember([FromBody] MemberCreateCommand memberCreateCommand)
     {
-        return await Task.FromResult("");
+        var createdMemberId = await createMemberService.CreateMember(memberCreateCommand);
+        return CreatedAtAction(nameof(CreateMember), new { id = createdMemberId }, createdMemberId);
     }
     
     [HttpPut("{memberId}")]
