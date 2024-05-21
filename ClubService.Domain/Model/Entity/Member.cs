@@ -30,7 +30,7 @@ public class Member
         
         var domainEnvelop = new DomainEnvelope<IMemberDomainEvent>(
             Guid.NewGuid(),
-            MemberId.Id,
+            memberCreatedEvent.MemberId.Id,
             EventType.MEMBER_CREATED,
             EntityType.MEMBER,
             DateTime.UtcNow,
