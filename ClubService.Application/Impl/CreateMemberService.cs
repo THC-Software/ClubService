@@ -24,7 +24,7 @@ public class CreateMemberService(IEventRepository eventRepository) : ICreateMemb
             throw new TennisClubNotFoundException("No events found!");
         }
         
-        var tennisClub = TennisClub.Create(tennisClubId);
+        var tennisClub = new TennisClub();
         foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
