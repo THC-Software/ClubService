@@ -1,4 +1,5 @@
 using ClubService.Domain.Event;
+using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.ValueObject;
@@ -108,6 +109,22 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 EntityType.TENNIS_CLUB,
                 DateTime.UtcNow.AddHours(1),
                 new TennisClubLockedEvent()
+            ),
+            // Members
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("20a699d7-1bf8-4e0e-823c-82cafb246611"),
+                new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc"),
+                EventType.MEMBER_CREATED,
+                EntityType.MEMBER,
+                DateTime.UtcNow,
+                new MemberCreatedEvent(
+                    new MemberId(new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc")),
+                    new FullName("Adrian", "Spiegel"),
+                    "adrianSpiegel@fhv.gorillaKaefig",
+                    false,
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    false
+                )
             )
         );
     }
