@@ -13,7 +13,7 @@ public class CreateMemberService(IEventRepository eventRepository) : ICreateMemb
         // does tennisClubRegistered event exist?
         // is member limit reached? if yes create MemberLimitExceeded event if it does not exist yet?
         
-        var member = Member.Create();
+        var member = new Member();
         
         var memberDomainEvents = member.ProcessMemberCreatedCommand(
             memberCreateCommand.FirstName,

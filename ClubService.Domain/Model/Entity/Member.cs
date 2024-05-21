@@ -13,36 +13,6 @@ public class Member
     public TennisClubId TennisClubId { get; private set; } = null!;
     public bool IsDeleted { get; private set; }
     
-    private Member()
-    {
-    }
-    
-    private Member(
-        MemberId memberId,
-        FullName name,
-        string email,
-        bool isLocked,
-        TennisClubId tennisClubId,
-        bool isDeleted)
-    {
-        MemberId = memberId;
-        Name = name;
-        Email = email;
-        IsLocked = isLocked;
-        TennisClubId = tennisClubId;
-        IsDeleted = isDeleted;
-    }
-    
-    public static Member Create()
-    {
-        return new Member();
-    }
-    
-    public static Member Create(MemberId id, FullName name, string email, TennisClubId tennisClubId)
-    {
-        return new Member(id, name, email, isLocked: false, tennisClubId, isDeleted: false);
-    }
-    
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberCreatedCommand(
         string firstName,
         string lastName,
