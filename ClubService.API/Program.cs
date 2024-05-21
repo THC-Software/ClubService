@@ -19,6 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
 
 // Services
+builder.Services.AddScoped<ICreateMemberService, CreateMemberService>();
 builder.Services.AddScoped<IRegisterTennisClubService, RegisterTennisClubService>();
 builder.Services.AddScoped<IUpdateTennisClubService, UpdateTennisClubService>();
 
