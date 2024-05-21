@@ -1,6 +1,6 @@
 namespace ClubService.Domain.Event.Member;
 
-public class MemberAccountUpdatedEvent(
+public class MemberUpdatedEvent(
     string firstName,
     string lastName,
     string email) : IMemberDomainEvent
