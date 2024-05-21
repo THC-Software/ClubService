@@ -47,8 +47,9 @@ public class TennisClubController(
         
         if (tennisClubUpdateCommand.Name != null)
         {
-            // TODO: Implement
-            throw new NotImplementedException("Currently it is not possible to update the name of a tennis club.");
+            var updatedTennisClubId =
+                await updateTennisClubService.ChangeName(clubId, tennisClubUpdateCommand.Name);
+            return Ok(updatedTennisClubId);
         }
         
         return BadRequest("You have to provide either a name or a subscription tier!");

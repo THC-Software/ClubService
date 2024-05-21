@@ -106,6 +106,27 @@ public class TennisClub
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeNameCommand(string name)
+    {
+        if (name.Equals(Name))
+        {
+            throw new InvalidOperationException("This name is already set!");
+        }
+        
+        var nameChangedEvent = new TennisClubNameChangedEvent(name);
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_NAME_CHANGED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            nameChangedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -121,6 +142,9 @@ public class TennisClub
                 break;
             case EventType.TENNIS_CLUB_UNLOCKED:
                 Apply((TennisClubUnlockedEvent)domainEnvelope.EventData);
+                break;
+            case EventType.TENNIS_CLUB_NAME_CHANGED:
+                Apply((TennisClubNameChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_ACCOUNT_CREATED:
             case EventType.MEMBER_ACCOUNT_LIMIT_EXCEEDED:
@@ -161,6 +185,11 @@ public class TennisClub
     private void Apply(TennisClubSubscriptionTierChangedEvent tennisClubSubscriptionTierChangedEvent)
     {
         SubscriptionTierId = tennisClubSubscriptionTierChangedEvent.SubscriptionTierId;
+    }
+    
+    private void Apply(TennisClubNameChangedEvent tennisClubNameChangedEvent)
+    {
+        Name = tennisClubNameChangedEvent.Name;
     }
     
     protected bool Equals(TennisClub other)
