@@ -189,6 +189,14 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
+            case EventType.TENNIS_CLUB_NAME_CHANGED:
+                if (JsonConvert.DeserializeObject<TennisClubNameChangedEvent>(eventDataJson) is T
+                    tennisClubNameChangedEvent)
+                {
+                    return tennisClubNameChangedEvent;
+                }
+                
+                break;
             default:
                 throw new InvalidOperationException($"Unknown event type: {eventType}");
         }
