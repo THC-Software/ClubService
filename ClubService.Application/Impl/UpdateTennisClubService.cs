@@ -12,7 +12,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
     public async Task<string> LockTennisClub(string clubId)
     {
         var tennisClubId = new TennisClubId(new Guid(clubId));
-        var tennisClub = TennisClub.Create(tennisClubId);
+        var tennisClub = new TennisClub();
         
         var existingDomainEvents = eventRepository
             .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
@@ -70,7 +70,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
     public async Task<string> UnlockTennisClub(string clubId)
     {
         var tennisClubId = new TennisClubId(new Guid(clubId));
-        var tennisClub = TennisClub.Create(tennisClubId);
+        var tennisClub = new TennisClub();
         
         var existingDomainEvents = eventRepository
             .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
@@ -128,7 +128,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
     public async Task<string> ChangeSubscriptionTier(string clubId, string subscriptionTierId)
     {
         var tennisClubId = new TennisClubId(new Guid(clubId));
-        var tennisClub = TennisClub.Create(tennisClubId);
+        var tennisClub = new TennisClub();
         
         var existingDomainEvents = eventRepository
             .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)

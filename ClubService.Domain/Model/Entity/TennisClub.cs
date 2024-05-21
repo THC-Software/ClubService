@@ -6,31 +6,22 @@ namespace ClubService.Domain.Model.Entity;
 
 public class TennisClub
 {
-    private TennisClub(TennisClubId tennisClubId)
-    {
-        TennisClubId = tennisClubId;
-    }
-    
-    public TennisClubId TennisClubId { get; private set; }
-    public string Name { get; private set; }
+    public TennisClubId TennisClubId { get; private set; } = null!;
+    public string Name { get; private set; } = null!;
     public bool IsLocked { get; private set; }
-    public SubscriptionTierId SubscriptionTierId { get; private set; }
-    public List<MemberId> MemberIds { get; private set; }
-    
-    public static TennisClub Create(TennisClubId id)
-    {
-        return new TennisClub(id);
-    }
+    public SubscriptionTierId SubscriptionTierId { get; private set; } = null!;
+    public List<MemberId> MemberIds { get; private set; } = null!;
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(
         string name,
         string subscriptionTierIdStr)
     {
+        var tennisClubId = new TennisClubId(Guid.NewGuid());
         var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
         var memberIds = new List<MemberId>();
         
         var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
-            TennisClubId,
+            tennisClubId,
             name,
             false,
             subscriptionTierId,
@@ -39,7 +30,7 @@ public class TennisClub
         
         var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
             Guid.NewGuid(),
-            TennisClubId.Id,
+            tennisClubId.Id,
             EventType.TENNIS_CLUB_REGISTERED,
             EntityType.TENNIS_CLUB,
             DateTime.UtcNow,
