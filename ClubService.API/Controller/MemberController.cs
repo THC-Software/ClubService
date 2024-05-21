@@ -19,8 +19,12 @@ public class MemberController(ICreateMemberService createMemberService) : Contro
         return await Task.FromResult(
             new MemberDto("", "", "", "", false));
     }
-
+    
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<string>> CreateMember([FromBody] MemberCreateCommand memberCreateCommand)
     {
         var createdMemberId = await createMemberService.CreateMember(memberCreateCommand);
