@@ -44,18 +44,6 @@ public class CreateMemberService(IEventRepository eventRepository) : ICreateMemb
             throw new SubscriptionTierNotFoundException($"Subscription Tier '{subscriptionTierId}' not found!");
         }
         
-        var subscriptionTier = new SubscriptionTier();
-        foreach (var domainEvent in existingSubscriptionTierDomainEvents)
-        {
-            subscriptionTier.Apply(domainEvent);
-        }
-        
-        if (tennisClub.MemberIds.Count >= subscriptionTier.MaxMemberCount)
-        {
-            // TODO: should we remove the TennisClubMemberLimitExceededEvent?
-            throw new ArgumentException("Member limit exceeded!");
-        }
-        
         var member = new Member();
         
         var memberDomainEvents = member.ProcessMemberCreatedCommand(
