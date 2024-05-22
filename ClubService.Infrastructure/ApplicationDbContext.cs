@@ -2,6 +2,7 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Infrastructure.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -85,9 +86,8 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 new TennisClubRegisteredEvent(
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     "Tennis CLub 1",
-                    false,
                     new SubscriptionTierId(new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7")),
-                    [])
+                    TennisClubStatus.NONE)
             ),
             new DomainEnvelope<IDomainEvent>(
                 new Guid("e3d63ccb-7f1d-43c1-b44e-2221dce70998"),
@@ -98,9 +98,8 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 new TennisClubRegisteredEvent(
                     new TennisClubId(new Guid("6a463e1a-6b0f-4825-83c3-911f12f80076")),
                     "Tennis CLub 2",
-                    false,
                     new SubscriptionTierId(new Guid("38888969-d579-46ec-9cd6-0208569a077e")),
-                    [])
+                    TennisClubStatus.NONE)
             ),
             new DomainEnvelope<IDomainEvent>(
                 new Guid("b0457bfe-e8c5-4831-a10f-9e66490b4332"),
@@ -121,9 +120,8 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                     new MemberId(new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc")),
                     new FullName("Adrian", "Spiegel"),
                     "adrianSpiegel@fhv.gorillaKaefig",
-                    false,
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
-                    false
+                    MemberStatus.NONE
                 )
             )
         );

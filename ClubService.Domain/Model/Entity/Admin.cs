@@ -1,5 +1,6 @@
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Admin;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Model.Entity;
@@ -10,22 +11,29 @@ public class Admin
     public string Username { get; private set; } = null!;
     public FullName Name { get; private set; } = null!;
     public TennisClubId TennisClubId { get; private set; } = null!;
-    public bool IsDeleted { get; private set; }
+    public AdminStatus Status { get; private set; }
     
     public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminRegisterCommand(
         string username,
         FullName name,
         TennisClubId tennisClubId)
     {
-        var adminRegisteredEvent =
-            new AdminRegisteredEvent(new AdminId(Guid.NewGuid()), username, name, tennisClubId, false);
+        var adminRegisteredEvent = new AdminRegisteredEvent(
+            new AdminId(Guid.NewGuid()),
+            username,
+            name,
+            tennisClubId,
+            AdminStatus.NONE
+        );
+        
         var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
             Guid.NewGuid(),
             adminRegisteredEvent.AdminId.Id,
             EventType.ADMIN_REGISTERED,
             EntityType.ADMIN,
             DateTime.UtcNow,
-            adminRegisteredEvent);
+            adminRegisteredEvent
+        );
         
         return [domainEnvelope];
     }
@@ -46,7 +54,7 @@ public class Admin
         Username = adminRegisteredEvent.Username;
         Name = adminRegisteredEvent.Name;
         TennisClubId = adminRegisteredEvent.TennisClubId;
-        IsDeleted = false;
+        Status = adminRegisteredEvent.Status;
     }
     
     protected bool Equals(Admin other)

@@ -1,5 +1,6 @@
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Model.Entity;
@@ -9,9 +10,8 @@ public class Member
     public MemberId MemberId { get; private set; } = null!;
     public FullName Name { get; private set; } = null!;
     public string Email { get; private set; } = null!;
-    public bool IsLocked { get; private set; }
     public TennisClubId TennisClubId { get; private set; } = null!;
-    public bool IsDeleted { get; private set; }
+    public MemberStatus Status { get; private set; }
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberRegisterCommand(
         string firstName,
@@ -23,9 +23,8 @@ public class Member
             new MemberId(Guid.NewGuid()),
             new FullName(firstName, lastName),
             email,
-            false,
             new TennisClubId(new Guid(tennisClubId)),
-            false
+            MemberStatus.NONE
         );
         
         var domainEnvelop = new DomainEnvelope<IMemberDomainEvent>(
@@ -74,9 +73,8 @@ public class Member
         MemberId = memberRegisteredEvent.MemberId;
         Name = memberRegisteredEvent.Name;
         Email = memberRegisteredEvent.Email;
-        IsLocked = memberRegisteredEvent.IsLocked;
         TennisClubId = memberRegisteredEvent.TennisClubId;
-        IsDeleted = memberRegisteredEvent.IsDeleted;
+        Status = memberRegisteredEvent.Status;
     }
     
     protected bool Equals(Member other)
