@@ -65,4 +65,9 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
         
         return id;
     }
+    
+    public Task<string> UnlockMember(string id)
+    {
+        throw new NotImplementedException();
+    }
 }

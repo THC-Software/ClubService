@@ -44,7 +44,7 @@ public class MemberController(IRegisterMemberService registerMemberService, IUpd
         return await Task.FromResult("");
     }
     
-    [HttpPost("{memberId}/lock")]
+    [HttpPost("{id}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -55,9 +55,14 @@ public class MemberController(IRegisterMemberService registerMemberService, IUpd
         return Ok(lockedMemberId);
     }
     
-    [HttpDelete("{memberId}/lock")]
-    public async Task<ActionResult<string>> UnlockMember(string memberId)
+    [HttpDelete("{id}/lock")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> UnlockMember(string id)
     {
-        return await Task.FromResult(Ok());
+        var unlockedMemberId = await updateMemberService.UnlockMember(id);
+        return Ok(unlockedMemberId);
     }
 }
