@@ -3,7 +3,7 @@ namespace ClubService.Domain.Event;
 public enum EventType
 {
     TENNIS_CLUB_REGISTERED,
-    MEMBER_CREATED,
+    MEMBER_REGISTERED,
     MEMBER_LIMIT_EXCEEDED,
     MEMBER_DELETED,
     ADMIN_ACCOUNT_CREATED,

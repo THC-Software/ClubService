@@ -95,9 +95,9 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
-            case EventType.MEMBER_CREATED:
+            case EventType.MEMBER_REGISTERED:
                 if (JsonConvert
-                        .DeserializeObject<MemberCreatedEvent>(eventDataJson) is T memberDomainEvent)
+                        .DeserializeObject<MemberRegisteredEvent>(eventDataJson) is T memberDomainEvent)
                 {
                     return memberDomainEvent;
                 }
