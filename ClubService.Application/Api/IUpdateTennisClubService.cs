@@ -4,4 +4,6 @@ public interface IUpdateTennisClubService
 {
     Task<string> LockTennisClub(string clubId);
     Task<string> UnlockTennisClub(string clubId);
+    Task<string> ChangeSubscriptionTier(string clubId, string subscriptionTierId);
+    Task<string> ChangeName(string clubId, string name);
 }

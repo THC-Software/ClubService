@@ -6,31 +6,22 @@ namespace ClubService.Domain.Model.Entity;
 
 public class TennisClub
 {
-    private TennisClub(TennisClubId tennisClubId)
-    {
-        TennisClubId = tennisClubId;
-    }
-    
-    public TennisClubId TennisClubId { get; private set; }
-    public string Name { get; private set; }
+    public TennisClubId TennisClubId { get; private set; } = null!;
+    public string Name { get; private set; } = null!;
     public bool IsLocked { get; private set; }
-    public SubscriptionTierId SubscriptionTierId { get; private set; }
-    public List<MemberId> MemberIds { get; private set; }
-    
-    public static TennisClub Create(TennisClubId id)
-    {
-        return new TennisClub(id);
-    }
+    public SubscriptionTierId SubscriptionTierId { get; private set; } = null!;
+    public List<MemberId> MemberIds { get; private set; } = null!;
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(
         string name,
         string subscriptionTierIdStr)
     {
+        var tennisClubId = new TennisClubId(Guid.NewGuid());
         var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
         var memberIds = new List<MemberId>();
         
         var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
-            TennisClubId,
+            tennisClubId,
             name,
             false,
             subscriptionTierId,
@@ -39,7 +30,7 @@ public class TennisClub
         
         var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
             Guid.NewGuid(),
-            TennisClubId.Id,
+            tennisClubId.Id,
             EventType.TENNIS_CLUB_REGISTERED,
             EntityType.TENNIS_CLUB,
             DateTime.UtcNow,
@@ -91,6 +82,51 @@ public class TennisClub
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeSubscriptionTierCommand(
+        string subscriptionTierIdStr)
+    {
+        if (subscriptionTierIdStr.Equals(SubscriptionTierId.Id.ToString()))
+        {
+            throw new InvalidOperationException("This subscription tier is already set!");
+        }
+        
+        var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
+        
+        var subscriptionTierChangedEvent = new TennisClubSubscriptionTierChangedEvent(subscriptionTierId);
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            subscriptionTierChangedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeNameCommand(string name)
+    {
+        if (name.Equals(Name))
+        {
+            throw new InvalidOperationException("This name is already set!");
+        }
+        
+        var nameChangedEvent = new TennisClubNameChangedEvent(name);
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_NAME_CHANGED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            nameChangedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -99,6 +135,7 @@ public class TennisClub
                 Apply((TennisClubRegisteredEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
+                Apply((TennisClubSubscriptionTierChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_LOCKED:
                 Apply((TennisClubLockedEvent)domainEnvelope.EventData);
@@ -106,11 +143,15 @@ public class TennisClub
             case EventType.TENNIS_CLUB_UNLOCKED:
                 Apply((TennisClubUnlockedEvent)domainEnvelope.EventData);
                 break;
+            case EventType.TENNIS_CLUB_NAME_CHANGED:
+                Apply((TennisClubNameChangedEvent)domainEnvelope.EventData);
+                break;
+            case EventType.ADMIN_REGISTERED:
+            case EventType.ADMIN_DELETED:
+            case EventType.SUBSCRIPTION_TIER_CREATED:
             case EventType.MEMBER_REGISTERED:
             case EventType.MEMBER_LIMIT_EXCEEDED:
             case EventType.MEMBER_DELETED:
-            case EventType.ADMIN_REGISTERED:
-            case EventType.ADMIN_DELETED:
             case EventType.MEMBER_LOCKED:
             case EventType.MEMBER_UNLOCKED:
             case EventType.MEMBER_UPDATED:
@@ -139,6 +180,16 @@ public class TennisClub
     private void Apply(TennisClubUnlockedEvent tennisClubUnlockedEvent)
     {
         IsLocked = false;
+    }
+    
+    private void Apply(TennisClubSubscriptionTierChangedEvent tennisClubSubscriptionTierChangedEvent)
+    {
+        SubscriptionTierId = tennisClubSubscriptionTierChangedEvent.SubscriptionTierId;
+    }
+    
+    private void Apply(TennisClubNameChangedEvent tennisClubNameChangedEvent)
+    {
+        Name = tennisClubNameChangedEvent.Name;
     }
     
     protected bool Equals(TennisClub other)

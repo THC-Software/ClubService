@@ -3,7 +3,6 @@ using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Model.Entity;
-using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
 
 namespace ClubService.Application.Impl;
@@ -22,9 +21,7 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
             throw new SubscriptionTierNotFoundException($"Subscription Tier '{subscriptionTierId}' not found!");
         }
         
-        var clubId = Guid.NewGuid();
-        
-        var tennisClub = TennisClub.Create(new TennisClubId(clubId));
+        var tennisClub = new TennisClub();
         
         var tennisClubDomainEvents =
             tennisClub.ProcessTennisClubRegisterCommand(tennisClubRegisterCommand.Name,
@@ -36,6 +33,6 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
             await eventRepository.Save(tennisClubDomainEvent);
         }
         
-        return clubId.ToString();
+        return tennisClub.TennisClubId.Id.ToString();
     }
 }

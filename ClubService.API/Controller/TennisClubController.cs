@@ -32,12 +32,27 @@ public class TennisClubController(
         return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
     
-    [HttpPut("{clubId}")]
+    [HttpPatch("{clubId}")]
     public async Task<ActionResult<string>> UpdateTennisClub(
         string clubId,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
-        return await Task.FromResult(Ok());
+        if (tennisClubUpdateCommand.SubscriptionTierId != null)
+        {
+            var updatedTennisClubId =
+                await updateTennisClubService.ChangeSubscriptionTier(clubId,
+                    tennisClubUpdateCommand.SubscriptionTierId);
+            return Ok(updatedTennisClubId);
+        }
+        
+        if (tennisClubUpdateCommand.Name != null)
+        {
+            var updatedTennisClubId =
+                await updateTennisClubService.ChangeName(clubId, tennisClubUpdateCommand.Name);
+            return Ok(updatedTennisClubId);
+        }
+        
+        return BadRequest("You have to provide either a name or a subscription tier!");
     }
     
     [HttpPost("{clubId}/lock")]
