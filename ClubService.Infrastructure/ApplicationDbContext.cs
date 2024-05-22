@@ -123,6 +123,28 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     MemberStatus.NONE
                 )
+            ),
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("16f3386e-4b6f-4e12-9599-fc4e0d5fa551"),
+                new Guid("51ae7aca-2bb8-421a-a923-2ba2eb94bb3a"),
+                EventType.MEMBER_REGISTERED,
+                EntityType.MEMBER,
+                DateTime.UtcNow,
+                new MemberRegisteredEvent(
+                    new MemberId(new Guid("51ae7aca-2bb8-421a-a923-2ba2eb94bb3a")),
+                    new FullName("John", "Doe"),
+                    "john.doe@fhv.gorillaKaefig",
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    MemberStatus.NONE
+                )
+            ),
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("83396767-c873-4e11-95b9-f6d6abc4abd1"),
+                new Guid("51ae7aca-2bb8-421a-a923-2ba2eb94bb3a"),
+                EventType.MEMBER_LOCKED,
+                EntityType.MEMBER,
+                DateTime.UtcNow.AddHours(1),
+                new MemberLockedEvent()
             )
         );
     }
