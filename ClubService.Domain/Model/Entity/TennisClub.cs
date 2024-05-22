@@ -124,7 +124,23 @@ public class TennisClub
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessDeleteTennisClubCommand()
     {
-        return [];
+        if (Status.Equals(TennisClubStatus.DELETED))
+        {
+            throw new InvalidOperationException("Tennis Club is already deleted!");
+        }
+        
+        var tennisClubDeletedEvent = new TennisClubDeletedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_DELETED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            tennisClubDeletedEvent
+        );
+        
+        return [domainEnvelope];
     }
     
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
@@ -144,6 +160,9 @@ public class TennisClub
                 Apply((TennisClubUnlockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_NAME_CHANGED:
+                Apply((TennisClubNameChangedEvent)domainEnvelope.EventData);
+                break;
+            case EventType.TENNIS_CLUB_DELETED:
                 Apply((TennisClubNameChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.ADMIN_REGISTERED:
@@ -189,6 +208,12 @@ public class TennisClub
     private void Apply(TennisClubNameChangedEvent tennisClubNameChangedEvent)
     {
         Name = tennisClubNameChangedEvent.Name;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(TennisClubDeletedEvent tennisClubDeletedEvent)
+    {
+        Status = TennisClubStatus.DELETED;
     }
     
     protected bool Equals(TennisClub other)
