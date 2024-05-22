@@ -9,7 +9,7 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/members")]
 [ApiController]
 [ApiVersion("1.0")]
-public class MemberController(ICreateMemberService createMemberService) : ControllerBase
+public class MemberController(IRegisterMemberService registerMemberService) : ControllerBase
 {
     [HttpGet("{memberId}")]
     [ProducesResponseType(typeof(MemberDto), StatusCodes.Status200OK)]
@@ -25,10 +25,10 @@ public class MemberController(ICreateMemberService createMemberService) : Contro
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> CreateMember([FromBody] MemberCreateCommand memberCreateCommand)
+    public async Task<ActionResult<string>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
     {
-        var createdMemberId = await createMemberService.CreateMember(memberCreateCommand);
-        return CreatedAtAction(nameof(CreateMember), new { id = createdMemberId }, createdMemberId);
+        var registeredMemberId = await registerMemberService.RegisterMember(memberRegisterCommand);
+        return CreatedAtAction(nameof(RegisterMember), new { id = registeredMemberId }, registeredMemberId);
     }
     
     [HttpPut("{memberId}")]

@@ -95,9 +95,8 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
-            case EventType.MEMBER_CREATED:
-                if (JsonConvert
-                        .DeserializeObject<MemberCreatedEvent>(eventDataJson) is T memberDomainEvent)
+            case EventType.MEMBER_REGISTERED:
+                if (JsonConvert.DeserializeObject<MemberRegisteredEvent>(eventDataJson) is T memberDomainEvent)
                 {
                     return memberDomainEvent;
                 }
@@ -119,17 +118,17 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
-            case EventType.ADMIN_ACCOUNT_CREATED:
+            case EventType.ADMIN_REGISTERED:
                 if (JsonConvert
-                        .DeserializeObject<AdminAccountCreatedEvent>(eventDataJson) is T adminAccountCreatedEvent)
+                        .DeserializeObject<AdminRegisteredEvent>(eventDataJson) is T adminAccountCreatedEvent)
                 {
                     return adminAccountCreatedEvent;
                 }
                 
                 break;
-            case EventType.ADMIN_ACCOUNT_DELETED:
+            case EventType.ADMIN_DELETED:
                 if (JsonConvert
-                        .DeserializeObject<AdminAccountDeletedEvent>(eventDataJson) is T adminAccountDeletedEvent)
+                        .DeserializeObject<AdminDeletedEvent>(eventDataJson) is T adminAccountDeletedEvent)
                 {
                     return adminAccountDeletedEvent;
                 }
@@ -144,8 +143,8 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 
                 break;
             case EventType.MEMBER_LOCKED:
-                if (JsonConvert
-                        .DeserializeObject<MemberLockedEvent>(eventDataJson) is T memberLockedEvent)
+                if (JsonConvert.DeserializeObject<MemberLockedEvent>(eventDataJson) is T memberLockedEvent)
+
                 {
                     return memberLockedEvent;
                 }

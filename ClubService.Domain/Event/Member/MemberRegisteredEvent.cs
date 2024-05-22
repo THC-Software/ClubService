@@ -2,7 +2,7 @@ using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Event.Member;
 
-public class MemberCreatedEvent(
+public class MemberRegisteredEvent(
     MemberId memberId,
     FullName name,
     string email,

@@ -9,11 +9,11 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.Impl;
 
-public class CreateMemberService(IEventRepository eventRepository) : ICreateMemberService
+public class RegisterMemberService(IEventRepository eventRepository) : IRegisterMemberService
 {
-    public async Task<string> CreateMember(MemberCreateCommand memberCreateCommand)
+    public async Task<string> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
-        var tennisClubId = new TennisClubId(new Guid(memberCreateCommand.TennisClubId));
+        var tennisClubId = new TennisClubId(new Guid(memberRegisterCommand.TennisClubId));
         var existingTennisClubDomainEvents = eventRepository
             .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
             .OrderBy(e => e.Timestamp)
@@ -46,11 +46,11 @@ public class CreateMemberService(IEventRepository eventRepository) : ICreateMemb
         
         var member = new Member();
         
-        var memberDomainEvents = member.ProcessMemberCreatedCommand(
-            memberCreateCommand.FirstName,
-            memberCreateCommand.LastName,
-            memberCreateCommand.Email,
-            memberCreateCommand.TennisClubId
+        var memberDomainEvents = member.ProcessMemberRegisterCommand(
+            memberRegisterCommand.FirstName,
+            memberRegisterCommand.LastName,
+            memberRegisterCommand.Email,
+            memberRegisterCommand.TennisClubId
         );
         
         foreach (var memberDomainEvent in memberDomainEvents)
