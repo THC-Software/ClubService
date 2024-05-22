@@ -39,6 +39,27 @@ public class Member
         return [domainEnvelop];
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberLockCommand()
+    {
+        if (Status.Equals(MemberStatus.LOCKED))
+        {
+            throw new InvalidOperationException("Member is already locked!");
+        }
+        
+        var memberLockedEvent = new MemberLockedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+            Guid.NewGuid(),
+            MemberId.Id,
+            EventType.TENNIS_CLUB_LOCKED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            memberLockedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)

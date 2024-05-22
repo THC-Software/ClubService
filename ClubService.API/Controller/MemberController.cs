@@ -9,7 +9,8 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/members")]
 [ApiController]
 [ApiVersion("1.0")]
-public class MemberController(IRegisterMemberService registerMemberService) : ControllerBase
+public class MemberController(IRegisterMemberService registerMemberService, IUpdateMemberService updateMemberService)
+    : ControllerBase
 {
     [HttpGet("{memberId}")]
     [ProducesResponseType(typeof(MemberDto), StatusCodes.Status200OK)]
@@ -44,9 +45,14 @@ public class MemberController(IRegisterMemberService registerMemberService) : Co
     }
     
     [HttpPost("{memberId}/lock")]
-    public async Task<ActionResult<string>> LockMember(string memberId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> LockMember(string id)
     {
-        return await Task.FromResult(Ok());
+        var lockedMemberId = await updateMemberService.LockMember(id);
+        return Ok(lockedMemberId);
     }
     
     [HttpDelete("{memberId}/lock")]
