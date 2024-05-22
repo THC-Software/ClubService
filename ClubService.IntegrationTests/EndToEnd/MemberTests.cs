@@ -59,4 +59,36 @@ public class MemberTests : TestBase
             Assert.That(memberRegisteredEvent.TennisClubId, Is.EqualTo(tennisClubIdExpected));
         });
     }
+    
+    [Test]
+    public async Task GivenMemberId_WhenLockMember_ThenMemberLockedEventExistsInRepositoryAndIdIsReturned()
+    {
+        // Given
+        var numberOfEventsExpected = 2;
+        var memberIdExpected = new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc");
+        var eventTypeExpected = EventType.MEMBER_LOCKED;
+        var entityTypeExpected = EntityType.MEMBER;
+        var eventDataTypeExpected = typeof(MemberLockedEvent);
+        
+        // When
+        var response = await HttpClient.PostAsync($"{BaseUrl}/{memberIdExpected.ToString()}/lock", null);
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
+        
+        var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var storedEvent = storedEvents[1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
+            Assert.That(storedEvent.EntityId, Is.EqualTo(memberIdExpected));
+            Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
+    }
 }
