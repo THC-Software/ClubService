@@ -4,6 +4,5 @@ namespace ClubService.Application.Api;
 
 public interface IEventHandler
 {
-    bool SupportsEvent(IDomainEvent domainEvent);
-    void Handle(IDomainEvent domainEvent);
+    void Handle(DomainEnvelope<IDomainEvent> domainEnvelope);
 }
