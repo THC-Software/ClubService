@@ -57,8 +57,8 @@ public class Member
                 break;
             case EventType.MEMBER_UPDATED:
                 break;
-            case EventType.ADMIN_ACCOUNT_CREATED:
-            case EventType.ADMIN_ACCOUNT_DELETED:
+            case EventType.ADMIN_REGISTERED:
+            case EventType.ADMIN_DELETED:
             case EventType.TENNIS_CLUB_REGISTERED:
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
             case EventType.TENNIS_CLUB_LOCKED:
@@ -86,9 +86,21 @@ public class Member
     
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+        
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+        
+        if (obj.GetType() != GetType())
+        {
+            return false;
+        }
+        
         return Equals((Member)obj);
     }
     

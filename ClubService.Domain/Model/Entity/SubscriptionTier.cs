@@ -21,8 +21,8 @@ public class SubscriptionTier
             case EventType.MEMBER_REGISTERED:
             case EventType.MEMBER_LIMIT_EXCEEDED:
             case EventType.MEMBER_DELETED:
-            case EventType.ADMIN_ACCOUNT_CREATED:
-            case EventType.ADMIN_ACCOUNT_DELETED:
+            case EventType.ADMIN_REGISTERED:
+            case EventType.ADMIN_DELETED:
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
             case EventType.MEMBER_LOCKED:
             case EventType.MEMBER_UNLOCKED:
