@@ -12,14 +12,6 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
 {
     public async Task<string> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
     {
-        if (string.IsNullOrWhiteSpace(adminRegisterCommand.Username) ||
-            string.IsNullOrWhiteSpace(adminRegisterCommand.FirstName) ||
-            string.IsNullOrWhiteSpace(adminRegisterCommand.LastName) || 
-            string.IsNullOrWhiteSpace(adminRegisterCommand.TennisClubId))
-        {
-            throw new ArgumentException("You have to provide a username, firstname, lastname, and tennisclub id!");
-        }
-        
         var admin = new Admin();
         
         var tennisClubDomainEvents =
