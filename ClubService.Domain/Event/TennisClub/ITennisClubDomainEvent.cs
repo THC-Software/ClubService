@@ -1,6 +1,6 @@
 namespace ClubService.Domain.Event.TennisClub;
 
-public interface ITennisClubDomainEvent
+public interface ITennisClubDomainEvent : IDomainEvent
 {
     
 }

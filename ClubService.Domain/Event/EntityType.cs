@@ -4,5 +4,6 @@ public enum EntityType
 {
     TENNIS_CLUB,
     MEMBER,
-    ADMIN
+    ADMIN,
+    SUBSCRIPTION_TIER
 }
