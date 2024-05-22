@@ -163,7 +163,7 @@ public class TennisClub
                 Apply((TennisClubNameChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_DELETED:
-                Apply((TennisClubNameChangedEvent)domainEnvelope.EventData);
+                Apply((TennisClubDeletedEvent)domainEnvelope.EventData);
                 break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:

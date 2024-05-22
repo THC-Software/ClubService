@@ -11,7 +11,8 @@ namespace ClubService.API.Controller;
 [ApiVersion("1.0")]
 public class TennisClubController(
     IRegisterTennisClubService registerTennisClubService,
-    IUpdateTennisClubService updateTennisClubService) : ControllerBase
+    IUpdateTennisClubService updateTennisClubService,
+    IDeleteTennisClubService deleteTennisClubService) : ControllerBase
 {
     [HttpGet("{clubId}/members")]
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByClub(string clubId)
@@ -56,9 +57,14 @@ public class TennisClubController(
     }
     
     [HttpDelete("{clubId}")]
-    public IActionResult DeleteTennisClub(string clubId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> DeleteTennisClub(string clubId)
     {
-        return Ok();
+        var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(clubId);
+        return Ok(deletedTennisClubId);
     }
     
     [HttpPost("{clubId}/lock")]
