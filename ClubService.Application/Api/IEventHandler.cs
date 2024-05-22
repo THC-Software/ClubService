@@ -1,6 +1,6 @@
 using ClubService.Domain.Event;
 
-namespace ClubService.Application;
+namespace ClubService.Application.Api;
 
 public interface IEventHandler
 {

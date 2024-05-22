@@ -1,6 +1,7 @@
+using ClubService.Application.Api;
 using ClubService.Domain.Event;
 
-namespace ClubService.Application;
+namespace ClubService.Application.EventHandlers;
 
 public class ChainEventHandler : IEventHandler
 {
