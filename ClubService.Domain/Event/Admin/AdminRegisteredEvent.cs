@@ -1,3 +1,4 @@
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Event.Admin;
@@ -7,11 +8,11 @@ public class AdminRegisteredEvent(
     string username,
     FullName name,
     TennisClubId tennisClubId,
-    bool isDeleted) : IAdminDomainEvent
+    AdminStatus adminStatus) : IAdminDomainEvent
 {
     public AdminId AdminId { get; } = adminId;
     public string Username { get; } = username;
     public FullName Name { get; } = name;
     public TennisClubId TennisClubId { get; } = tennisClubId;
-    public bool IsDeleted { get; } = isDeleted;
+    public AdminStatus AdminStatus { get; } = adminStatus;
 }
