@@ -2,6 +2,7 @@ using System.Text;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Enum;
 using ClubService.IntegrationTests.TestSetup;
 using Newtonsoft.Json;
 
@@ -47,7 +48,7 @@ public class TennisClubTests : TestBase
         Assert.Multiple(() =>
         {
             Assert.That(tennisClubRegisteredEventActual.Name, Is.EqualTo(registerTennisClubCommand.Name));
-            Assert.That(tennisClubRegisteredEventActual.IsLocked, Is.False);
+            Assert.That(tennisClubRegisteredEventActual.Status, Is.EqualTo(TennisClubStatus.NONE));
             Assert.That(tennisClubRegisteredEventActual.SubscriptionTierId.Id,
                 Is.EqualTo(subscriptionTierIdExpected));
         });

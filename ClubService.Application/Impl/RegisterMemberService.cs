@@ -4,6 +4,7 @@ using ClubService.Application.Commands;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
 
@@ -30,7 +31,7 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
             tennisClub.Apply(domainEvent);
         }
         
-        if (tennisClub.IsLocked)
+        if (tennisClub.Status.Equals(TennisClubStatus.LOCKED))
         {
             throw new ConflictException("Tennis club is locked!");
         }
