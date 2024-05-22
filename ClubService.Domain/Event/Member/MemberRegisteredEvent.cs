@@ -8,11 +8,11 @@ public class MemberRegisteredEvent(
     FullName name,
     string email,
     TennisClubId tennisClubId,
-    MemberStatus memberStatus) : IMemberDomainEvent
+    MemberStatus status) : IMemberDomainEvent
 {
     public MemberId MemberId { get; private set; } = memberId;
     public FullName Name { get; private set; } = name;
     public string Email { get; private set; } = email;
     public TennisClubId TennisClubId { get; private set; } = tennisClubId;
-    public MemberStatus MemberStatus { get; private set; } = memberStatus;
+    public MemberStatus Status { get; private set; } = status;
 }

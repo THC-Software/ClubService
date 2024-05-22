@@ -8,11 +8,11 @@ public class AdminRegisteredEvent(
     string username,
     FullName name,
     TennisClubId tennisClubId,
-    AdminStatus adminStatus) : IAdminDomainEvent
+    AdminStatus status) : IAdminDomainEvent
 {
     public AdminId AdminId { get; } = adminId;
     public string Username { get; } = username;
     public FullName Name { get; } = name;
     public TennisClubId TennisClubId { get; } = tennisClubId;
-    public AdminStatus AdminStatus { get; } = adminStatus;
+    public AdminStatus Status { get; } = status;
 }

@@ -11,7 +11,7 @@ public class Member
     public FullName Name { get; private set; } = null!;
     public string Email { get; private set; } = null!;
     public TennisClubId TennisClubId { get; private set; } = null!;
-    public MemberStatus MemberStatus { get; private set; }
+    public MemberStatus Status { get; private set; }
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberRegisterCommand(
         string firstName,
@@ -74,7 +74,7 @@ public class Member
         Name = memberRegisteredEvent.Name;
         Email = memberRegisteredEvent.Email;
         TennisClubId = memberRegisteredEvent.TennisClubId;
-        MemberStatus = memberRegisteredEvent.MemberStatus;
+        Status = memberRegisteredEvent.Status;
     }
     
     protected bool Equals(Member other)

@@ -11,7 +11,7 @@ public class Admin
     public string Username { get; private set; } = null!;
     public FullName Name { get; private set; } = null!;
     public TennisClubId TennisClubId { get; private set; } = null!;
-    public AdminStatus AdminStatus { get; private set; }
+    public AdminStatus Status { get; private set; }
     
     public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminRegisteredCommand(
         string username,
@@ -54,7 +54,7 @@ public class Admin
         Username = adminRegisteredEvent.Username;
         Name = adminRegisteredEvent.Name;
         TennisClubId = adminRegisteredEvent.TennisClubId;
-        AdminStatus = adminRegisteredEvent.AdminStatus;
+        Status = adminRegisteredEvent.Status;
     }
     
     protected bool Equals(Admin other)
