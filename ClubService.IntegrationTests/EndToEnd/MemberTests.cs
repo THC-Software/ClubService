@@ -42,7 +42,7 @@ public class MemberTests : TestBase
         var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(Guid.Parse(responseContent));
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
-        var storedEvent = storedEvents[0];
+        var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
             Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
@@ -82,7 +82,39 @@ public class MemberTests : TestBase
         var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
-        var storedEvent = storedEvents[1];
+        var storedEvent = storedEvents[numberOfEventsExpected - 1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
+            Assert.That(storedEvent.EntityId, Is.EqualTo(memberIdExpected));
+            Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
+    }
+    
+    [Test]
+    public async Task GivenMemberId_WhenUnlockMember_ThenMemberUnlockedEventExistsInRepositoryAndIdIsReturned()
+    {
+        // Given
+        var numberOfEventsExpected = 3;
+        var memberIdExpected = new Guid("51ae7aca-2bb8-421a-a923-2ba2eb94bb3a");
+        var eventTypeExpected = EventType.MEMBER_UNLOCKED;
+        var entityTypeExpected = EntityType.MEMBER;
+        var eventDataTypeExpected = typeof(MemberUnlockedEvent);
+        
+        // When
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{memberIdExpected.ToString()}/lock");
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
+        
+        var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
             Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
