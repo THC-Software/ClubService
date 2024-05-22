@@ -13,7 +13,7 @@ public class Admin
     public TennisClubId TennisClubId { get; private set; } = null!;
     public AdminStatus Status { get; private set; }
     
-    public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminRegisteredCommand(
+    public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminRegisterCommand(
         string username,
         FullName name,
         TennisClubId tennisClubId)
