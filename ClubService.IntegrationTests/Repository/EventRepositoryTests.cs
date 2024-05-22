@@ -1,5 +1,6 @@
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.IntegrationTests.TestSetup;
 
@@ -13,8 +14,8 @@ public class EventRepositoryTests : TestBase
     {
         // Given
         var tennisClubRegisteredEventExpected =
-            new TennisClubRegisteredEvent(new TennisClubId(Guid.NewGuid()), "Test Tennis Club", false,
-                new SubscriptionTierId(Guid.NewGuid()), []);
+            new TennisClubRegisteredEvent(new TennisClubId(Guid.NewGuid()), "Test Tennis Club",
+                new SubscriptionTierId(Guid.NewGuid()), TennisClubStatus.NONE);
         var domainEnvelopeExpected =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(),
                 tennisClubRegisteredEventExpected.TennisClubId.Id,
@@ -48,12 +49,10 @@ public class EventRepositoryTests : TestBase
             Assert.That(tennisClubRegisteredEventActual.TennisClubId,
                 Is.EqualTo(tennisClubRegisteredEventExpected.TennisClubId));
             Assert.That(tennisClubRegisteredEventActual.Name, Is.EqualTo(tennisClubRegisteredEventExpected.Name));
-            Assert.That(tennisClubRegisteredEventActual.IsLocked,
-                Is.EqualTo(tennisClubRegisteredEventExpected.IsLocked));
+            Assert.That(tennisClubRegisteredEventActual.Status,
+                Is.EqualTo(tennisClubRegisteredEventExpected.Status));
             Assert.That(tennisClubRegisteredEventActual.SubscriptionTierId,
                 Is.EqualTo(tennisClubRegisteredEventExpected.SubscriptionTierId));
-            Assert.That(tennisClubRegisteredEventActual.MemberIds,
-                Is.EqualTo(tennisClubRegisteredEventExpected.MemberIds));
         });
     }
 }

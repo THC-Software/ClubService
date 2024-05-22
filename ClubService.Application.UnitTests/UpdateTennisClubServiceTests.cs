@@ -2,6 +2,7 @@ using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Impl;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
 using Moq;
@@ -27,13 +28,11 @@ public class UpdateTennisClubServiceTests
         // Given
         var tennisClubId = new TennisClubId(Guid.NewGuid());
         var name = "Test Tennis Club";
-        var isLocked = false;
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
-        List<MemberId> memberIds = [];
         
         var tennisClubRegisteredEvent =
-            new TennisClubRegisteredEvent(tennisClubId, name, isLocked,
-                subscriptionTierId, memberIds);
+            new TennisClubRegisteredEvent(tennisClubId, name,
+                subscriptionTierId, TennisClubStatus.NONE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
@@ -88,13 +87,11 @@ public class UpdateTennisClubServiceTests
         // Given
         var tennisClubId = new TennisClubId(Guid.NewGuid());
         var name = "Test Tennis Club";
-        var isLocked = false;
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
-        List<MemberId> memberIds = [];
         
         var tennisClubRegisteredEvent =
-            new TennisClubRegisteredEvent(tennisClubId, name, isLocked,
-                subscriptionTierId, memberIds);
+            new TennisClubRegisteredEvent(tennisClubId, name,
+                subscriptionTierId, TennisClubStatus.NONE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
@@ -156,14 +153,12 @@ public class UpdateTennisClubServiceTests
         // Given
         var tennisClubId = new TennisClubId(Guid.NewGuid());
         var name = "Test Tennis Club";
-        var isLocked = false;
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var newSubscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
-        List<MemberId> memberIds = [];
         
         var tennisClubRegisteredEvent =
-            new TennisClubRegisteredEvent(tennisClubId, name, isLocked,
-                subscriptionTierId, memberIds);
+            new TennisClubRegisteredEvent(tennisClubId, name,
+                subscriptionTierId, TennisClubStatus.NONE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
@@ -224,13 +219,11 @@ public class UpdateTennisClubServiceTests
         var tennisClubId = new TennisClubId(Guid.NewGuid());
         var name = "Test Tennis Club";
         var newName = "New Tennis Club Name";
-        var isLocked = false;
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
-        List<MemberId> memberIds = [];
         
         var tennisClubRegisteredEvent =
-            new TennisClubRegisteredEvent(tennisClubId, name, isLocked,
-                subscriptionTierId, memberIds);
+            new TennisClubRegisteredEvent(tennisClubId, name,
+                subscriptionTierId, TennisClubStatus.NONE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);

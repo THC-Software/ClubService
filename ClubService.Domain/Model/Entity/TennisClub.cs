@@ -1,5 +1,6 @@
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Model.Entity;
@@ -8,29 +9,23 @@ public class TennisClub
 {
     public TennisClubId TennisClubId { get; private set; } = null!;
     public string Name { get; private set; } = null!;
-    public bool IsLocked { get; private set; }
     public SubscriptionTierId SubscriptionTierId { get; private set; } = null!;
-    public List<MemberId> MemberIds { get; private set; } = null!;
+    public TennisClubStatus Status { get; private set; }
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(
         string name,
         string subscriptionTierIdStr)
     {
-        var tennisClubId = new TennisClubId(Guid.NewGuid());
-        var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
-        var memberIds = new List<MemberId>();
-        
         var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
-            tennisClubId,
+            new TennisClubId(Guid.NewGuid()),
             name,
-            false,
-            subscriptionTierId,
-            memberIds
+            new SubscriptionTierId(new Guid(subscriptionTierIdStr)),
+            TennisClubStatus.NONE
         );
         
         var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
             Guid.NewGuid(),
-            tennisClubId.Id,
+            tennisClubRegisteredEvent.TennisClubId.Id,
             EventType.TENNIS_CLUB_REGISTERED,
             EntityType.TENNIS_CLUB,
             DateTime.UtcNow,
@@ -42,7 +37,7 @@ public class TennisClub
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubLockCommand()
     {
-        if (IsLocked)
+        if (Status.Equals(TennisClubStatus.LOCKED))
         {
             throw new InvalidOperationException("Tennis Club is already locked!");
         }
@@ -63,7 +58,7 @@ public class TennisClub
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUnlockCommand()
     {
-        if (!IsLocked)
+        if (Status.Equals(TennisClubStatus.NONE))
         {
             throw new InvalidOperationException("Tennis Club needs to be locked!");
         }
@@ -165,21 +160,20 @@ public class TennisClub
     {
         TennisClubId = tennisClubRegisteredEvent.TennisClubId;
         Name = tennisClubRegisteredEvent.Name;
-        IsLocked = tennisClubRegisteredEvent.IsLocked;
         SubscriptionTierId = tennisClubRegisteredEvent.SubscriptionTierId;
-        MemberIds = tennisClubRegisteredEvent.MemberIds;
+        Status = tennisClubRegisteredEvent.Status;
     }
     
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(TennisClubLockedEvent tennisClubLockedEvent)
     {
-        IsLocked = true;
+        Status = TennisClubStatus.LOCKED;
     }
     
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(TennisClubUnlockedEvent tennisClubUnlockedEvent)
     {
-        IsLocked = false;
+        Status = TennisClubStatus.NONE;
     }
     
     private void Apply(TennisClubSubscriptionTierChangedEvent tennisClubSubscriptionTierChangedEvent)
