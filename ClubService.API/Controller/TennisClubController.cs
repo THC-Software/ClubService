@@ -55,6 +55,12 @@ public class TennisClubController(
         return BadRequest("You have to provide either a name or a subscription tier!");
     }
     
+    [HttpDelete("{clubId}")]
+    public IActionResult DeleteTennisClub(string clubId)
+    {
+        return Ok();
+    }
+    
     [HttpPost("{clubId}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
