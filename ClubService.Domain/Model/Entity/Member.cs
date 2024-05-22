@@ -13,13 +13,13 @@ public class Member
     public TennisClubId TennisClubId { get; private set; } = null!;
     public bool IsDeleted { get; private set; }
     
-    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberCreatedCommand(
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberRegisterCommand(
         string firstName,
         string lastName,
         string email,
         string tennisClubId)
     {
-        var memberCreatedEvent = new MemberCreatedEvent(
+        var memberRegisteredEvent = new MemberRegisteredEvent(
             new MemberId(Guid.NewGuid()),
             new FullName(firstName, lastName),
             email,
@@ -30,11 +30,11 @@ public class Member
         
         var domainEnvelop = new DomainEnvelope<IMemberDomainEvent>(
             Guid.NewGuid(),
-            memberCreatedEvent.MemberId.Id,
-            EventType.MEMBER_CREATED,
+            memberRegisteredEvent.MemberId.Id,
+            EventType.MEMBER_REGISTERED,
             EntityType.MEMBER,
             DateTime.UtcNow,
-            memberCreatedEvent
+            memberRegisteredEvent
         );
         
         return [domainEnvelop];
@@ -44,8 +44,8 @@ public class Member
     {
         switch (domainEnvelope.EventType)
         {
-            case EventType.MEMBER_CREATED:
-                Apply((MemberCreatedEvent)domainEnvelope.EventData);
+            case EventType.MEMBER_REGISTERED:
+                Apply((MemberRegisteredEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_LIMIT_EXCEEDED:
                 break;
@@ -69,14 +69,14 @@ public class Member
         }
     }
     
-    private void Apply(MemberCreatedEvent memberCreatedEvent)
+    private void Apply(MemberRegisteredEvent memberRegisteredEvent)
     {
-        MemberId = memberCreatedEvent.MemberId;
-        Name = memberCreatedEvent.Name;
-        Email = memberCreatedEvent.Email;
-        IsLocked = memberCreatedEvent.IsLocked;
-        TennisClubId = memberCreatedEvent.TennisClubId;
-        IsDeleted = memberCreatedEvent.IsDeleted;
+        MemberId = memberRegisteredEvent.MemberId;
+        Name = memberRegisteredEvent.Name;
+        Email = memberRegisteredEvent.Email;
+        IsLocked = memberRegisteredEvent.IsLocked;
+        TennisClubId = memberRegisteredEvent.TennisClubId;
+        IsDeleted = memberRegisteredEvent.IsDeleted;
     }
     
     protected bool Equals(Member other)

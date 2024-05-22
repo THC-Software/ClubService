@@ -114,10 +114,10 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
             new DomainEnvelope<IDomainEvent>(
                 new Guid("20a699d7-1bf8-4e0e-823c-82cafb246611"),
                 new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc"),
-                EventType.MEMBER_CREATED,
+                EventType.MEMBER_REGISTERED,
                 EntityType.MEMBER,
                 DateTime.UtcNow,
-                new MemberCreatedEvent(
+                new MemberRegisteredEvent(
                     new MemberId(new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc")),
                     new FullName("Adrian", "Spiegel"),
                     "adrianSpiegel@fhv.gorillaKaefig",

@@ -106,7 +106,7 @@ public class TennisClub
             case EventType.TENNIS_CLUB_UNLOCKED:
                 Apply((TennisClubUnlockedEvent)domainEnvelope.EventData);
                 break;
-            case EventType.MEMBER_CREATED:
+            case EventType.MEMBER_REGISTERED:
             case EventType.MEMBER_LIMIT_EXCEEDED:
             case EventType.MEMBER_DELETED:
             case EventType.ADMIN_ACCOUNT_CREATED:

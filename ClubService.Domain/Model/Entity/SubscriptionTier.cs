@@ -18,7 +18,7 @@ public class SubscriptionTier
                 Apply((SubscriptionTierCreatedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_REGISTERED:
-            case EventType.MEMBER_CREATED:
+            case EventType.MEMBER_REGISTERED:
             case EventType.MEMBER_LIMIT_EXCEEDED:
             case EventType.MEMBER_DELETED:
             case EventType.ADMIN_ACCOUNT_CREATED:
