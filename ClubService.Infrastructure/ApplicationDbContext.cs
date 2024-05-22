@@ -1,4 +1,5 @@
 using ClubService.Domain.Event;
+using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.ValueObject;
@@ -38,7 +39,7 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 DateTime.UtcNow,
                 new SubscriptionTierCreatedEvent(
                     new SubscriptionTierId(new Guid("38888969-d579-46ec-9cd6-0208569a077e")),
-                    "Gold Subscription Tier",
+                    "Gorilla Subscription Tier",
                     200)
             ),
             new DomainEnvelope<IDomainEvent>(
@@ -49,7 +50,18 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 DateTime.UtcNow,
                 new SubscriptionTierCreatedEvent(
                     new SubscriptionTierId(new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7")),
-                    "Silver Subscription Tier",
+                    "Bison Subscription Tier",
+                    150)
+            ),
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("36db98d7-8fea-4715-923c-74192b147752"),
+                new Guid("4c148d45-ebc8-4bbf-aa9a-d491eb185ad5"),
+                EventType.SUBSCRIPTION_TIER_CREATED,
+                EntityType.SUBSCRIPTION_TIER,
+                DateTime.UtcNow,
+                new SubscriptionTierCreatedEvent(
+                    new SubscriptionTierId(new Guid("4c148d45-ebc8-4bbf-aa9a-d491eb185ad5")),
+                    "Guinea Pig Subscription Tier",
                     150)
             ),
             new DomainEnvelope<IDomainEvent>(
@@ -60,7 +72,7 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 DateTime.UtcNow,
                 new SubscriptionTierCreatedEvent(
                     new SubscriptionTierId(new Guid("2bebd11c-bf8e-4448-886f-0cb8608af7ca")),
-                    "Bronze Subscription Tier",
+                    "Woolf Subscription Tier",
                     100)
             ),
             // Tennis Clubs
@@ -74,7 +86,7 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     "Tennis CLub 1",
                     false,
-                    new SubscriptionTierId(new Guid("20698bde-5b82-4129-a72f-145ea96d8be7")),
+                    new SubscriptionTierId(new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7")),
                     [])
             ),
             new DomainEnvelope<IDomainEvent>(
@@ -87,7 +99,7 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                     new TennisClubId(new Guid("6a463e1a-6b0f-4825-83c3-911f12f80076")),
                     "Tennis CLub 2",
                     false,
-                    new SubscriptionTierId(new Guid("20698bde-5b82-4129-a72f-145ea96d8be7")),
+                    new SubscriptionTierId(new Guid("38888969-d579-46ec-9cd6-0208569a077e")),
                     [])
             ),
             new DomainEnvelope<IDomainEvent>(
@@ -97,6 +109,22 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 EntityType.TENNIS_CLUB,
                 DateTime.UtcNow.AddHours(1),
                 new TennisClubLockedEvent()
+            ),
+            // Members
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("20a699d7-1bf8-4e0e-823c-82cafb246611"),
+                new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc"),
+                EventType.MEMBER_REGISTERED,
+                EntityType.MEMBER,
+                DateTime.UtcNow,
+                new MemberRegisteredEvent(
+                    new MemberId(new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc")),
+                    new FullName("Adrian", "Spiegel"),
+                    "adrianSpiegel@fhv.gorillaKaefig",
+                    false,
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    false
+                )
             )
         );
     }

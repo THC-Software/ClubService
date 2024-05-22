@@ -96,26 +96,25 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 
                 break;
             case EventType.MEMBER_REGISTERED:
-                if (JsonConvert
-                        .DeserializeObject<MemberDomainEvent>(eventDataJson) is T memberAccountDomainEvent)
+                if (JsonConvert.DeserializeObject<MemberRegisteredEvent>(eventDataJson) is T memberDomainEvent)
                 {
-                    return memberAccountDomainEvent;
+                    return memberDomainEvent;
                 }
                 
                 break;
             case EventType.MEMBER_LIMIT_EXCEEDED:
-                if (JsonConvert.DeserializeObject<TennisClubMemberAccountLimitExceededEvent>(eventDataJson) is T
-                    tennisClubMemberAccountLimitExceededEvent)
+                if (JsonConvert.DeserializeObject<TennisClubMemberLimitExceededEvent>(eventDataJson) is T
+                    tennisClubMemberLimitExceededEvent)
                 {
-                    return tennisClubMemberAccountLimitExceededEvent;
+                    return tennisClubMemberLimitExceededEvent;
                 }
                 
                 break;
             case EventType.MEMBER_DELETED:
                 if (JsonConvert.DeserializeObject<MemberDeletedEvent>(eventDataJson) is T
-                    memberAccountDeletedEvent)
+                    memberDeletedEvent)
                 {
-                    return memberAccountDeletedEvent;
+                    return memberDeletedEvent;
                 }
                 
                 break;
@@ -144,26 +143,26 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 
                 break;
             case EventType.MEMBER_LOCKED:
-                if (JsonConvert
-                        .DeserializeObject<MemberLockedEvent>(eventDataJson) is T memberAccountLockedEvent)
+                if (JsonConvert.DeserializeObject<MemberLockedEvent>(eventDataJson) is T memberLockedEvent)
+
                 {
-                    return memberAccountLockedEvent;
+                    return memberLockedEvent;
                 }
                 
                 break;
             case EventType.MEMBER_UNLOCKED:
                 if (JsonConvert.DeserializeObject<MemberUnlockedEvent>(eventDataJson) is T
-                    memberAccountUnlockedEvent)
+                    memberUnlockedEvent)
                 {
-                    return memberAccountUnlockedEvent;
+                    return memberUnlockedEvent;
                 }
                 
                 break;
             case EventType.MEMBER_UPDATED:
                 if (JsonConvert.DeserializeObject<MemberUpdatedEvent>(eventDataJson) is T
-                    memberAccountUpdatedEvent)
+                    memberUpdatedEvent)
                 {
-                    return memberAccountUpdatedEvent;
+                    return memberUpdatedEvent;
                 }
                 
                 break;

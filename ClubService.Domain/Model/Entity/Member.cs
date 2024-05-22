@@ -1,36 +1,89 @@
+using ClubService.Domain.Event;
+using ClubService.Domain.Event.Member;
 using ClubService.Domain.Model.ValueObject;
 
 namespace ClubService.Domain.Model.Entity;
 
 public class Member
 {
-    public MemberId Id { get; }
-    public FullName Name { get; }
-    public string Email { get; }
-    public bool IsLocked { get; }
-    public TennisClubId TennisClubId { get; }
-    public bool IsDeleted { get; }
+    public MemberId MemberId { get; private set; } = null!;
+    public FullName Name { get; private set; } = null!;
+    public string Email { get; private set; } = null!;
+    public bool IsLocked { get; private set; }
+    public TennisClubId TennisClubId { get; private set; } = null!;
+    public bool IsDeleted { get; private set; }
     
-    private Member(MemberId id, FullName name, string email, bool isLocked, TennisClubId tennisClubId, bool isDeleted)
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberRegisterCommand(
+        string firstName,
+        string lastName,
+        string email,
+        string tennisClubId)
     {
-        Id = id;
-        Name = name;
-        Email = email;
-        IsLocked = isLocked;
-        TennisClubId = tennisClubId;
-        IsDeleted = isDeleted;
+        var memberRegisteredEvent = new MemberRegisteredEvent(
+            new MemberId(Guid.NewGuid()),
+            new FullName(firstName, lastName),
+            email,
+            false,
+            new TennisClubId(new Guid(tennisClubId)),
+            false
+        );
+        
+        var domainEnvelop = new DomainEnvelope<IMemberDomainEvent>(
+            Guid.NewGuid(),
+            memberRegisteredEvent.MemberId.Id,
+            EventType.MEMBER_REGISTERED,
+            EntityType.MEMBER,
+            DateTime.UtcNow,
+            memberRegisteredEvent
+        );
+        
+        return [domainEnvelop];
     }
-
-    public static Member Create(MemberId id, FullName name, string email, TennisClubId tennisClubId)
+    
+    public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
-        return new Member(id, name, email, isLocked: false, tennisClubId, isDeleted: false);
+        switch (domainEnvelope.EventType)
+        {
+            case EventType.MEMBER_REGISTERED:
+                Apply((MemberRegisteredEvent)domainEnvelope.EventData);
+                break;
+            case EventType.MEMBER_LIMIT_EXCEEDED:
+                break;
+            case EventType.MEMBER_DELETED:
+                break;
+            case EventType.MEMBER_LOCKED:
+                break;
+            case EventType.MEMBER_UNLOCKED:
+                break;
+            case EventType.MEMBER_UPDATED:
+                break;
+            case EventType.ADMIN_ACCOUNT_CREATED:
+            case EventType.ADMIN_ACCOUNT_DELETED:
+            case EventType.TENNIS_CLUB_REGISTERED:
+            case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
+            case EventType.TENNIS_CLUB_LOCKED:
+            case EventType.TENNIS_CLUB_UNLOCKED:
+            default:
+                throw new ArgumentException(
+                    $"{nameof(domainEnvelope.EventType)} is not supported for the entity Member!");
+        }
     }
-
+    
+    private void Apply(MemberRegisteredEvent memberRegisteredEvent)
+    {
+        MemberId = memberRegisteredEvent.MemberId;
+        Name = memberRegisteredEvent.Name;
+        Email = memberRegisteredEvent.Email;
+        IsLocked = memberRegisteredEvent.IsLocked;
+        TennisClubId = memberRegisteredEvent.TennisClubId;
+        IsDeleted = memberRegisteredEvent.IsDeleted;
+    }
+    
     protected bool Equals(Member other)
     {
-        return Id.Equals(other.Id);
+        return MemberId.Equals(other.MemberId);
     }
-
+    
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
@@ -38,9 +91,9 @@ public class Member
         if (obj.GetType() != this.GetType()) return false;
         return Equals((Member)obj);
     }
-
+    
     public override int GetHashCode()
     {
-        return Id.GetHashCode();
+        return MemberId.GetHashCode();
     }
 }
