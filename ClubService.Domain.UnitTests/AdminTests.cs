@@ -21,7 +21,7 @@ public class AdminTests
         var admin = new Admin();
         
         // When
-        var domainEnvelopes = admin.ProcessAdminRegisteredCommand(usernameExpected,
+        var domainEnvelopes = admin.ProcessAdminRegisterCommand(usernameExpected,
             new FullName(firstNameExpected, lastNameExpected), new TennisClubId(new Guid(tennisClubIdExpected)));
         
         // Then
