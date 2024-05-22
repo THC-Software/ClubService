@@ -2,6 +2,7 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Infrastructure.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
@@ -121,9 +122,8 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                     new MemberId(new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc")),
                     new FullName("Adrian", "Spiegel"),
                     "adrianSpiegel@fhv.gorillaKaefig",
-                    false,
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
-                    false
+                    MemberStatus.NONE
                 )
             )
         );
