@@ -20,6 +20,7 @@ builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
 
 // Services
 builder.Services.AddScoped<IRegisterMemberService, RegisterMemberService>();
+builder.Services.AddScoped<IUpdateMemberService, UpdateMemberService>();
 builder.Services.AddScoped<IRegisterTennisClubService, RegisterTennisClubService>();
 builder.Services.AddScoped<IUpdateTennisClubService, UpdateTennisClubService>();
 builder.Services.AddScoped<IDeleteTennisClubService, DeleteTennisClubService>();

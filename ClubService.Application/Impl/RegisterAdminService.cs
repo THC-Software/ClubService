@@ -23,7 +23,7 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
             throw new TennisClubNotFoundException($"Tennis Club '{adminRegisterCommand.TennisClubId}' not found!");
         }
         
-        var adminDomainEvents = admin.ProcessAdminRegisteredCommand(adminRegisterCommand.Username,
+        var adminDomainEvents = admin.ProcessAdminRegisterCommand(adminRegisterCommand.Username,
             new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName),
             new TennisClubId(new Guid(adminRegisterCommand.TennisClubId)));
         
