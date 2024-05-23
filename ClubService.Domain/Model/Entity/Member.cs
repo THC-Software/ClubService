@@ -41,9 +41,16 @@ public class Member
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberLockCommand()
     {
-        if (Status.Equals(MemberStatus.LOCKED))
+        switch (Status)
         {
-            throw new InvalidOperationException("Member is already locked!");
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is already locked!");
+            case MemberStatus.NONE:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         
         var memberLockedEvent = new MemberLockedEvent();
@@ -62,9 +69,16 @@ public class Member
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUnlockCommand()
     {
-        if (Status.Equals(MemberStatus.NONE))
+        switch (Status)
         {
-            throw new InvalidOperationException("Member needs to be locked!");
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.NONE:
+                throw new InvalidOperationException("Member needs to be locked!");
+            case MemberStatus.LOCKED:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         
         var memberUnlockedEvent = new MemberUnlockedEvent();
@@ -81,6 +95,27 @@ public class Member
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberDeleteCommand()
+    {
+        if (Status.Equals(MemberStatus.DELETED))
+        {
+            throw new InvalidOperationException("Member is already deleted!");
+        }
+        
+        var memberDeletedEvent = new MemberDeletedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+            Guid.NewGuid(),
+            MemberId.Id,
+            EventType.MEMBER_DELETED,
+            EntityType.MEMBER,
+            DateTime.UtcNow,
+            memberDeletedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -91,6 +126,7 @@ public class Member
             case EventType.MEMBER_LIMIT_EXCEEDED:
                 break;
             case EventType.MEMBER_DELETED:
+                Apply((MemberDeletedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_LOCKED:
                 Apply((MemberLockedEvent)domainEnvelope.EventData);
@@ -131,6 +167,12 @@ public class Member
     private void Apply(MemberUnlockedEvent memberUnlockedEvent)
     {
         Status = MemberStatus.NONE;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(MemberDeletedEvent memberDeletedEvent)
+    {
+        Status = MemberStatus.DELETED;
     }
     
     protected bool Equals(Member other)

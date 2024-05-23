@@ -38,10 +38,15 @@ public class MemberController(IRegisterMemberService registerMemberService, IUpd
         return await Task.FromResult("");
     }
     
-    [HttpDelete("{memberId}")]
-    public async Task<ActionResult<string>> DeleteMember(string memberId)
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> DeleteMember(string id)
     {
-        return await Task.FromResult("");
+        var deletedMemberId = await updateMemberService.DeleteMember(id);
+        return Ok(deletedMemberId);
     }
     
     [HttpPost("{id}/lock")]
