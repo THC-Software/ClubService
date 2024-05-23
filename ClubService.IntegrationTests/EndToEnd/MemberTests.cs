@@ -161,10 +161,42 @@ public class MemberTests : TestBase
     public async Task GivenDeletedMemberId_WhenDeleteMemberAgain_ThenErrorResponseIsReturned()
     {
         // Given
-        var memberIdExpected = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
+        var deletedMemberId = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
         
         // When
-        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{memberIdExpected.ToString()}");
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{deletedMemberId.ToString()}");
+        
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Does.Contain("Member is already deleted!"));
+    }
+    
+    [Test]
+    public async Task GivenDeletedMemberId_WhenLockMember_ThenErrorResponseIsReturned()
+    {
+        // Given
+        var deletedMemberId = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
+        
+        // When
+        var response = await HttpClient.PostAsync($"{BaseUrl}/{deletedMemberId.ToString()}/lock", null);
+        
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Does.Contain("Member is already deleted!"));
+    }
+    
+    [Test]
+    public async Task GivenDeletedMemberId_WhenUnlockMember_ThenErrorResponseIsReturned()
+    {
+        // Given
+        var deletedMemberId = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
+        
+        // When
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{deletedMemberId.ToString()}/lock");
         
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
