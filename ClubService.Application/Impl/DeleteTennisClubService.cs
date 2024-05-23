@@ -14,10 +14,7 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = eventRepository
-            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
         if (existingDomainEvents.Count == 0)
         {
@@ -44,8 +41,7 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
                 await eventRepository.Save(domainEvent);
             }
             
-            existingDomainEvents =
-                eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
             
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {

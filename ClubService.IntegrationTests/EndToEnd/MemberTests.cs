@@ -39,7 +39,7 @@ public class MemberTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         
-        var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(Guid.Parse(responseContent));
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(Guid.Parse(responseContent));
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -79,7 +79,7 @@ public class MemberTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -111,7 +111,7 @@ public class MemberTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[numberOfEventsExpected - 1];

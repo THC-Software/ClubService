@@ -13,6 +13,9 @@ namespace ClubService.Infrastructure;
 
 public class PostgresEventRepository(ApplicationDbContext applicationDbContext) : IEventRepository
 {
+    private const string SelectSqlQuery =
+        "SELECT * FROM \"DomainEvent\" WHERE \"entityId\" = @entityId ORDER BY \"timestamp\"";
+    
     private IDbContextTransaction _transaction;
     
     public async Task Save<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
@@ -28,42 +31,39 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
         await applicationDbContext.SaveChangesAsync();
     }
     
-    public List<DomainEnvelope<T>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
+    public async Task<List<DomainEnvelope<T>>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
     {
-        var sql = "SELECT * FROM \"DomainEvent\" WHERE \"entityId\" = @entityId";
         var events = new List<DomainEnvelope<T>>();
         
-        using (var command = applicationDbContext.Database.GetDbConnection().CreateCommand())
+        await using var command = applicationDbContext.Database.GetDbConnection().CreateCommand();
+        command.CommandText = SelectSqlQuery;
+        command.Parameters.Add(new NpgsqlParameter("@entityId", entityId));
+        
+        await applicationDbContext.Database.OpenConnectionAsync();
+        
+        await using var result = await command.ExecuteReaderAsync();
+        while (await result.ReadAsync())
         {
-            command.CommandText = sql;
-            command.Parameters.Add(new NpgsqlParameter("@entityId", entityId));
+            var eventType = (EventType)Enum.Parse(typeof(EventType),
+                result.GetString(result.GetOrdinal("EventType")));
+            var entityType = (EntityType)Enum.Parse(typeof(EntityType),
+                result.GetString(result.GetOrdinal("EntityType")));
+            var eventDataJson = result.GetString(result.GetOrdinal("EventData"));
             
-            applicationDbContext.Database.OpenConnection();
+            // Determine the type of event and deserialize accordingly
+            var eventData = DeserializeEventData<T>(eventType, eventDataJson);
             
-            using (var result = command.ExecuteReader())
-            {
-                while (result.Read())
-                {
-                    var eventType = (EventType)Enum.Parse(typeof(EventType),
-                        result.GetString(result.GetOrdinal("EventType")));
-                    var entityType = (EntityType)Enum.Parse(typeof(EntityType),
-                        result.GetString(result.GetOrdinal("EntityType")));
-                    var eventDataJson = result.GetString(result.GetOrdinal("EventData"));
-                    
-                    // Determine the type of event and deserialize accordingly
-                    var eventData = DeserializeEventData<T>(eventType, eventDataJson);
-                    
-                    events.Add(new DomainEnvelope<T>(
-                        result.GetGuid(result.GetOrdinal("EventId")),
-                        entityId,
-                        eventType,
-                        entityType,
-                        result.GetDateTime(result.GetOrdinal("Timestamp")),
-                        eventData
-                    ));
-                }
-            }
+            events.Add(new DomainEnvelope<T>(
+                result.GetGuid(result.GetOrdinal("EventId")),
+                entityId,
+                eventType,
+                entityType,
+                result.GetDateTime(result.GetOrdinal("Timestamp")),
+                eventData
+            ));
         }
+        
+        await applicationDbContext.Database.CloseConnectionAsync();
         
         return events;
     }

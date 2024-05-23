@@ -106,7 +106,7 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 new Guid("6a463e1a-6b0f-4825-83c3-911f12f80076"),
                 EventType.TENNIS_CLUB_LOCKED,
                 EntityType.TENNIS_CLUB,
-                DateTime.UtcNow.AddHours(1),
+                DateTime.UtcNow.AddMilliseconds(10.0),
                 new TennisClubLockedEvent()
             ),
             // Members
@@ -143,7 +143,7 @@ public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env
                 new Guid("51ae7aca-2bb8-421a-a923-2ba2eb94bb3a"),
                 EventType.MEMBER_LOCKED,
                 EntityType.MEMBER,
-                DateTime.UtcNow.AddHours(1),
+                DateTime.UtcNow.AddMilliseconds(10.0),
                 new MemberLockedEvent()
             )
         );

@@ -14,10 +14,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = eventRepository
-            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
         if (existingDomainEvents.Count == 0)
         {
@@ -43,8 +40,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
                 await eventRepository.Save(domainEvent);
             }
             
-            existingDomainEvents =
-                eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
             
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
@@ -72,10 +68,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = eventRepository
-            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
         if (existingDomainEvents.Count == 0)
         {
@@ -101,8 +94,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
                 await eventRepository.Save(domainEvent);
             }
             
-            existingDomainEvents =
-                eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
             
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
@@ -130,10 +122,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = eventRepository
-            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
         if (existingDomainEvents.Count == 0)
         {
@@ -159,8 +148,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
                 await eventRepository.Save(domainEvent);
             }
             
-            existingDomainEvents =
-                eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
             
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
@@ -188,10 +176,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = eventRepository
-            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
         if (existingDomainEvents.Count == 0)
         {
@@ -217,8 +202,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
                 await eventRepository.Save(domainEvent);
             }
             
-            existingDomainEvents =
-                eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
             
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {

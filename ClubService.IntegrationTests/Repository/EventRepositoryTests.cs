@@ -27,7 +27,7 @@ public class EventRepositoryTests : TestBase
         
         // Then
         var savedEvents =
-            EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
+            await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
         Assert.That(savedEvents, Has.Count.EqualTo(1));
         
         var domainEnvelopeActual = savedEvents[0];

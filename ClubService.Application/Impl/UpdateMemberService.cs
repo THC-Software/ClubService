@@ -12,10 +12,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
     public async Task<string> LockMember(string id)
     {
         var memberId = new MemberId(new Guid(id));
-        var existingMemberDomainEvents = eventRepository
-            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -42,8 +39,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
                 await eventRepository.Save(domainEvent);
             }
             
-            existingMemberDomainEvents =
-                eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
             
             if (existingMemberDomainEvents.Count != initialEventCount + memberLockDomainEvents.Count)
             {
@@ -69,10 +65,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
     public async Task<string> UnlockMember(string id)
     {
         var memberId = new MemberId(new Guid(id));
-        var existingMemberDomainEvents = eventRepository
-            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -99,8 +92,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
                 await eventRepository.Save(domainEvent);
             }
             
-            existingMemberDomainEvents =
-                eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
             
             if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
             {

@@ -14,7 +14,7 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
     {
         var subscriptionTierId = new Guid(tennisClubRegisterCommand.SubscriptionTierId);
         var subscriptionTierDomainEvents =
-            eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId);
+            await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId);
         
         if (subscriptionTierDomainEvents.Count == 0)
         {

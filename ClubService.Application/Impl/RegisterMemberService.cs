@@ -15,10 +15,8 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
     public async Task<string> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
         var tennisClubId = new TennisClubId(new Guid(memberRegisterCommand.TennisClubId));
-        var existingTennisClubDomainEvents = eventRepository
-            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingTennisClubDomainEvents = await eventRepository
+            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
         if (existingTennisClubDomainEvents.Count == 0)
         {
@@ -38,7 +36,7 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
         
         var subscriptionTierId = tennisClub.SubscriptionTierId;
         var existingSubscriptionTierDomainEvents =
-            eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id);
+            await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id);
         
         if (existingSubscriptionTierDomainEvents.Count == 0)
         {

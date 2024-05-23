@@ -15,7 +15,8 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
         var admin = new Admin();
         
         var tennisClubDomainEvents =
-            eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(new Guid(adminRegisterCommand.TennisClubId));
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(
+                new Guid(adminRegisterCommand.TennisClubId));
         
         //TODO: what if deleted?
         if (tennisClubDomainEvents.Count == 0)
