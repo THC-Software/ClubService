@@ -123,8 +123,6 @@ public class Member
             case EventType.MEMBER_REGISTERED:
                 Apply((MemberRegisteredEvent)domainEnvelope.EventData);
                 break;
-            case EventType.MEMBER_LIMIT_EXCEEDED:
-                break;
             case EventType.MEMBER_DELETED:
                 Apply((MemberDeletedEvent)domainEnvelope.EventData);
                 break;
