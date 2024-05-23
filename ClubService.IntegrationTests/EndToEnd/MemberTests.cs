@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event;
@@ -122,5 +123,53 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EntityId, Is.EqualTo(memberIdExpected));
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
+    }
+    
+    [Test]
+    public async Task GivenMemberId_WhenDeleteMember_ThenMemberDeletedEventExistsInRepositoryAndIdIsReturned()
+    {
+        // Given
+        var numberOfEventsExpected = 2;
+        var memberIdExpected = new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc");
+        var eventTypeExpected = EventType.MEMBER_DELETED;
+        var entityTypeExpected = EntityType.MEMBER;
+        var eventDataTypeExpected = typeof(MemberDeletedEvent);
+        
+        // When
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{memberIdExpected.ToString()}");
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
+        
+        var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var storedEvent = storedEvents[numberOfEventsExpected - 1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
+            Assert.That(storedEvent.EntityId, Is.EqualTo(memberIdExpected));
+            Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
+    }
+    
+    [Test]
+    public async Task GivenDeletedMemberId_WhenDeleteMemberAgain_ThenErrorResponseIsReturned()
+    {
+        // Given
+        var memberIdExpected = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
+        
+        // When
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{memberIdExpected.ToString()}");
+        
+        // Then
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Does.Contain("Member is already deleted!"));
     }
 }
