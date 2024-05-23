@@ -17,7 +17,7 @@ public class WebAppFactory(string connectionString) : WebApplicationFactory<Prog
     private void ReplaceDbContext(IServiceCollection services)
     {
         var existingDbContextRegistration = services.SingleOrDefault(
-            d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>)
+            d => d.ServiceType == typeof(DbContextOptions<EventStoreDbContext>)
         );
         
         if (existingDbContextRegistration != null)
@@ -25,7 +25,7 @@ public class WebAppFactory(string connectionString) : WebApplicationFactory<Prog
             services.Remove(existingDbContextRegistration);
         }
         
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<EventStoreDbContext>(options =>
             options.UseNpgsql(connectionString));
     }
 }

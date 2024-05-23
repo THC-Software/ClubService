@@ -10,7 +10,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace ClubService.Infrastructure;
 
-public class ApplicationDbContext(DbContextOptions options, IHostEnvironment env) : DbContext(options)
+public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env) : DbContext(options)
 {
     public DbSet<DomainEnvelope<IDomainEvent>> DomainEvents { get; init; }
     

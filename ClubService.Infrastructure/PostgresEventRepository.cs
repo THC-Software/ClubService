@@ -11,7 +11,7 @@ using Npgsql;
 
 namespace ClubService.Infrastructure;
 
-public class PostgresEventRepository(ApplicationDbContext applicationDbContext) : IEventRepository
+public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : IEventRepository
 {
     private const string SelectSqlQuery = @"
         SELECT * 
@@ -29,7 +29,7 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
     
     public async Task Append<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
     {
-        await using var command = applicationDbContext.Database.GetDbConnection().CreateCommand();
+        await using var command = eventStoreDbContext.Database.GetDbConnection().CreateCommand();
         command.CommandText = InsertSqlQuery;
         
         var jsonSerializedEventData = JsonConvert.SerializeObject(domainEnvelope.EventData);
@@ -40,20 +40,20 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
         command.Parameters.Add(new NpgsqlParameter("@timestamp", domainEnvelope.Timestamp));
         command.Parameters.Add(new NpgsqlParameter("@eventData", jsonSerializedEventData));
         
-        await applicationDbContext.Database.OpenConnectionAsync();
+        await eventStoreDbContext.Database.OpenConnectionAsync();
         await command.ExecuteNonQueryAsync();
-        await applicationDbContext.Database.CloseConnectionAsync();
+        await eventStoreDbContext.Database.CloseConnectionAsync();
     }
     
     public async Task<List<DomainEnvelope<T>>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
     {
         var events = new List<DomainEnvelope<T>>();
         
-        await using var command = applicationDbContext.Database.GetDbConnection().CreateCommand();
+        await using var command = eventStoreDbContext.Database.GetDbConnection().CreateCommand();
         command.CommandText = SelectSqlQuery;
         command.Parameters.Add(new NpgsqlParameter("@entityId", entityId));
         
-        await applicationDbContext.Database.OpenConnectionAsync();
+        await eventStoreDbContext.Database.OpenConnectionAsync();
         
         await using var result = await command.ExecuteReaderAsync();
         while (await result.ReadAsync())
@@ -77,14 +77,14 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
             ));
         }
         
-        await applicationDbContext.Database.CloseConnectionAsync();
+        await eventStoreDbContext.Database.CloseConnectionAsync();
         
         return events;
     }
     
     public async Task BeginTransactionAsync()
     {
-        _transaction = await applicationDbContext.Database.BeginTransactionAsync();
+        _transaction = await eventStoreDbContext.Database.BeginTransactionAsync();
     }
     
     public async Task CommitTransactionAsync()
