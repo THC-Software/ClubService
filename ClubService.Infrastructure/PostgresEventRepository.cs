@@ -144,7 +144,7 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 break;
             case EventType.MEMBER_LOCKED:
                 if (JsonConvert.DeserializeObject<MemberLockedEvent>(eventDataJson) is T memberLockedEvent)
-
+                
                 {
                     return memberLockedEvent;
                 }
@@ -193,6 +193,14 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                     tennisClubNameChangedEvent)
                 {
                     return tennisClubNameChangedEvent;
+                }
+                
+                break;
+            case EventType.TENNIS_CLUB_DELETED:
+                if (JsonConvert.DeserializeObject<TennisClubDeletedEvent>(eventDataJson) is T
+                    tennisClubDeletedEvent)
+                {
+                    return tennisClubDeletedEvent;
                 }
                 
                 break;
