@@ -61,7 +61,7 @@ public class UpdateTennisClubServiceTests
         _ = await _updateTennisClubService.LockTennisClub(tennisClubId.Id.ToString());
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_LOCKED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubLockedEvent))), Times.Once);
@@ -127,7 +127,7 @@ public class UpdateTennisClubServiceTests
         _ = await _updateTennisClubService.UnlockTennisClub(tennisClubId.Id.ToString());
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_UNLOCKED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubUnlockedEvent))), Times.Once);
@@ -190,7 +190,7 @@ public class UpdateTennisClubServiceTests
             newSubscriptionTierId.Id.ToString());
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubSubscriptionTierChangedEvent))), Times.Once);
@@ -255,7 +255,7 @@ public class UpdateTennisClubServiceTests
             newName);
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_NAME_CHANGED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubNameChangedEvent))), Times.Once);

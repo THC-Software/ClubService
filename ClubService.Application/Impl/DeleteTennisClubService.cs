@@ -38,7 +38,7 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
             existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);

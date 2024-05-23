@@ -37,7 +37,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
             existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
@@ -91,7 +91,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
             existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
@@ -145,7 +145,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
             existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
@@ -199,7 +199,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
             existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);

@@ -55,7 +55,7 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
         foreach (var memberDomainEvent in memberDomainEvents)
         {
             member.Apply(memberDomainEvent);
-            await eventRepository.Save(memberDomainEvent);
+            await eventRepository.Append(memberDomainEvent);
         }
         
         return member.MemberId.Id.ToString();

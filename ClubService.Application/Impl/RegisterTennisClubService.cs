@@ -30,7 +30,7 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
         foreach (var tennisClubDomainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(tennisClubDomainEvent);
-            await eventRepository.Save(tennisClubDomainEvent);
+            await eventRepository.Append(tennisClubDomainEvent);
         }
         
         return tennisClub.TennisClubId.Id.ToString();

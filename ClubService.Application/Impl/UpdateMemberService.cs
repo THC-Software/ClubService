@@ -36,7 +36,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             foreach (var domainEvent in memberLockDomainEvents)
             {
                 member.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
             existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
@@ -89,7 +89,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             foreach (var domainEvent in domainEvents)
             {
                 member.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
             existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);

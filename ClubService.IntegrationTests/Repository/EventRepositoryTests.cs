@@ -23,7 +23,7 @@ public class EventRepositoryTests : TestBase
                 tennisClubRegisteredEventExpected);
         
         // When
-        await EventRepository.Save(domainEnvelopeExpected);
+        await EventRepository.Append(domainEnvelopeExpected);
         
         // Then
         var savedEvents =

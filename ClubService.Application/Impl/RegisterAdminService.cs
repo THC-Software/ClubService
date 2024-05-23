@@ -31,7 +31,7 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
         foreach (var adminDomainEvent in adminDomainEvents)
         {
             admin.Apply(adminDomainEvent);
-            await eventRepository.Save(adminDomainEvent);
+            await eventRepository.Append(adminDomainEvent);
         }
         
         return admin.AdminId.Id.ToString();
