@@ -51,10 +51,31 @@ public class Member
         var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
             Guid.NewGuid(),
             MemberId.Id,
-            EventType.TENNIS_CLUB_LOCKED,
-            EntityType.TENNIS_CLUB,
+            EventType.MEMBER_LOCKED,
+            EntityType.MEMBER,
             DateTime.UtcNow,
             memberLockedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUnlockCommand()
+    {
+        if (Status.Equals(MemberStatus.NONE))
+        {
+            throw new InvalidOperationException("Member needs to be locked!");
+        }
+        
+        var memberUnlockedEvent = new MemberUnlockedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+            Guid.NewGuid(),
+            MemberId.Id,
+            EventType.MEMBER_UNLOCKED,
+            EntityType.MEMBER,
+            DateTime.UtcNow,
+            memberUnlockedEvent
         );
         
         return [domainEnvelope];
@@ -72,8 +93,10 @@ public class Member
             case EventType.MEMBER_DELETED:
                 break;
             case EventType.MEMBER_LOCKED:
+                Apply((MemberLockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_UNLOCKED:
+                Apply((MemberUnlockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_UPDATED:
                 break;
@@ -96,6 +119,18 @@ public class Member
         Email = memberRegisteredEvent.Email;
         TennisClubId = memberRegisteredEvent.TennisClubId;
         Status = memberRegisteredEvent.Status;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(MemberLockedEvent memberLockedEvent)
+    {
+        Status = MemberStatus.LOCKED;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(MemberUnlockedEvent memberUnlockedEvent)
+    {
+        Status = MemberStatus.NONE;
     }
     
     protected bool Equals(Member other)
