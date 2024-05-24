@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EventStoreDbContext>(options =>
 {
     options
-        .UseNpgsql(builder.Configuration.GetConnectionString("postgres-connection"));
+        .UseNpgsql(builder.Configuration.GetConnectionString("event-store-connection"));
 });
 
 // Repositories
