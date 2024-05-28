@@ -25,7 +25,7 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new DomainEnvelopeConfiguration());
         
-        if (!env.IsDevelopment() && !env.IsEnvironment("Test"))
+        if (env.IsProduction())
         {
             return;
         }
