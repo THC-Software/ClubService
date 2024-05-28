@@ -23,7 +23,7 @@ public class Admin
             username,
             name,
             tennisClubId,
-            AdminStatus.NONE
+            AdminStatus.ACTIVE
         );
         
         var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(

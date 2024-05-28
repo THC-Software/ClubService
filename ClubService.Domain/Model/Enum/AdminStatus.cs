@@ -2,6 +2,6 @@
 
 public enum AdminStatus
 {
-    NONE,
+    ACTIVE,
     DELETED
 }

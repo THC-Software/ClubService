@@ -20,7 +20,7 @@ public class TennisClub
             new TennisClubId(Guid.NewGuid()),
             name,
             new SubscriptionTierId(new Guid(subscriptionTierIdStr)),
-            TennisClubStatus.NONE
+            TennisClubStatus.ACTIVE
         );
         
         var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
@@ -58,7 +58,7 @@ public class TennisClub
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUnlockCommand()
     {
-        if (Status.Equals(TennisClubStatus.NONE))
+        if (Status.Equals(TennisClubStatus.ACTIVE))
         {
             throw new InvalidOperationException("Tennis Club needs to be locked!");
         }
@@ -196,7 +196,7 @@ public class TennisClub
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(TennisClubUnlockedEvent tennisClubUnlockedEvent)
     {
-        Status = TennisClubStatus.NONE;
+        Status = TennisClubStatus.ACTIVE;
     }
     
     private void Apply(TennisClubSubscriptionTierChangedEvent tennisClubSubscriptionTierChangedEvent)
