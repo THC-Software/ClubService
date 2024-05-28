@@ -44,7 +44,7 @@ public class DeleteMemberService(IEventRepository eventRepository) : IDeleteMemb
             if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing unlocking the member!");
+                    "Additional events added during processing of delete member!");
             }
             
             await eventRepository.CommitTransactionAsync();

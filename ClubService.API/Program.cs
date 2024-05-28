@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using ClubService.API;
 using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IRegisterTennisClubService, RegisterTennisClubService
 builder.Services.AddScoped<IUpdateTennisClubService, UpdateTennisClubService>();
 builder.Services.AddScoped<IDeleteTennisClubService, DeleteTennisClubService>();
 builder.Services.AddScoped<IRegisterAdminService, RegisterAdminService>();
+builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
