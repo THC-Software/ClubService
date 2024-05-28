@@ -24,7 +24,7 @@ public class Member
             new FullName(firstName, lastName),
             email,
             new TennisClubId(new Guid(tennisClubId)),
-            MemberStatus.NONE
+            MemberStatus.ACTIVE
         );
         
         var domainEnvelop = new DomainEnvelope<IMemberDomainEvent>(
@@ -43,7 +43,7 @@ public class Member
     {
         switch (Status)
         {
-            case MemberStatus.NONE:
+            case MemberStatus.ACTIVE:
                 var memberLockedEvent = new MemberLockedEvent();
                 var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
                     Guid.NewGuid(),
@@ -80,7 +80,7 @@ public class Member
                 return [domainEnvelope];
             case MemberStatus.DELETED:
                 throw new InvalidOperationException("Member is already deleted!");
-            case MemberStatus.NONE:
+            case MemberStatus.ACTIVE:
                 throw new InvalidOperationException("Member needs to be locked!");
             default:
                 throw new ArgumentOutOfRangeException();
@@ -156,7 +156,7 @@ public class Member
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(MemberUnlockedEvent memberUnlockedEvent)
     {
-        Status = MemberStatus.NONE;
+        Status = MemberStatus.ACTIVE;
     }
     
     // Parameter is only in method signature to distinguish the Apply method from the others

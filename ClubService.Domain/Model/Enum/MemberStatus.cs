@@ -2,7 +2,7 @@
 
 public enum MemberStatus
 {
-    NONE,
+    ACTIVE,
     LOCKED,
     DELETED
 }

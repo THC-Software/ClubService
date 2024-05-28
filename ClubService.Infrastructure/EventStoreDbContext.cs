@@ -1,4 +1,5 @@
 using ClubService.Domain.Event;
+using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
@@ -87,7 +88,7 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     "Tennis CLub 1",
                     new SubscriptionTierId(new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7")),
-                    TennisClubStatus.NONE)
+                    TennisClubStatus.ACTIVE)
             ),
             new DomainEnvelope<ITennisClubDomainEvent>(
                 new Guid("e3d63ccb-7f1d-43c1-b44e-2221dce70998"),
@@ -99,7 +100,7 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
                     new TennisClubId(new Guid("6a463e1a-6b0f-4825-83c3-911f12f80076")),
                     "Tennis CLub 2",
                     new SubscriptionTierId(new Guid("38888969-d579-46ec-9cd6-0208569a077e")),
-                    TennisClubStatus.NONE)
+                    TennisClubStatus.ACTIVE)
             ),
             new DomainEnvelope<ITennisClubDomainEvent>(
                 new Guid("b0457bfe-e8c5-4831-a10f-9e66490b4332"),
@@ -121,7 +122,7 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
                     new FullName("Adrian", "Spiegel"),
                     "adrianSpiegel@fhv.gorillaKaefig",
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
-                    MemberStatus.NONE
+                    MemberStatus.ACTIVE
                 )
             ),
             new DomainEnvelope<IMemberDomainEvent>(
@@ -135,7 +136,7 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
                     new FullName("John", "Doe"),
                     "john.doe@fhv.gorillaKaefig",
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
-                    MemberStatus.NONE
+                    MemberStatus.ACTIVE
                 )
             ),
             new DomainEnvelope<IMemberDomainEvent>(
@@ -157,7 +158,7 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
                     new FullName("John", "Doe"),
                     "john.moe@fhv.gorillaKaefig",
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
-                    MemberStatus.NONE
+                    MemberStatus.ACTIVE
                 )
             ),
             new DomainEnvelope<IDomainEvent>(
@@ -167,6 +168,43 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
                 EntityType.MEMBER,
                 DateTime.UtcNow.AddHours(1),
                 new MemberDeletedEvent()
+            ),
+            // Admins
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("46162bac-2fcd-4511-9713-2777b1bad883"),
+                new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe"),
+                EventType.ADMIN_REGISTERED,
+                EntityType.ADMIN,
+                DateTime.UtcNow,
+                new AdminRegisteredEvent(
+                    new AdminId(new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe")),
+                    "adrian_spiegel",
+                    new FullName("Adrian", "Spiegel"),
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    AdminStatus.ACTIVE
+                )
+            ),
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("4d3d8403-f0a3-4d8a-a610-af4dfeb77124"),
+                new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
+                EventType.ADMIN_REGISTERED,
+                EntityType.ADMIN,
+                DateTime.UtcNow,
+                new AdminRegisteredEvent(
+                    new AdminId(new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a")),
+                    "michael_essig",
+                    new FullName("Michael", "Essig"),
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    AdminStatus.ACTIVE
+                )
+            ),
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("b9832de8-542e-4a3c-b745-b39f8ffc3223"),
+                new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
+                EventType.ADMIN_DELETED,
+                EntityType.ADMIN,
+                DateTime.UtcNow.AddHours(1),
+                new AdminDeletedEvent()
             )
         );
     }

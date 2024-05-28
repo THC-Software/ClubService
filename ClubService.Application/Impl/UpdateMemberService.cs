@@ -44,7 +44,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             if (existingMemberDomainEvents.Count != initialEventCount + memberLockDomainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing locking the member!");
+                    "Additional events added during processing of lock member!");
             }
             
             await eventRepository.CommitTransactionAsync();
@@ -97,61 +97,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing unlocking the member!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new ConflictException(ex.Message, ex);
-        }
-        catch (ConcurrencyException)
-        {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
-        }
-        
-        return id;
-    }
-    
-    public async Task<string> DeleteMember(string id)
-    {
-        var memberId = new MemberId(new Guid(id));
-        var existingMemberDomainEvents = await eventRepository
-            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
-        
-        if (existingMemberDomainEvents.Count == 0)
-        {
-            throw new MemberNotFoundException("No member events found!");
-        }
-        
-        var initialEventCount = existingMemberDomainEvents.Count;
-        
-        var member = new Member();
-        foreach (var domainEvent in existingMemberDomainEvents)
-        {
-            member.Apply(domainEvent);
-        }
-        
-        try
-        {
-            var domainEvents = member.ProcessMemberDeleteCommand();
-            
-            await eventRepository.BeginTransactionAsync();
-            
-            foreach (var domainEvent in domainEvents)
-            {
-                member.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
-            }
-            
-            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
-            
-            if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing unlocking the member!");
+                    "Additional events added during processing of unlock member!");
             }
             
             await eventRepository.CommitTransactionAsync();

@@ -45,7 +45,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing locking the tennis club!");
+                    "Additional events added during processing of lock tennis club!");
             }
             
             await eventRepository.CommitTransactionAsync();
@@ -99,7 +99,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing unlocking the tennis club!");
+                    "Additional events added during processing of unlock tennis club!");
             }
             
             await eventRepository.CommitTransactionAsync();
@@ -153,7 +153,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing changing subscription tier!");
+                    "Additional events added during processing of change subscription tier!");
             }
             
             await eventRepository.CommitTransactionAsync();
@@ -207,7 +207,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing changing name!");
+                    "Additional events added during processing of change name!");
             }
             
             await eventRepository.CommitTransactionAsync();

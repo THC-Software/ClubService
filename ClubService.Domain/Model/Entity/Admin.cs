@@ -23,7 +23,7 @@ public class Admin
             username,
             name,
             tennisClubId,
-            AdminStatus.NONE
+            AdminStatus.ACTIVE
         );
         
         var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
@@ -38,6 +38,27 @@ public class Admin
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminDeleteCommand()
+    {
+        if (Status.Equals(AdminStatus.DELETED))
+        {
+            throw new InvalidOperationException("Admin is already deleted!");
+        }
+        
+        var adminDeletedEvent = new AdminDeletedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
+            Guid.NewGuid(),
+            AdminId.Id,
+            EventType.ADMIN_DELETED,
+            EntityType.ADMIN,
+            DateTime.UtcNow,
+            adminDeletedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<IAdminDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -45,6 +66,24 @@ public class Admin
             case EventType.ADMIN_REGISTERED:
                 Apply((AdminRegisteredEvent)domainEnvelope.EventData);
                 break;
+            case EventType.ADMIN_DELETED:
+                Apply((AdminDeletedEvent)domainEnvelope.EventData);
+                break;
+            case EventType.TENNIS_CLUB_REGISTERED:
+            case EventType.MEMBER_REGISTERED:
+            case EventType.MEMBER_DELETED:
+            case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
+            case EventType.MEMBER_LOCKED:
+            case EventType.MEMBER_UNLOCKED:
+            case EventType.MEMBER_UPDATED:
+            case EventType.TENNIS_CLUB_LOCKED:
+            case EventType.TENNIS_CLUB_UNLOCKED:
+            case EventType.SUBSCRIPTION_TIER_CREATED:
+            case EventType.TENNIS_CLUB_NAME_CHANGED:
+            case EventType.TENNIS_CLUB_DELETED:
+            default:
+                throw new ArgumentException(
+                    $"{nameof(domainEnvelope.EventType)} is not supported for the entity Admin!");
         }
     }
     
@@ -55,6 +94,12 @@ public class Admin
         Name = adminRegisteredEvent.Name;
         TennisClubId = adminRegisteredEvent.TennisClubId;
         Status = adminRegisteredEvent.Status;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(AdminDeletedEvent adminDeletedEvent)
+    {
+        Status = AdminStatus.DELETED;
     }
     
     protected bool Equals(Admin other)

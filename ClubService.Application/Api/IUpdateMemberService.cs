@@ -4,5 +4,4 @@ public interface IUpdateMemberService
 {
     Task<string> LockMember(string id);
     Task<string> UnlockMember(string id);
-    Task<string> DeleteMember(string id);
 }

@@ -46,7 +46,7 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
             if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing delete tennis club!");
+                    "Additional events added during processing of delete tennis club!");
             }
             
             await eventRepository.CommitTransactionAsync();
