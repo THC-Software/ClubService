@@ -1,4 +1,5 @@
 using ClubService.Domain.Event;
+using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
@@ -167,6 +168,43 @@ public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env)
                 EntityType.MEMBER,
                 DateTime.UtcNow.AddHours(1),
                 new MemberDeletedEvent()
+            ),
+            // Admins
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("46162bac-2fcd-4511-9713-2777b1bad883"),
+                new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe"),
+                EventType.ADMIN_REGISTERED,
+                EntityType.ADMIN,
+                DateTime.UtcNow,
+                new AdminRegisteredEvent(
+                    new AdminId(new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe")),
+                    "adrian_spiegel",
+                    new FullName("Adrian", "Spiegel"),
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    AdminStatus.ACTIVE
+                )
+            ),
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("4d3d8403-f0a3-4d8a-a610-af4dfeb77124"),
+                new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
+                EventType.ADMIN_REGISTERED,
+                EntityType.ADMIN,
+                DateTime.UtcNow,
+                new AdminRegisteredEvent(
+                    new AdminId(new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a")),
+                    "michael_essig",
+                    new FullName("Michael", "Essig"),
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    AdminStatus.ACTIVE
+                )
+            ),
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("b9832de8-542e-4a3c-b745-b39f8ffc3223"),
+                new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
+                EventType.ADMIN_DELETED,
+                EntityType.ADMIN,
+                DateTime.UtcNow.AddHours(1),
+                new AdminDeletedEvent()
             )
         );
     }
