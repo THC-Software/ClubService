@@ -54,14 +54,14 @@ public class UpdateTennisClubServiceTests
         };
         
         _eventRepositoryMock.SetupSequence(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(existingDomainEventsBeforeLock)
-            .Returns(existingDomainEventsAfterLock);
+            .ReturnsAsync(existingDomainEventsBeforeLock)
+            .ReturnsAsync(existingDomainEventsAfterLock);
         
         // When
         _ = await _updateTennisClubService.LockTennisClub(tennisClubId.Id.ToString());
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_LOCKED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubLockedEvent))), Times.Once);
@@ -75,7 +75,7 @@ public class UpdateTennisClubServiceTests
         // Given
         var clubId = Guid.NewGuid().ToString();
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(new List<DomainEnvelope<ITennisClubDomainEvent>>());
+            .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() => _updateTennisClubService.LockTennisClub(clubId));
@@ -120,14 +120,14 @@ public class UpdateTennisClubServiceTests
         };
         
         _eventRepositoryMock.SetupSequence(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(existingDomainEventsBeforeUnlock)
-            .Returns(existingDomainEventsAfterUnlock);
+            .ReturnsAsync(existingDomainEventsBeforeUnlock)
+            .ReturnsAsync(existingDomainEventsAfterUnlock);
         
         // When
         _ = await _updateTennisClubService.UnlockTennisClub(tennisClubId.Id.ToString());
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_UNLOCKED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubUnlockedEvent))), Times.Once);
@@ -141,7 +141,7 @@ public class UpdateTennisClubServiceTests
         // Given
         var clubId = Guid.NewGuid().ToString();
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(new List<DomainEnvelope<ITennisClubDomainEvent>>());
+            .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() => _updateTennisClubService.UnlockTennisClub(clubId));
@@ -182,15 +182,15 @@ public class UpdateTennisClubServiceTests
         };
         
         _eventRepositoryMock.SetupSequence(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(existingDomainEventsBefore)
-            .Returns(existingDomainEventsAfter);
+            .ReturnsAsync(existingDomainEventsBefore)
+            .ReturnsAsync(existingDomainEventsAfter);
         
         // When
         _ = await _updateTennisClubService.ChangeSubscriptionTier(tennisClubId.Id.ToString(),
             newSubscriptionTierId.Id.ToString());
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubSubscriptionTierChangedEvent))), Times.Once);
@@ -205,7 +205,7 @@ public class UpdateTennisClubServiceTests
         var clubId = Guid.NewGuid().ToString();
         var subscriptionTierId = Guid.NewGuid().ToString();
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(new List<DomainEnvelope<ITennisClubDomainEvent>>());
+            .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() =>
@@ -247,15 +247,15 @@ public class UpdateTennisClubServiceTests
         };
         
         _eventRepositoryMock.SetupSequence(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(existingDomainEventsBefore)
-            .Returns(existingDomainEventsAfter);
+            .ReturnsAsync(existingDomainEventsBefore)
+            .ReturnsAsync(existingDomainEventsAfter);
         
         // When
         _ = await _updateTennisClubService.ChangeName(tennisClubId.Id.ToString(),
             newName);
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Save(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
             e.EventType == EventType.TENNIS_CLUB_NAME_CHANGED &&
             e.EntityType == EntityType.TENNIS_CLUB &&
             e.EventData.GetType() == typeof(TennisClubNameChangedEvent))), Times.Once);
@@ -270,7 +270,7 @@ public class UpdateTennisClubServiceTests
         var clubId = Guid.NewGuid().ToString();
         var name = "Test";
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .Returns(new List<DomainEnvelope<ITennisClubDomainEvent>>());
+            .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() =>

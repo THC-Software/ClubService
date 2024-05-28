@@ -12,10 +12,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
     public async Task<string> LockMember(string id)
     {
         var memberId = new MemberId(new Guid(id));
-        var existingMemberDomainEvents = eventRepository
-            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -39,11 +36,10 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             foreach (var domainEvent in memberLockDomainEvents)
             {
                 member.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
-            existingMemberDomainEvents =
-                eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
             
             if (existingMemberDomainEvents.Count != initialEventCount + memberLockDomainEvents.Count)
             {
@@ -69,10 +65,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
     public async Task<string> UnlockMember(string id)
     {
         var memberId = new MemberId(new Guid(id));
-        var existingMemberDomainEvents = eventRepository
-            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -96,11 +89,10 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             foreach (var domainEvent in domainEvents)
             {
                 member.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
-            existingMemberDomainEvents =
-                eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
             
             if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
@@ -126,10 +118,8 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
     public async Task<string> DeleteMember(string id)
     {
         var memberId = new MemberId(new Guid(id));
-        var existingMemberDomainEvents = eventRepository
-            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id)
-            .OrderBy(e => e.Timestamp)
-            .ToList();
+        var existingMemberDomainEvents = await eventRepository
+            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -153,11 +143,10 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             foreach (var domainEvent in domainEvents)
             {
                 member.Apply(domainEvent);
-                await eventRepository.Save(domainEvent);
+                await eventRepository.Append(domainEvent);
             }
             
-            existingMemberDomainEvents =
-                eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
             
             if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
             {

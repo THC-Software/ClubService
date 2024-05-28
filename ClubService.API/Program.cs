@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Database
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<EventStoreDbContext>(options =>
 {
     options
-        .UseNpgsql(builder.Configuration.GetConnectionString("postgres-connection"));
+        .UseNpgsql(builder.Configuration.GetConnectionString("event-store-connection"));
 });
 
 // Repositories
@@ -58,7 +58,7 @@ if (app.Environment.IsDevelopment())
     
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
-    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+    var dbContext = services.GetRequiredService<EventStoreDbContext>();
     dbContext.Database.EnsureDeleted();
     dbContext.Database.EnsureCreated();
 }

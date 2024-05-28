@@ -35,7 +35,8 @@ public class TennisClubTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(Guid.Parse(responseContent));
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(Guid.Parse(responseContent));
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         var storedEvent = storedEvents[0];
         Assert.Multiple(() =>
@@ -73,7 +74,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];
@@ -106,7 +107,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[2];
@@ -142,7 +143,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];
@@ -183,7 +184,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];
@@ -221,7 +222,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];

@@ -7,7 +7,7 @@ namespace ClubService.IntegrationTests.TestSetup;
 
 public class TestBase
 {
-    private ApplicationDbContext _dbContext;
+    private EventStoreDbContext _eventStoreDbContext;
     private WebAppFactory _factory;
     private PostgreSqlContainer _postgresContainer;
     protected IEventRepository EventRepository;
@@ -36,11 +36,11 @@ public class TestBase
         var scope = scopeFactory.CreateScope() ??
                     throw new Exception("Could not create Scope");
         
-        _dbContext = scope.ServiceProvider.GetService<ApplicationDbContext>() ??
-                     throw new Exception("Could not get ApplicationDbContext");
+        _eventStoreDbContext = scope.ServiceProvider.GetService<EventStoreDbContext>() ??
+                               throw new Exception("Could not get ApplicationDbContext");
         EventRepository = scope.ServiceProvider.GetService<IEventRepository>() ??
                           throw new Exception("Could not get EventRepository");
-        await _dbContext.Database.EnsureCreatedAsync();
+        await _eventStoreDbContext.Database.EnsureCreatedAsync();
     }
     
     [TearDown]
@@ -48,7 +48,7 @@ public class TestBase
     {
         HttpClient.Dispose();
         await _factory.DisposeAsync();
-        await _dbContext.DisposeAsync();
+        await _eventStoreDbContext.DisposeAsync();
         await _postgresContainer.StopAsync();
     }
 }
