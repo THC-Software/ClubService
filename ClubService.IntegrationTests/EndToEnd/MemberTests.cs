@@ -144,7 +144,7 @@ public class MemberTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
