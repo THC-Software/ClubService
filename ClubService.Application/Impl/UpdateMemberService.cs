@@ -114,4 +114,61 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
         
         return id;
     }
+    
+    public async Task<string> DeleteMember(string id)
+    {
+        var memberId = new MemberId(new Guid(id));
+        var existingMemberDomainEvents = eventRepository
+            .GetEventsForEntity<IMemberDomainEvent>(memberId.Id)
+            .OrderBy(e => e.Timestamp)
+            .ToList();
+        
+        if (existingMemberDomainEvents.Count == 0)
+        {
+            throw new MemberNotFoundException("No member events found!");
+        }
+        
+        var initialEventCount = existingMemberDomainEvents.Count;
+        
+        var member = new Member();
+        foreach (var domainEvent in existingMemberDomainEvents)
+        {
+            member.Apply(domainEvent);
+        }
+        
+        try
+        {
+            var domainEvents = member.ProcessMemberDeleteCommand();
+            
+            await eventRepository.BeginTransactionAsync();
+            
+            foreach (var domainEvent in domainEvents)
+            {
+                member.Apply(domainEvent);
+                await eventRepository.Save(domainEvent);
+            }
+            
+            existingMemberDomainEvents =
+                eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+            
+            if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
+            {
+                throw new ConcurrencyException(
+                    "Additional events added during processing unlocking the member!");
+            }
+            
+            await eventRepository.CommitTransactionAsync();
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new ConflictException(ex.Message, ex);
+        }
+        catch (ConcurrencyException)
+        {
+            await eventRepository.RollbackTransactionAsync();
+            throw;
+        }
+        
+        return id;
+    }
 }
