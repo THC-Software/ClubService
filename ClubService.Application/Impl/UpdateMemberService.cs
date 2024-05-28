@@ -44,7 +44,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             if (existingMemberDomainEvents.Count != initialEventCount + memberLockDomainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing locking the member!");
+                    "Additional events added during processing of lock member!");
             }
             
             await eventRepository.CommitTransactionAsync();
@@ -97,7 +97,7 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
             {
                 throw new ConcurrencyException(
-                    "Additional events added during processing unlocking the member!");
+                    "Additional events added during processing of unlock member!");
             }
             
             await eventRepository.CommitTransactionAsync();
