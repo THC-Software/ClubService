@@ -15,7 +15,7 @@ public class EventRepositoryTests : TestBase
         // Given
         var tennisClubRegisteredEventExpected =
             new TennisClubRegisteredEvent(new TennisClubId(Guid.NewGuid()), "Test Tennis Club",
-                new SubscriptionTierId(Guid.NewGuid()), TennisClubStatus.NONE);
+                new SubscriptionTierId(Guid.NewGuid()), TennisClubStatus.ACTIVE);
         var domainEnvelopeExpected =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(),
                 tennisClubRegisteredEventExpected.TennisClubId.Id,

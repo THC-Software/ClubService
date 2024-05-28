@@ -32,7 +32,7 @@ public class UpdateTennisClubServiceTests
         
         var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(tennisClubId, name,
-                subscriptionTierId, TennisClubStatus.NONE);
+                subscriptionTierId, TennisClubStatus.ACTIVE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
@@ -91,7 +91,7 @@ public class UpdateTennisClubServiceTests
         
         var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(tennisClubId, name,
-                subscriptionTierId, TennisClubStatus.NONE);
+                subscriptionTierId, TennisClubStatus.ACTIVE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
@@ -158,7 +158,7 @@ public class UpdateTennisClubServiceTests
         
         var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(tennisClubId, name,
-                subscriptionTierId, TennisClubStatus.NONE);
+                subscriptionTierId, TennisClubStatus.ACTIVE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
@@ -223,7 +223,7 @@ public class UpdateTennisClubServiceTests
         
         var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(tennisClubId, name,
-                subscriptionTierId, TennisClubStatus.NONE);
+                subscriptionTierId, TennisClubStatus.ACTIVE);
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);

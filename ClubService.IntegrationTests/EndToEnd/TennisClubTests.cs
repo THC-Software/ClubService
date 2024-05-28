@@ -49,7 +49,7 @@ public class TennisClubTests : TestBase
         Assert.Multiple(() =>
         {
             Assert.That(tennisClubRegisteredEventActual.Name, Is.EqualTo(registerTennisClubCommand.Name));
-            Assert.That(tennisClubRegisteredEventActual.Status, Is.EqualTo(TennisClubStatus.NONE));
+            Assert.That(tennisClubRegisteredEventActual.Status, Is.EqualTo(TennisClubStatus.ACTIVE));
             Assert.That(tennisClubRegisteredEventActual.SubscriptionTierId.Id,
                 Is.EqualTo(subscriptionTierIdExpected));
         });

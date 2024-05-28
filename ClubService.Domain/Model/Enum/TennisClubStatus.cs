@@ -2,7 +2,7 @@
 
 public enum TennisClubStatus
 {
-    NONE,
+    ACTIVE,
     LOCKED,
     DELETED
 }

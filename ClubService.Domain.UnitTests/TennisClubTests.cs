@@ -41,7 +41,7 @@ public class TennisClubTests
         Assert.Multiple(() =>
         {
             Assert.That(tennisClubRegisteredEvent.Name, Is.EqualTo(nameExpected));
-            Assert.That(tennisClubRegisteredEvent.Status, Is.EqualTo(TennisClubStatus.NONE));
+            Assert.That(tennisClubRegisteredEvent.Status, Is.EqualTo(TennisClubStatus.ACTIVE));
             Assert.That(tennisClubRegisteredEvent.SubscriptionTierId, Is.EqualTo(subscriptionTierIdExpected));
         });
     }
@@ -57,7 +57,7 @@ public class TennisClubTests
         
         var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(tennisClubIdExpected, nameExpected,
-                subscriptionTierIdExpected, TennisClubStatus.NONE);
+                subscriptionTierIdExpected, TennisClubStatus.ACTIVE);
         
         var domainEnvelope =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubIdExpected.Id,
@@ -71,7 +71,7 @@ public class TennisClubTests
         {
             Assert.That(tennisClub.TennisClubId, Is.EqualTo(tennisClubIdExpected));
             Assert.That(tennisClub.Name, Is.EqualTo(nameExpected));
-            Assert.That(tennisClub.Status, Is.EqualTo(TennisClubStatus.NONE));
+            Assert.That(tennisClub.Status, Is.EqualTo(TennisClubStatus.ACTIVE));
             Assert.That(tennisClub.SubscriptionTierId, Is.EqualTo(subscriptionTierIdExpected));
         });
     }
@@ -200,7 +200,7 @@ public class TennisClubTests
         tennisClub.Apply(domainEvent);
         
         // Then
-        Assert.That(tennisClub.Status, Is.EqualTo(TennisClubStatus.NONE));
+        Assert.That(tennisClub.Status, Is.EqualTo(TennisClubStatus.ACTIVE));
     }
     
     [Test]
