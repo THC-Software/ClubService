@@ -43,56 +43,48 @@ public class Member
     {
         switch (Status)
         {
+            case MemberStatus.NONE:
+                var memberLockedEvent = new MemberLockedEvent();
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_LOCKED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberLockedEvent
+                );
+                return [domainEnvelope];
             case MemberStatus.DELETED:
                 throw new InvalidOperationException("Member is already deleted!");
             case MemberStatus.LOCKED:
                 throw new InvalidOperationException("Member is already locked!");
-            case MemberStatus.NONE:
-                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        
-        var memberLockedEvent = new MemberLockedEvent();
-        
-        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-            Guid.NewGuid(),
-            MemberId.Id,
-            EventType.MEMBER_LOCKED,
-            EntityType.MEMBER,
-            DateTime.UtcNow,
-            memberLockedEvent
-        );
-        
-        return [domainEnvelope];
     }
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUnlockCommand()
     {
         switch (Status)
         {
+            case MemberStatus.LOCKED:
+                var memberUnlockedEvent = new MemberUnlockedEvent();
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_UNLOCKED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberUnlockedEvent
+                );
+                return [domainEnvelope];
             case MemberStatus.DELETED:
                 throw new InvalidOperationException("Member is already deleted!");
             case MemberStatus.NONE:
                 throw new InvalidOperationException("Member needs to be locked!");
-            case MemberStatus.LOCKED:
-                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        
-        var memberUnlockedEvent = new MemberUnlockedEvent();
-        
-        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-            Guid.NewGuid(),
-            MemberId.Id,
-            EventType.MEMBER_UNLOCKED,
-            EntityType.MEMBER,
-            DateTime.UtcNow,
-            memberUnlockedEvent
-        );
-        
-        return [domainEnvelope];
     }
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberDeleteCommand()
