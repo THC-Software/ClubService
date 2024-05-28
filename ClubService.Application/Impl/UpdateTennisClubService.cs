@@ -18,7 +18,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         
         if (existingDomainEvents.Count == 0)
         {
-            throw new TennisClubNotFoundException("No events found!");
+            throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
         var initialEventCount = existingDomainEvents.Count;
@@ -72,7 +72,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         
         if (existingDomainEvents.Count == 0)
         {
-            throw new TennisClubNotFoundException("No events found!");
+            throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
         var initialEventCount = existingDomainEvents.Count;
@@ -126,7 +126,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         
         if (existingDomainEvents.Count == 0)
         {
-            throw new TennisClubNotFoundException("No events found!");
+            throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
         var initialEventCount = existingDomainEvents.Count;
@@ -180,7 +180,7 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         
         if (existingDomainEvents.Count == 0)
         {
-            throw new TennisClubNotFoundException("No events found!");
+            throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
         var initialEventCount = existingDomainEvents.Count;

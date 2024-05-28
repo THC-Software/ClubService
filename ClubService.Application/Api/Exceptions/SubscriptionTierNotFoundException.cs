@@ -1,16 +1,6 @@
 namespace ClubService.Application.Api.Exceptions;
 
-public class SubscriptionTierNotFoundException : Exception
+public class SubscriptionTierNotFoundException(Guid id) : Exception(string.Format(DefaultMessage, id))
 {
-    public SubscriptionTierNotFoundException()
-    {
-    }
-    
-    public SubscriptionTierNotFoundException(string? message) : base(message)
-    {
-    }
-    
-    public SubscriptionTierNotFoundException(string? message, Exception? innerException) : base(message, innerException)
-    {
-    }
+    private const string DefaultMessage = "Subscription tier with id {0} was not found.";
 }

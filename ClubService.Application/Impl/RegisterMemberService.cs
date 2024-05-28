@@ -20,7 +20,7 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
         
         if (existingTennisClubDomainEvents.Count == 0)
         {
-            throw new TennisClubNotFoundException("No events found!");
+            throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
         var tennisClub = new TennisClub();
@@ -40,7 +40,7 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
         
         if (existingSubscriptionTierDomainEvents.Count == 0)
         {
-            throw new SubscriptionTierNotFoundException($"Subscription Tier '{subscriptionTierId}' not found!");
+            throw new SubscriptionTierNotFoundException(subscriptionTierId.Id);
         }
         
         var member = new Member();

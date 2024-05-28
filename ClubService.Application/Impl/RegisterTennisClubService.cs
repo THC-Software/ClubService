@@ -18,7 +18,7 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
         
         if (subscriptionTierDomainEvents.Count == 0)
         {
-            throw new SubscriptionTierNotFoundException($"Subscription Tier '{subscriptionTierId}' not found!");
+            throw new SubscriptionTierNotFoundException(subscriptionTierId);
         }
         
         var tennisClub = new TennisClub();
