@@ -9,7 +9,10 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/members")]
 [ApiController]
 [ApiVersion("1.0")]
-public class MemberController(IRegisterMemberService registerMemberService, IUpdateMemberService updateMemberService)
+public class MemberController(
+    IRegisterMemberService registerMemberService,
+    IUpdateMemberService updateMemberService,
+    IDeleteMemberService deleteMemberService)
     : ControllerBase
 {
     [HttpGet("{memberId}")]
@@ -45,7 +48,7 @@ public class MemberController(IRegisterMemberService registerMemberService, IUpd
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<string>> DeleteMember(string id)
     {
-        var deletedMemberId = await updateMemberService.DeleteMember(id);
+        var deletedMemberId = await deleteMemberService.DeleteMember(id);
         return Ok(deletedMemberId);
     }
     
