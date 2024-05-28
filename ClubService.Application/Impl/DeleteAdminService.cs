@@ -28,7 +28,7 @@ public class DeleteAdminService(IEventRepository eventRepository) : IDeleteAdmin
         
         try
         {
-            var domainEvents = admin.ProcessMemberDeleteCommand();
+            var domainEvents = admin.ProcessAdminDeleteCommand();
             
             await eventRepository.BeginTransactionAsync();
             

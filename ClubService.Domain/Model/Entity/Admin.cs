@@ -38,7 +38,7 @@ public class Admin
         return [domainEnvelope];
     }
     
-    public List<DomainEnvelope<IAdminDomainEvent>> ProcessMemberDeleteCommand()
+    public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminDeleteCommand()
     {
         if (Status.Equals(AdminStatus.DELETED))
         {
