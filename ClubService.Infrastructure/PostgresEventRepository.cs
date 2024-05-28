@@ -102,14 +102,6 @@ public class PostgresEventRepository(ApplicationDbContext applicationDbContext) 
                 }
                 
                 break;
-            case EventType.MEMBER_LIMIT_EXCEEDED:
-                if (JsonConvert.DeserializeObject<TennisClubMemberLimitExceededEvent>(eventDataJson) is T
-                    tennisClubMemberLimitExceededEvent)
-                {
-                    return tennisClubMemberLimitExceededEvent;
-                }
-                
-                break;
             case EventType.MEMBER_DELETED:
                 if (JsonConvert.DeserializeObject<MemberDeletedEvent>(eventDataJson) is T
                     memberDeletedEvent)

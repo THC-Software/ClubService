@@ -19,7 +19,6 @@ public class SubscriptionTier
                 break;
             case EventType.TENNIS_CLUB_REGISTERED:
             case EventType.MEMBER_REGISTERED:
-            case EventType.MEMBER_LIMIT_EXCEEDED:
             case EventType.MEMBER_DELETED:
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
