@@ -1,4 +1,5 @@
-﻿using ClubService.Application.Api.Exceptions;
+﻿using System.Data;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
@@ -18,8 +19,6 @@ public class DeleteAdminService(IEventRepository eventRepository) : IDeleteAdmin
             throw new AdminNotFoundException(adminId.Id);
         }
         
-        var initialEventCount = existingAdminDomainEvents.Count;
-        
         var admin = new Admin();
         foreach (var domainEvent in existingAdminDomainEvents)
         {
@@ -29,33 +28,21 @@ public class DeleteAdminService(IEventRepository eventRepository) : IDeleteAdmin
         try
         {
             var domainEvents = admin.ProcessAdminDeleteCommand();
-            
-            await eventRepository.BeginTransactionAsync();
+            var expectedEventCount = existingAdminDomainEvents.Count;
             
             foreach (var domainEvent in domainEvents)
             {
                 admin.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingAdminDomainEvents = await eventRepository.GetEventsForEntity<IAdminDomainEvent>(adminId.Id);
-            
-            if (existingAdminDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of delete admin!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return id;

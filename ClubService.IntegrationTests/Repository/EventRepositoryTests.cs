@@ -13,6 +13,8 @@ public class EventRepositoryTests : TestBase
     public async Task GivenDomainEvent_WhenSave_ThenEventIsSavedInDatabase()
     {
         // Given
+        const int eventCount = 0;
+        const int eventCountExpected = 1;
         var tennisClubRegisteredEventExpected =
             new TennisClubRegisteredEvent(new TennisClubId(Guid.NewGuid()), "Test Tennis Club",
                 new SubscriptionTierId(Guid.NewGuid()), TennisClubStatus.ACTIVE);
@@ -23,12 +25,14 @@ public class EventRepositoryTests : TestBase
                 tennisClubRegisteredEventExpected);
         
         // When
-        await EventRepository.Append(domainEnvelopeExpected);
+        var eventCountActual = await EventRepository.Append(domainEnvelopeExpected, eventCount);
         
         // Then
+        Assert.That(eventCountActual, Is.EqualTo(eventCountExpected));
+        
         var savedEvents =
             await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
-        Assert.That(savedEvents, Has.Count.EqualTo(1));
+        Assert.That(savedEvents, Has.Count.EqualTo(eventCountExpected));
         
         var domainEnvelopeActual = savedEvents[0];
         Assert.Multiple(() =>

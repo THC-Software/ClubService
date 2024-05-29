@@ -23,14 +23,15 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
         
         var tennisClub = new TennisClub();
         
-        var tennisClubDomainEvents =
+        var domainEvents =
             tennisClub.ProcessTennisClubRegisterCommand(tennisClubRegisterCommand.Name,
                 tennisClubRegisterCommand.SubscriptionTierId);
+        var expectedEventCount = 0;
         
-        foreach (var tennisClubDomainEvent in tennisClubDomainEvents)
+        foreach (var domainEvent in domainEvents)
         {
-            tennisClub.Apply(tennisClubDomainEvent);
-            await eventRepository.Append(tennisClubDomainEvent);
+            tennisClub.Apply(domainEvent);
+            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
         }
         
         return tennisClub.TennisClubId.Id.ToString();

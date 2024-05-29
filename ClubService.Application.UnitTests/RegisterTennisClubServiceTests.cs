@@ -27,6 +27,10 @@ public class RegisterTennisClubServiceTests
     public async Task GivenValidInputs_WhenRegisterTennisClub_ThenRepoIsCalledWithExpectedEvent()
     {
         // Given
+        const int eventCountExpected = 0;
+        const EventType eventTypeExpected = EventType.TENNIS_CLUB_REGISTERED;
+        const EntityType entityTypeExpected = EntityType.TENNIS_CLUB;
+        var eventDataTypeExpected = typeof(TennisClubRegisteredEvent);
         var subscriptionTierId = Guid.NewGuid();
         var tennisClubRegisterCommand =
             new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId.ToString());
@@ -47,17 +51,18 @@ public class RegisterTennisClubServiceTests
         
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))
             .ReturnsAsync(subscriptionTierDomainEvents);
-        _eventRepositoryMock.Setup(repo => repo.Append(It.IsAny<DomainEnvelope<ITennisClubDomainEvent>>()))
-            .Returns(Task.CompletedTask);
         
         // When
         _ = await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
         
         // Then
-        _eventRepositoryMock.Verify(repo => repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
-            e.EventType == EventType.TENNIS_CLUB_REGISTERED &&
-            e.EntityType == EntityType.TENNIS_CLUB &&
-            e.EventData.GetType() == typeof(TennisClubRegisteredEvent))), Times.Once);
+        _eventRepositoryMock.Verify(repo =>
+                repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
+                        e.EventType == eventTypeExpected &&
+                        e.EntityType == entityTypeExpected &&
+                        e.EventData.GetType() == eventDataTypeExpected),
+                    eventCountExpected), Times.Once
+        );
     }
     
     [Test]
