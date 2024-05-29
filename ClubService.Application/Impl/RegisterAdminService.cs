@@ -12,16 +12,16 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
 {
     public async Task<string> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
     {
+        var tennisClubId = new TennisClubId(new Guid(adminRegisterCommand.TennisClubId));
         var admin = new Admin();
         
         var tennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(
-                new Guid(adminRegisterCommand.TennisClubId));
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
         //TODO: what if deleted?
         if (tennisClubDomainEvents.Count == 0)
         {
-            throw new TennisClubNotFoundException($"Tennis Club '{adminRegisterCommand.TennisClubId}' not found!");
+            throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
         var adminDomainEvents = admin.ProcessAdminRegisterCommand(adminRegisterCommand.Username,

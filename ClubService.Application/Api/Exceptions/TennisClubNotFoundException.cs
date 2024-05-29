@@ -1,16 +1,6 @@
 namespace ClubService.Application.Api.Exceptions;
 
-public class TennisClubNotFoundException : Exception
+public class TennisClubNotFoundException(Guid id) : Exception
 {
-    public TennisClubNotFoundException()
-    {
-    }
-    
-    public TennisClubNotFoundException(string message) : base(message)
-    {
-    }
-    
-    public TennisClubNotFoundException(string message, Exception innerException) : base(message, innerException)
-    {
-    }
+    public override string Message { get; } = $"Tennis club with id {id} not found.";
 }

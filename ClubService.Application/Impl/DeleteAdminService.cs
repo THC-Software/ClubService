@@ -15,7 +15,7 @@ public class DeleteAdminService(IEventRepository eventRepository) : IDeleteAdmin
         
         if (existingAdminDomainEvents.Count == 0)
         {
-            throw new AdminNotFoundException("No admin events found!");
+            throw new AdminNotFoundException(adminId.Id);
         }
         
         var initialEventCount = existingAdminDomainEvents.Count;

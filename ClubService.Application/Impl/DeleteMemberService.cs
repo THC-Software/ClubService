@@ -16,7 +16,7 @@ public class DeleteMemberService(IEventRepository eventRepository) : IDeleteMemb
         
         if (existingMemberDomainEvents.Count == 0)
         {
-            throw new MemberNotFoundException("No member events found!");
+            throw new MemberNotFoundException(memberId.Id);
         }
         
         var initialEventCount = existingMemberDomainEvents.Count;
