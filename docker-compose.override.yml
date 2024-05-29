@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7.0-alpine
+    container_name: "club-service-redis"
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - tennis-club-network
+  
+  debezium-postgres:
+    ports:
+      - "5432:5432"
