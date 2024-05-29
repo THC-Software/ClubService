@@ -9,6 +9,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ClubService.API/ClubService.API.csproj", "ClubService.API/"]
 COPY ["ClubService.Application/ClubService.Application.csproj", "ClubService.Application/"]
+COPY ["ClubService.Domain/ClubService.Domain.csproj", "ClubService.Domain/"]
+COPY ["ClubService.Infrastructure/ClubService.Infrastructure.csproj", "ClubService.Infrastructure/"]
 RUN dotnet restore "ClubService.API/ClubService.API.csproj"
 COPY . .
 WORKDIR "/src/ClubService.API"
