@@ -1,6 +1,6 @@
 ﻿namespace ClubService.Application.Api.Exceptions;
 
-public class AdminNotFoundException(Guid id) : Exception(string.Format(DefaultMessage, id))
+public class AdminNotFoundException(Guid id) : Exception
 {
-    private const string DefaultMessage = "Admin with id {0} was not found.";
+    public override string Message { get; } = $"Admin with id {id} not found.";
 }
