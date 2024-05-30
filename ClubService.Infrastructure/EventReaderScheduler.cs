@@ -1,9 +1,9 @@
 ﻿using ClubService.Infrastructure.Api;
 using Microsoft.Extensions.Hosting;
 
-namespace ClubService.Application;
+namespace ClubService.Infrastructure;
 
-public class EventProcessingService(IEventReader eventReader) : BackgroundService
+public class EventReaderScheduler(IEventReader eventReader) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -13,7 +13,7 @@ public class EventProcessingService(IEventReader eventReader) : BackgroundServic
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine("Redis Event Reader stopped!");
+            Console.WriteLine("BackgroundService Stopped!");
         }
     }
 }

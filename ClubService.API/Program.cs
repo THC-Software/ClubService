@@ -46,7 +46,7 @@ builder.Services.AddApiVersioning(options =>
 
 builder.Services.AddSingleton<IEventReader>(sp => new RedisEventReader(new CancellationTokenSource().Token, new ChainEventHandler()));
 
-builder.Services.AddHostedService<EventProcessingService>();
+builder.Services.AddHostedService<EventReaderScheduler>();
 builder.Services.AddControllers();
 
 // Swagger
