@@ -13,20 +13,15 @@ public class RedisEventReader : IEventReader
 
     public RedisEventReader(CancellationToken cancellationToken)
     {
-        Console.WriteLine("{RedisEventReader}: constructor called start");
         _cancellationToken = cancellationToken;
         var configurationOptions = ConfigurationOptions.Parse("localhost");
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
         var muxer = ConnectionMultiplexer.Connect(configurationOptions);
         _db = muxer.GetDatabase();
-        Console.WriteLine("{RedisEventReader}: constructor called end");
     }
 
     public async Task ConsumeMessagesAsync()
     {
-        Console.WriteLine("{RedisEventReader}: starting to consume messages");
-
-
         if (!(await _db.KeyExistsAsync(StreamName)) ||
             (await _db.StreamGroupInfoAsync(StreamName)).All(x=>x.Name!=GroupName))
         {
@@ -48,7 +43,6 @@ public class RedisEventReader : IEventReader
                 {
                     var streamEntry = result.First();
                     id = streamEntry.Id;
-                    Console.WriteLine(streamEntry.ToString());
                     //CALL CHAIN EVENT HANDLER
                     // var parsedEvent = ParseEvent(streamEntry);
                     // if (parsedEvent == null)
