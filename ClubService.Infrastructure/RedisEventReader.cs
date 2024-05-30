@@ -52,8 +52,16 @@ public class RedisEventReader : IEventReader
                     var jsonContent = JsonNode.Parse(dict.Values.First());
                     var eventInfo = jsonContent["payload"]["after"];
                     
-                    DomainEnvelope<IDomainEvent> parsedEvent = EventParser.ParseEvent(eventInfo);
-                    _eventHandler.Handle(parsedEvent);
+                    try
+                    {
+                        DomainEnvelope<IDomainEvent> parsedEvent = EventParser.ParseEvent(eventInfo);
+                        _eventHandler.Handle(parsedEvent);
+                    }
+                    catch (InvalidOperationException e)
+                    {
+                        //TODO: Use logger
+                        Console.WriteLine("Event Ignored: " + e.Message);
+                    }
                 }
                 
                 await Task.Delay(1000, _cancellationToken);
@@ -61,6 +69,7 @@ public class RedisEventReader : IEventReader
             catch (OperationCanceledException)
             {
                 Console.WriteLine("Redis Event Reader stopped!");
+                Dispose();
                 break;
             }
         }
