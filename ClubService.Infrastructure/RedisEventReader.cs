@@ -2,7 +2,6 @@ using System.Text.Json.Nodes;
 using ClubService.Application.Api;
 using ClubService.Domain.Event;
 using ClubService.Infrastructure.Api;
-using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
 namespace ClubService.Infrastructure;
@@ -15,7 +14,7 @@ public class RedisEventReader : IEventReader
     private readonly IDatabase _db;
     private readonly ConnectionMultiplexer _muxer;
     private readonly IEventHandler _eventHandler;
-
+    
     public RedisEventReader(CancellationToken cancellationToken, IEventHandler eventHandler)
     {
         _eventHandler = eventHandler;
@@ -25,11 +24,11 @@ public class RedisEventReader : IEventReader
         _muxer = ConnectionMultiplexer.Connect(configurationOptions);
         _db = _muxer.GetDatabase();
     }
-
+    
     public async Task ConsumeMessagesAsync()
     {
         if (!(await _db.KeyExistsAsync(StreamName)) ||
-            (await _db.StreamGroupInfoAsync(StreamName)).All(x=>x.Name!=GroupName))
+            (await _db.StreamGroupInfoAsync(StreamName)).All(x => x.Name != GroupName))
         {
             await _db.StreamCreateConsumerGroupAsync(StreamName, GroupName, "0-0", true);
         }
@@ -44,6 +43,7 @@ public class RedisEventReader : IEventReader
                     await _db.StreamAcknowledgeAsync(StreamName, GroupName, id);
                     id = string.Empty;
                 }
+                
                 var result = await _db.StreamReadGroupAsync(StreamName, GroupName, "pos-member", ">", 1);
                 if (result.Any())
                 {
@@ -55,9 +55,10 @@ public class RedisEventReader : IEventReader
                     DomainEnvelope<IDomainEvent> parsedEvent = EventParser.ParseEvent(eventInfo);
                     _eventHandler.Handle(parsedEvent);
                 }
+                
                 await Task.Delay(1000, _cancellationToken);
             }
-            catch (OperationCanceledException )
+            catch (OperationCanceledException)
             {
                 Console.WriteLine("Redis Event Reader stopped!");
                 break;
