@@ -1,4 +1,5 @@
-﻿using ClubService.Application.Api;
+﻿using System.Data;
+using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Model.Entity;
@@ -19,8 +20,6 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             throw new MemberNotFoundException(memberId.Id);
         }
         
-        var initialEventCount = existingMemberDomainEvents.Count;
-        
         var member = new Member();
         foreach (var domainEvent in existingMemberDomainEvents)
         {
@@ -29,34 +28,22 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
         
         try
         {
-            var memberLockDomainEvents = member.ProcessMemberLockCommand();
+            var domainEvents = member.ProcessMemberLockCommand();
+            var expectedEventCount = existingMemberDomainEvents.Count;
             
-            await eventRepository.BeginTransactionAsync();
-            
-            foreach (var domainEvent in memberLockDomainEvents)
+            foreach (var domainEvent in domainEvents)
             {
                 member.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
-            
-            if (existingMemberDomainEvents.Count != initialEventCount + memberLockDomainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of lock member!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return id;
@@ -72,8 +59,6 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
             throw new MemberNotFoundException(memberId.Id);
         }
         
-        var initialEventCount = existingMemberDomainEvents.Count;
-        
         var member = new Member();
         foreach (var domainEvent in existingMemberDomainEvents)
         {
@@ -83,33 +68,21 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
         try
         {
             var domainEvents = member.ProcessMemberUnlockCommand();
-            
-            await eventRepository.BeginTransactionAsync();
+            var expectedEventCount = existingMemberDomainEvents.Count;
             
             foreach (var domainEvent in domainEvents)
             {
                 member.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
-            
-            if (existingMemberDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of unlock member!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return id;

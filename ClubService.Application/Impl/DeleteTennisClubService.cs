@@ -1,3 +1,4 @@
+using System.Data;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.TennisClub;
@@ -14,16 +15,15 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+        var existingTennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
-        if (existingDomainEvents.Count == 0)
+        if (existingTennisClubDomainEvents.Count == 0)
         {
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var initialEventCount = existingDomainEvents.Count;
-        
-        foreach (var domainEvent in existingDomainEvents)
+        foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
@@ -32,33 +32,21 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
         try
         {
             var domainEvents = tennisClub.ProcessDeleteTennisClubCommand();
-            
-            await eventRepository.BeginTransactionAsync();
+            var expectedEventCount = existingTennisClubDomainEvents.Count;
             
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-            
-            if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of delete tennis club!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return tennisClub.TennisClubId.Id.ToString();

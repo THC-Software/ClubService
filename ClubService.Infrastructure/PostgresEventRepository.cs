@@ -1,4 +1,9 @@
+using System.Data;
 using ClubService.Domain.Event;
+using ClubService.Domain.Event.Admin;
+using ClubService.Domain.Event.Member;
+using ClubService.Domain.Event.SubscriptionTier;
+using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
@@ -20,27 +25,36 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
     
     private const string InsertSqlQuery = @"
         INSERT INTO ""DomainEvent""(""eventId"", ""entityId"", ""eventType"", ""entityType"", ""timestamp"", ""eventData"")
-        VALUES(@eventId, @entityId, @eventType, @entityType, @timestamp, @eventData);
+        SELECT @eventId, @entityId, @eventType, @entityType, @timestamp, @eventData
+        WHERE (SELECT COUNT(*) FROM ""DomainEvent"" WHERE ""entityId"" = @entityId) = @expectedEventCount;
     ";
     
-    private IDbContextTransaction _transaction;
-    
-    public async Task Append<T>(DomainEnvelope<T> domainEnvelope) where T : IDomainEvent
+    public async Task<int> Append<T>(DomainEnvelope<T> domainEnvelope, int expectedEventCount) where T : IDomainEvent
     {
-        await using var command = eventStoreDbContext.Database.GetDbConnection().CreateCommand();
-        command.CommandText = InsertSqlQuery;
+        await eventStoreDbContext.Database.OpenConnectionAsync();
+        
+        await using var insertCommand = eventStoreDbContext.Database.GetDbConnection().CreateCommand();
+        insertCommand.CommandText = InsertSqlQuery;
         
         var jsonSerializedEventData = JsonConvert.SerializeObject(domainEnvelope.EventData);
-        command.Parameters.Add(new NpgsqlParameter("@eventId", domainEnvelope.EventId));
-        command.Parameters.Add(new NpgsqlParameter("@entityId", domainEnvelope.EntityId));
-        command.Parameters.Add(new NpgsqlParameter("@eventType", domainEnvelope.EventType.ToString()));
-        command.Parameters.Add(new NpgsqlParameter("@entityType", domainEnvelope.EntityType.ToString()));
-        command.Parameters.Add(new NpgsqlParameter("@timestamp", domainEnvelope.Timestamp));
-        command.Parameters.Add(new NpgsqlParameter("@eventData", jsonSerializedEventData));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@eventId", domainEnvelope.EventId));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@entityId", domainEnvelope.EntityId));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@eventType", domainEnvelope.EventType.ToString()));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@entityType", domainEnvelope.EntityType.ToString()));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@timestamp", domainEnvelope.Timestamp));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@eventData", jsonSerializedEventData));
+        insertCommand.Parameters.Add(new NpgsqlParameter("@expectedEventCount", expectedEventCount));
         
-        await eventStoreDbContext.Database.OpenConnectionAsync();
-        await command.ExecuteNonQueryAsync();
+        var affectedRows = await insertCommand.ExecuteNonQueryAsync();
         await eventStoreDbContext.Database.CloseConnectionAsync();
+        
+        if (affectedRows == 0)
+        {
+            throw new DataException(
+                $"Expected event count {expectedEventCount} did not match current event count.");
+        }
+        
+        return expectedEventCount + 1;
     }
     
     public async Task<List<DomainEnvelope<T>>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
@@ -78,20 +92,5 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
         await eventStoreDbContext.Database.CloseConnectionAsync();
         
         return events;
-    }
-    
-    public async Task BeginTransactionAsync()
-    {
-        _transaction = await eventStoreDbContext.Database.BeginTransactionAsync();
-    }
-    
-    public async Task CommitTransactionAsync()
-    {
-        await _transaction.CommitAsync();
-    }
-    
-    public async Task RollbackTransactionAsync()
-    {
-        await _transaction.RollbackAsync();
     }
 }
