@@ -35,7 +35,8 @@ public class TennisClubTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(Guid.Parse(responseContent));
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(Guid.Parse(responseContent));
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         var storedEvent = storedEvents[0];
         Assert.Multiple(() =>
@@ -48,7 +49,7 @@ public class TennisClubTests : TestBase
         Assert.Multiple(() =>
         {
             Assert.That(tennisClubRegisteredEventActual.Name, Is.EqualTo(registerTennisClubCommand.Name));
-            Assert.That(tennisClubRegisteredEventActual.Status, Is.EqualTo(TennisClubStatus.NONE));
+            Assert.That(tennisClubRegisteredEventActual.Status, Is.EqualTo(TennisClubStatus.ACTIVE));
             Assert.That(tennisClubRegisteredEventActual.SubscriptionTierId.Id,
                 Is.EqualTo(subscriptionTierIdExpected));
         });
@@ -73,7 +74,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];
@@ -106,7 +107,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[2];
@@ -142,7 +143,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];
@@ -183,7 +184,7 @@ public class TennisClubTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
         
-        var storedEvents = EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[1];
@@ -199,5 +200,38 @@ public class TennisClubTests : TestBase
             (TennisClubNameChangedEvent)storedEvent.EventData;
         Assert.That(tennisClubNameChangedEvent.Name,
             Is.EqualTo(tennisClubUpdateCommand.Name));
+    }
+    
+    [Test]
+    public async Task
+        GivenTennisClubId_WhenDeleteTennisClub_ThenTennisClubDeletedEventExistsInRepositoryAndIdIsReturned()
+    {
+        // Given
+        var numberOfEventsExpected = 2;
+        var clubIdExpected = new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3");
+        var eventTypeExpected = EventType.TENNIS_CLUB_DELETED;
+        var entityTypeExpected = EntityType.TENNIS_CLUB;
+        var eventDataTypeExpected = typeof(TennisClubDeletedEvent);
+        
+        // When
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected.ToString()}");
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
+        
+        var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var storedEvent = storedEvents[1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
+            Assert.That(storedEvent.EntityId, Is.EqualTo(clubIdExpected));
+            Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
     }
 }

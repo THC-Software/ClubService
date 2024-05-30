@@ -14,11 +14,11 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
     {
         var subscriptionTierId = new Guid(tennisClubRegisterCommand.SubscriptionTierId);
         var subscriptionTierDomainEvents =
-            eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId);
+            await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId);
         
         if (subscriptionTierDomainEvents.Count == 0)
         {
-            throw new SubscriptionTierNotFoundException($"Subscription Tier '{subscriptionTierId}' not found!");
+            throw new SubscriptionTierNotFoundException(subscriptionTierId);
         }
         
         var tennisClub = new TennisClub();
@@ -30,7 +30,7 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
         foreach (var tennisClubDomainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(tennisClubDomainEvent);
-            await eventRepository.Save(tennisClubDomainEvent);
+            await eventRepository.Append(tennisClubDomainEvent);
         }
         
         return tennisClub.TennisClubId.Id.ToString();

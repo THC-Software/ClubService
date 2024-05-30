@@ -9,6 +9,9 @@ public class DomainEnvelopeConfiguration : IEntityTypeConfiguration<DomainEnvelo
 {
     public void Configure(EntityTypeBuilder<DomainEnvelope<IDomainEvent>> builder)
     {
+        // In PostgresEventRepository we don't use the ORM for saving and loading events
+        // Nevertheless the mapping here will remain because then it creates the table for dev and test
+        // It also enables seeding data in EventStoreDbContext
         builder.ToTable("DomainEvent");
         
         builder.HasKey(e => e.EventId);
@@ -39,6 +42,6 @@ public class DomainEnvelopeConfiguration : IEntityTypeConfiguration<DomainEnvelo
         builder.Property(e => e.EventData)
             .HasConversion<string>(
                 v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<IDomainEvent>(v));
+                v => JsonConvert.DeserializeObject<IDomainEvent>(v)!);
     }
 }

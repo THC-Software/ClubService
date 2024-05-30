@@ -9,7 +9,11 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/members")]
 [ApiController]
 [ApiVersion("1.0")]
-public class MemberController(IRegisterMemberService registerMemberService) : ControllerBase
+public class MemberController(
+    IRegisterMemberService registerMemberService,
+    IUpdateMemberService updateMemberService,
+    IDeleteMemberService deleteMemberService)
+    : ControllerBase
 {
     [HttpGet("{memberId}")]
     [ProducesResponseType(typeof(MemberDto), StatusCodes.Status200OK)]
@@ -37,21 +41,36 @@ public class MemberController(IRegisterMemberService registerMemberService) : Co
         return await Task.FromResult("");
     }
     
-    [HttpDelete("{memberId}")]
-    public async Task<ActionResult<string>> DeleteMember(string memberId)
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> DeleteMember(string id)
     {
-        return await Task.FromResult("");
+        var deletedMemberId = await deleteMemberService.DeleteMember(id);
+        return Ok(deletedMemberId);
     }
     
-    [HttpPost("{memberId}/lock")]
-    public async Task<ActionResult<string>> LockMember(string memberId)
+    [HttpPost("{id}/lock")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> LockMember(string id)
     {
-        return await Task.FromResult(Ok());
+        var lockedMemberId = await updateMemberService.LockMember(id);
+        return Ok(lockedMemberId);
     }
     
-    [HttpDelete("{memberId}/lock")]
-    public async Task<ActionResult<string>> UnlockMember(string memberId)
+    [HttpDelete("{id}/lock")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> UnlockMember(string id)
     {
-        return await Task.FromResult(Ok());
+        var unlockedMemberId = await updateMemberService.UnlockMember(id);
+        return Ok(unlockedMemberId);
     }
 }

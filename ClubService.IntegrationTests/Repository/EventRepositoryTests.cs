@@ -15,7 +15,7 @@ public class EventRepositoryTests : TestBase
         // Given
         var tennisClubRegisteredEventExpected =
             new TennisClubRegisteredEvent(new TennisClubId(Guid.NewGuid()), "Test Tennis Club",
-                new SubscriptionTierId(Guid.NewGuid()), TennisClubStatus.NONE);
+                new SubscriptionTierId(Guid.NewGuid()), TennisClubStatus.ACTIVE);
         var domainEnvelopeExpected =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(),
                 tennisClubRegisteredEventExpected.TennisClubId.Id,
@@ -23,11 +23,11 @@ public class EventRepositoryTests : TestBase
                 tennisClubRegisteredEventExpected);
         
         // When
-        await EventRepository.Save(domainEnvelopeExpected);
+        await EventRepository.Append(domainEnvelopeExpected);
         
         // Then
         var savedEvents =
-            EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
+            await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
         Assert.That(savedEvents, Has.Count.EqualTo(1));
         
         var domainEnvelopeActual = savedEvents[0];

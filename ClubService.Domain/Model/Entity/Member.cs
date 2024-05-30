@@ -24,7 +24,7 @@ public class Member
             new FullName(firstName, lastName),
             email,
             new TennisClubId(new Guid(tennisClubId)),
-            MemberStatus.NONE
+            MemberStatus.ACTIVE
         );
         
         var domainEnvelop = new DomainEnvelope<IMemberDomainEvent>(
@@ -39,6 +39,75 @@ public class Member
         return [domainEnvelop];
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberLockCommand()
+    {
+        switch (Status)
+        {
+            case MemberStatus.ACTIVE:
+                var memberLockedEvent = new MemberLockedEvent();
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_LOCKED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberLockedEvent
+                );
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is already locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUnlockCommand()
+    {
+        switch (Status)
+        {
+            case MemberStatus.LOCKED:
+                var memberUnlockedEvent = new MemberUnlockedEvent();
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_UNLOCKED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberUnlockedEvent
+                );
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.ACTIVE:
+                throw new InvalidOperationException("Member needs to be locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberDeleteCommand()
+    {
+        if (Status.Equals(MemberStatus.DELETED))
+        {
+            throw new InvalidOperationException("Member is already deleted!");
+        }
+        
+        var memberDeletedEvent = new MemberDeletedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+            Guid.NewGuid(),
+            MemberId.Id,
+            EventType.MEMBER_DELETED,
+            EntityType.MEMBER,
+            DateTime.UtcNow,
+            memberDeletedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -46,13 +115,14 @@ public class Member
             case EventType.MEMBER_REGISTERED:
                 Apply((MemberRegisteredEvent)domainEnvelope.EventData);
                 break;
-            case EventType.MEMBER_LIMIT_EXCEEDED:
-                break;
             case EventType.MEMBER_DELETED:
+                Apply((MemberDeletedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_LOCKED:
+                Apply((MemberLockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_UNLOCKED:
+                Apply((MemberUnlockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_UPDATED:
                 break;
@@ -75,6 +145,24 @@ public class Member
         Email = memberRegisteredEvent.Email;
         TennisClubId = memberRegisteredEvent.TennisClubId;
         Status = memberRegisteredEvent.Status;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(MemberLockedEvent memberLockedEvent)
+    {
+        Status = MemberStatus.LOCKED;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(MemberUnlockedEvent memberUnlockedEvent)
+    {
+        Status = MemberStatus.ACTIVE;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(MemberDeletedEvent memberDeletedEvent)
+    {
+        Status = MemberStatus.DELETED;
     }
     
     protected bool Equals(Member other)

@@ -20,7 +20,7 @@ public class TennisClub
             new TennisClubId(Guid.NewGuid()),
             name,
             new SubscriptionTierId(new Guid(subscriptionTierIdStr)),
-            TennisClubStatus.NONE
+            TennisClubStatus.ACTIVE
         );
         
         var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
@@ -58,7 +58,7 @@ public class TennisClub
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUnlockCommand()
     {
-        if (Status.Equals(TennisClubStatus.NONE))
+        if (Status.Equals(TennisClubStatus.ACTIVE))
         {
             throw new InvalidOperationException("Tennis Club needs to be locked!");
         }
@@ -122,6 +122,27 @@ public class TennisClub
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessDeleteTennisClubCommand()
+    {
+        if (Status.Equals(TennisClubStatus.DELETED))
+        {
+            throw new InvalidOperationException("Tennis Club is already deleted!");
+        }
+        
+        var tennisClubDeletedEvent = new TennisClubDeletedEvent();
+        
+        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+            Guid.NewGuid(),
+            TennisClubId.Id,
+            EventType.TENNIS_CLUB_DELETED,
+            EntityType.TENNIS_CLUB,
+            DateTime.UtcNow,
+            tennisClubDeletedEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -141,11 +162,13 @@ public class TennisClub
             case EventType.TENNIS_CLUB_NAME_CHANGED:
                 Apply((TennisClubNameChangedEvent)domainEnvelope.EventData);
                 break;
+            case EventType.TENNIS_CLUB_DELETED:
+                Apply((TennisClubDeletedEvent)domainEnvelope.EventData);
+                break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
             case EventType.SUBSCRIPTION_TIER_CREATED:
             case EventType.MEMBER_REGISTERED:
-            case EventType.MEMBER_LIMIT_EXCEEDED:
             case EventType.MEMBER_DELETED:
             case EventType.MEMBER_LOCKED:
             case EventType.MEMBER_UNLOCKED:
@@ -173,7 +196,7 @@ public class TennisClub
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(TennisClubUnlockedEvent tennisClubUnlockedEvent)
     {
-        Status = TennisClubStatus.NONE;
+        Status = TennisClubStatus.ACTIVE;
     }
     
     private void Apply(TennisClubSubscriptionTierChangedEvent tennisClubSubscriptionTierChangedEvent)
@@ -184,6 +207,12 @@ public class TennisClub
     private void Apply(TennisClubNameChangedEvent tennisClubNameChangedEvent)
     {
         Name = tennisClubNameChangedEvent.Name;
+    }
+    
+    // Parameter is only in method signature to distinguish the Apply method from the others
+    private void Apply(TennisClubDeletedEvent tennisClubDeletedEvent)
+    {
+        Status = TennisClubStatus.DELETED;
     }
     
     protected bool Equals(TennisClub other)
