@@ -51,7 +51,6 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
                 $"Expected event count {expectedEventCount} did not match current event count.");
         }
         
-        await eventStoreDbContext.Database.CommitTransactionAsync();
         return expectedEventCount + 1;
     }
     
