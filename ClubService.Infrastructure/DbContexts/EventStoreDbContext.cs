@@ -11,7 +11,8 @@ using Microsoft.Extensions.Hosting;
 
 namespace ClubService.Infrastructure.DbContexts;
 
-public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env) : DbContext(options)
+public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, IHostEnvironment env)
+    : DbContext(options)
 {
     public DbSet<DomainEnvelope<IDomainEvent>> DomainEvents { get; init; }
     

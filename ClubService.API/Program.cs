@@ -19,6 +19,11 @@ builder.Services.AddDbContext<EventStoreDbContext>(options =>
     options
         .UseNpgsql(builder.Configuration.GetConnectionString("event-store-connection"));
 });
+builder.Services.AddDbContext<ReadStoreDbContext>(options =>
+{
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("read-store-connection"));
+});
 
 // Repositories
 builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
@@ -85,10 +90,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
-    var dbContext = services.GetRequiredService<EventStoreDbContext>();
+    var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
     //TODO: Causes issues with debezium :(
-    dbContext.Database.EnsureDeleted();
-    dbContext.Database.EnsureCreated();
+    await eventStoreDbContext.Database.EnsureDeletedAsync();
+    await eventStoreDbContext.Database.EnsureCreatedAsync();
+    
+    var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
+    await readStoreDbContext.Database.EnsureDeletedAsync();
+    await readStoreDbContext.Database.EnsureCreatedAsync();
 }
 
 app.MapControllers();
