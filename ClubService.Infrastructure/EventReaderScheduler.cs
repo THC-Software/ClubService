@@ -14,12 +14,8 @@ public class EventReaderScheduler(IEventReader eventReader) : BackgroundService
         catch (OperationCanceledException)
         {
             Console.WriteLine("BackgroundService Stopped!");
+            Dispose();
         }
-    }
-    
-    private void OnStopping()
-    {
-        eventReader.Dispose();
     }
     
     public override void Dispose()
