@@ -13,6 +13,7 @@ public class RedisEventReader : IEventReader
     private const string StreamName = "club_service_events.public.DomainEvent";
     private const string GroupName = "club_service_events.domain.events.group";
     private readonly IDatabase _db;
+    private readonly ConnectionMultiplexer _muxer;
     private readonly IEventHandler _eventHandler;
 
     public RedisEventReader(CancellationToken cancellationToken, IEventHandler eventHandler)
@@ -21,8 +22,8 @@ public class RedisEventReader : IEventReader
         _cancellationToken = cancellationToken;
         var configurationOptions = ConfigurationOptions.Parse("localhost");
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
-        var muxer = ConnectionMultiplexer.Connect(configurationOptions);
-        _db = muxer.GetDatabase();
+        _muxer = ConnectionMultiplexer.Connect(configurationOptions);
+        _db = _muxer.GetDatabase();
     }
 
     public async Task ConsumeMessagesAsync()
@@ -62,5 +63,10 @@ public class RedisEventReader : IEventReader
                 break;
             }
         }
+    }
+    
+    public void Dispose()
+    {
+        _muxer.Dispose();
     }
 }

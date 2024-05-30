@@ -16,4 +16,15 @@ public class EventReaderScheduler(IEventReader eventReader) : BackgroundService
             Console.WriteLine("BackgroundService Stopped!");
         }
     }
+    
+    private void OnStopping()
+    {
+        eventReader.Dispose();
+    }
+    
+    public override void Dispose()
+    {
+        eventReader.Dispose();
+        base.Dispose();
+    }
 }
