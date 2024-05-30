@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using ClubService.Domain.Event;
 
-namespace ClubService.Infrastructure;
+namespace ClubService.Infrastructure.EventHandling;
 
 public class EventParser
 {

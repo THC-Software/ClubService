@@ -1,7 +1,7 @@
 ﻿using ClubService.Infrastructure.Api;
 using Microsoft.Extensions.Hosting;
 
-namespace ClubService.Infrastructure;
+namespace ClubService.Infrastructure.EventHandling;
 
 public class EventReaderScheduler(IEventReader eventReader) : BackgroundService
 {

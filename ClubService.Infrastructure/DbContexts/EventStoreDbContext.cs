@@ -9,7 +9,7 @@ using ClubService.Infrastructure.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 
-namespace ClubService.Infrastructure;
+namespace ClubService.Infrastructure.DbContexts;
 
 public class EventStoreDbContext(DbContextOptions options, IHostEnvironment env) : DbContext(options)
 {

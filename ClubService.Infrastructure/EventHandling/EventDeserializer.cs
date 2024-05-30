@@ -5,7 +5,7 @@ using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using Newtonsoft.Json;
 
-namespace ClubService.Infrastructure;
+namespace ClubService.Infrastructure.EventHandling;
 
 public static class EventDeserializer
 {
