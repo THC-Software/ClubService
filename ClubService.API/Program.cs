@@ -3,6 +3,7 @@ using ClubService.API;
 using ClubService.Application;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.EventHandlers;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure;
@@ -43,7 +44,7 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
-builder.Services.AddSingleton<IEventReader>(sp => new RedisEventReader(new CancellationTokenSource().Token));
+builder.Services.AddSingleton<IEventReader>(sp => new RedisEventReader(new CancellationTokenSource().Token, new ChainEventHandler()));
 
 builder.Services.AddHostedService<EventProcessingService>();
 builder.Services.AddControllers();
