@@ -6,15 +6,16 @@ namespace ClubService.Application.EventHandlers;
 public class ChainEventHandler : IEventHandler
 {
     private List<IEventHandler> EventHandlers { get; set; } = new();
-
+    
     public void Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
+        Console.WriteLine(domainEnvelope.ToString());
         foreach (var eventHandler in EventHandlers)
         {
             eventHandler.Handle(domainEnvelope);
         }
     }
-
+    
     public void RegisterEventHandler(IEventHandler eventHandler)
     {
         EventHandlers.Add(eventHandler);

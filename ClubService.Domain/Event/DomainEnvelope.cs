@@ -14,4 +14,10 @@ public class DomainEnvelope<T>(
     public EntityType EntityType { get; } = entityType;
     public DateTime Timestamp { get; } = timestamp;
     public T EventData { get; } = eventData;
+    
+    public override string ToString()
+    {
+        return
+            $"EventId: {EventId}, EntityId: {EntityId}, EventType: {EventType}, EntityType: {EntityType}, Timestamp: {Timestamp}, EventData: {EventData}";
+    }
 }

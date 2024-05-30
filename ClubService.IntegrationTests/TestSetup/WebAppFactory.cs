@@ -1,4 +1,4 @@
-using ClubService.Infrastructure;
+using ClubService.Infrastructure.DbContexts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

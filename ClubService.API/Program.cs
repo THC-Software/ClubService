@@ -2,9 +2,13 @@ using Asp.Versioning;
 using ClubService.API;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.EventHandlers;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure;
+using ClubService.Infrastructure.Api;
+using ClubService.Infrastructure.DbContexts;
+using ClubService.Infrastructure.EventHandling;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +45,26 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+var chainEventHandler = new ChainEventHandler();
+//chainEventHandler.RegisterEventHandler(new MemberEventHandler(builder.Services.GetRequiredService<IEventRepository>())); //injects the repository of the projection
+
+//TODO: Logging/errorhandling?
+var redisHost = builder.Configuration["RedisConfig:Host"];
+var redisStreamName = builder.Configuration["RedisConfig:StreamName"];
+var redisGroupName = builder.Configuration["RedisConfig:ConsumerGroup"];
+if (redisHost == null || redisStreamName == null || redisGroupName == null)
+{
+    Console.WriteLine("RedisConfig is not correctly configured");
+}
+else
+{
+    builder.Services.AddSingleton<IEventReader>(sp =>
+        new RedisEventReader(new CancellationTokenSource().Token, chainEventHandler, redisHost, redisStreamName,
+            redisGroupName));
+    
+    builder.Services.AddHostedService<EventReaderScheduler>();
+}
+
 builder.Services.AddControllers();
 
 // Swagger
@@ -62,6 +86,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<EventStoreDbContext>();
+    //TODO: Causes issues with debezium :(
     dbContext.Database.EnsureDeleted();
     dbContext.Database.EnsureCreated();
 }
