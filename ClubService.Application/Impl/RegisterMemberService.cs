@@ -45,17 +45,18 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
         
         var member = new Member();
         
-        var memberDomainEvents = member.ProcessMemberRegisterCommand(
+        var domainEvents = member.ProcessMemberRegisterCommand(
             memberRegisterCommand.FirstName,
             memberRegisterCommand.LastName,
             memberRegisterCommand.Email,
             memberRegisterCommand.TennisClubId
         );
+        var expectedEventCount = 0;
         
-        foreach (var memberDomainEvent in memberDomainEvents)
+        foreach (var domainEvent in domainEvents)
         {
-            member.Apply(memberDomainEvent);
-            await eventRepository.Append(memberDomainEvent);
+            member.Apply(domainEvent);
+            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
         }
         
         return member.MemberId.Id.ToString();

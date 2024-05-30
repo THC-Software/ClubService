@@ -24,14 +24,15 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var adminDomainEvents = admin.ProcessAdminRegisterCommand(adminRegisterCommand.Username,
+        var domainEvents = admin.ProcessAdminRegisterCommand(adminRegisterCommand.Username,
             new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName),
             new TennisClubId(new Guid(adminRegisterCommand.TennisClubId)));
+        var expectedEventCount = 0;
         
-        foreach (var adminDomainEvent in adminDomainEvents)
+        foreach (var domainEvent in domainEvents)
         {
-            admin.Apply(adminDomainEvent);
-            await eventRepository.Append(adminDomainEvent);
+            admin.Apply(domainEvent);
+            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
         }
         
         return admin.AdminId.Id.ToString();

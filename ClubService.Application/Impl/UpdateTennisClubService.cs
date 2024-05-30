@@ -1,3 +1,4 @@
+using System.Data;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.TennisClub;
@@ -14,16 +15,15 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+        var existingTennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
-        if (existingDomainEvents.Count == 0)
+        if (existingTennisClubDomainEvents.Count == 0)
         {
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var initialEventCount = existingDomainEvents.Count;
-        
-        foreach (var domainEvent in existingDomainEvents)
+        foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
@@ -31,33 +31,21 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         try
         {
             var domainEvents = tennisClub.ProcessTennisClubLockCommand();
-            
-            await eventRepository.BeginTransactionAsync();
+            var expectedEventCount = existingTennisClubDomainEvents.Count;
             
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-            
-            if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of lock tennis club!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return clubId;
@@ -68,16 +56,15 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+        var existingTennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
-        if (existingDomainEvents.Count == 0)
+        if (existingTennisClubDomainEvents.Count == 0)
         {
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var initialEventCount = existingDomainEvents.Count;
-        
-        foreach (var domainEvent in existingDomainEvents)
+        foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
@@ -85,33 +72,21 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         try
         {
             var domainEvents = tennisClub.ProcessTennisClubUnlockCommand();
-            
-            await eventRepository.BeginTransactionAsync();
+            var expectedEventCount = existingTennisClubDomainEvents.Count;
             
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-            
-            if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of unlock tennis club!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return clubId;
@@ -122,16 +97,15 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+        var existingTennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
-        if (existingDomainEvents.Count == 0)
+        if (existingTennisClubDomainEvents.Count == 0)
         {
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var initialEventCount = existingDomainEvents.Count;
-        
-        foreach (var domainEvent in existingDomainEvents)
+        foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
@@ -139,33 +113,21 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         try
         {
             var domainEvents = tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierId);
-            
-            await eventRepository.BeginTransactionAsync();
+            var expectedEventCount = existingTennisClubDomainEvents.Count;
             
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-            
-            if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of change subscription tier!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return clubId;
@@ -176,16 +138,15 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         var tennisClubId = new TennisClubId(new Guid(clubId));
         var tennisClub = new TennisClub();
         
-        var existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+        var existingTennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
-        if (existingDomainEvents.Count == 0)
+        if (existingTennisClubDomainEvents.Count == 0)
         {
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var initialEventCount = existingDomainEvents.Count;
-        
-        foreach (var domainEvent in existingDomainEvents)
+        foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
@@ -193,33 +154,21 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         try
         {
             var domainEvents = tennisClub.ProcessTennisClubChangeNameCommand(name);
-            
-            await eventRepository.BeginTransactionAsync();
+            var expectedEventCount = existingTennisClubDomainEvents.Count;
             
             foreach (var domainEvent in domainEvents)
             {
                 tennisClub.Apply(domainEvent);
-                await eventRepository.Append(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-            
-            existingDomainEvents = await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-            
-            if (existingDomainEvents.Count != initialEventCount + domainEvents.Count)
-            {
-                throw new ConcurrencyException(
-                    "Additional events added during processing of change name!");
-            }
-            
-            await eventRepository.CommitTransactionAsync();
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (ConcurrencyException)
+        catch (DataException ex)
         {
-            await eventRepository.RollbackTransactionAsync();
-            throw;
+            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return clubId;
