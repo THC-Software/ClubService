@@ -4,22 +4,29 @@ using ClubService.Domain.Event;
 using ClubService.Infrastructure.Api;
 using StackExchange.Redis;
 
-namespace ClubService.Infrastructure;
+namespace ClubService.Infrastructure.EventHandling;
 
 public class RedisEventReader : IEventReader
 {
     private readonly CancellationToken _cancellationToken;
-    private const string StreamName = "club_service_events.public.DomainEvent";
-    private const string GroupName = "club_service_events.domain.events.group";
+    private readonly string _streamName;
+    private readonly string _groupName;
     private readonly IDatabase _db;
     private readonly ConnectionMultiplexer _muxer;
     private readonly IEventHandler _eventHandler;
     
-    public RedisEventReader(CancellationToken cancellationToken, IEventHandler eventHandler)
+    public RedisEventReader(
+        CancellationToken cancellationToken,
+        IEventHandler eventHandler,
+        string host,
+        string streamName,
+        string groupName)
     {
+        _streamName = streamName;
+        _groupName = groupName;
         _eventHandler = eventHandler;
         _cancellationToken = cancellationToken;
-        var configurationOptions = ConfigurationOptions.Parse("localhost");
+        var configurationOptions = ConfigurationOptions.Parse(host);
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
         _muxer = ConnectionMultiplexer.Connect(configurationOptions);
         _db = _muxer.GetDatabase();
@@ -27,10 +34,10 @@ public class RedisEventReader : IEventReader
     
     public async Task ConsumeMessagesAsync()
     {
-        if (!(await _db.KeyExistsAsync(StreamName)) ||
-            (await _db.StreamGroupInfoAsync(StreamName)).All(x => x.Name != GroupName))
+        if (!(await _db.KeyExistsAsync(_streamName)) ||
+            (await _db.StreamGroupInfoAsync(_streamName)).All(x => x.Name != _groupName))
         {
-            await _db.StreamCreateConsumerGroupAsync(StreamName, GroupName, "0-0", true);
+            await _db.StreamCreateConsumerGroupAsync(_streamName, _groupName, "0-0", true);
         }
         
         var id = string.Empty;
@@ -40,11 +47,11 @@ public class RedisEventReader : IEventReader
             {
                 if (!string.IsNullOrEmpty(id))
                 {
-                    await _db.StreamAcknowledgeAsync(StreamName, GroupName, id);
+                    await _db.StreamAcknowledgeAsync(_streamName, _groupName, id);
                     id = string.Empty;
                 }
                 
-                var result = await _db.StreamReadGroupAsync(StreamName, GroupName, "pos-member", ">", 1);
+                var result = await _db.StreamReadGroupAsync(_streamName, _groupName, "pos-member", ">", 1);
                 if (result.Any())
                 {
                     var streamEntry = result.First();

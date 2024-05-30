@@ -1,9 +1,7 @@
 using ClubService.Domain.Event;
-using ClubService.Domain.Event.Admin;
-using ClubService.Domain.Event.Member;
-using ClubService.Domain.Event.SubscriptionTier;
-using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Repository;
+using ClubService.Infrastructure.DbContexts;
+using ClubService.Infrastructure.EventHandling;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json;

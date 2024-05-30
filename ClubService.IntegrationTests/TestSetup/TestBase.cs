@@ -1,5 +1,5 @@
 using ClubService.Domain.Repository;
-using ClubService.Infrastructure;
+using ClubService.Infrastructure.DbContexts;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 

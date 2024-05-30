@@ -7,6 +7,8 @@ using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure;
 using ClubService.Infrastructure.Api;
+using ClubService.Infrastructure.DbContexts;
+using ClubService.Infrastructure.EventHandling;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,10 +48,23 @@ builder.Services.AddApiVersioning(options =>
 var chainEventHandler = new ChainEventHandler();
 //chainEventHandler.RegisterEventHandler(new MemberEventHandler(builder.Services.GetRequiredService<IEventRepository>())); //injects the repository of the projection
 
-builder.Services.AddSingleton<IEventReader>(sp =>
-    new RedisEventReader(new CancellationTokenSource().Token, chainEventHandler));
+//TODO: Logging/errorhandling?
+var redisHost = builder.Configuration.GetSection("RedisConfig")["Host"];
+var redisStreamName = builder.Configuration.GetSection("RedisConfig")["StreamName"];
+var redisGroupName = builder.Configuration.GetSection("RedisConfig")["GroupName"];
+if (redisHost == null || redisStreamName == null || redisGroupName == null)
+{
+    Console.WriteLine("RedisConfig is not correctly configured");
+}
+else
+{
+    builder.Services.AddSingleton<IEventReader>(sp =>
+        new RedisEventReader(new CancellationTokenSource().Token, chainEventHandler, redisHost, redisStreamName,
+            redisGroupName));
+    
+    builder.Services.AddHostedService<EventReaderScheduler>();
+}
 
-builder.Services.AddHostedService<EventReaderScheduler>();
 builder.Services.AddControllers();
 
 // Swagger
