@@ -1,3 +1,6 @@
+using System.Text.Json.Nodes;
+using ClubService.Application.Api;
+using ClubService.Domain.Event;
 using ClubService.Infrastructure.Api;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -10,9 +13,11 @@ public class RedisEventReader : IEventReader
     private const string StreamName = "club_service_events.public.DomainEvent";
     private const string GroupName = "club_service_events.domain.events.group";
     private readonly IDatabase _db;
+    private readonly IEventHandler _eventHandler;
 
-    public RedisEventReader(CancellationToken cancellationToken)
+    public RedisEventReader(CancellationToken cancellationToken, IEventHandler eventHandler)
     {
+        _eventHandler = eventHandler;
         _cancellationToken = cancellationToken;
         var configurationOptions = ConfigurationOptions.Parse("localhost");
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
@@ -42,12 +47,12 @@ public class RedisEventReader : IEventReader
                 if (result.Any())
                 {
                     var streamEntry = result.First();
-                    id = streamEntry.Id;
-                    //CALL CHAIN EVENT HANDLER
-                    // var parsedEvent = ParseEvent(streamEntry);
-                    // if (parsedEvent == null)
-                    //     continue;
-                    // await memberRepository.UpdateEntityAsync(parsedEvent);
+                    var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
+                    var jsonContent = JsonNode.Parse(dict.Values.First());
+                    var eventInfo = jsonContent["payload"]["after"];
+                    
+                    DomainEnvelope<IDomainEvent> parsedEvent = EventParser.ParseEvent(eventInfo);
+                    _eventHandler.Handle(parsedEvent);
                 }
                 await Task.Delay(1000, _cancellationToken);
             }
