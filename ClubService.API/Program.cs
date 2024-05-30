@@ -1,10 +1,12 @@
 using Asp.Versioning;
 using ClubService.API;
+using ClubService.Application;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure;
+using ClubService.Infrastructure.Api;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,6 +43,9 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+builder.Services.AddSingleton<IEventReader>(sp => new RedisEventReader(new CancellationTokenSource().Token));
+
+builder.Services.AddHostedService<EventProcessingService>();
 builder.Services.AddControllers();
 
 // Swagger
