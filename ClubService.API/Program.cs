@@ -49,9 +49,9 @@ var chainEventHandler = new ChainEventHandler();
 //chainEventHandler.RegisterEventHandler(new MemberEventHandler(builder.Services.GetRequiredService<IEventRepository>())); //injects the repository of the projection
 
 //TODO: Logging/errorhandling?
-var redisHost = builder.Configuration.GetSection("RedisConfig")["Host"];
-var redisStreamName = builder.Configuration.GetSection("RedisConfig")["StreamName"];
-var redisGroupName = builder.Configuration.GetSection("RedisConfig")["GroupName"];
+var redisHost = builder.Configuration["RedisConfig:Host"];
+var redisStreamName = builder.Configuration["RedisConfig:StreamName"];
+var redisGroupName = builder.Configuration["RedisConfig:ConsumerGroup"];
 if (redisHost == null || redisStreamName == null || redisGroupName == null)
 {
     Console.WriteLine("RedisConfig is not correctly configured");
@@ -86,6 +86,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var dbContext = services.GetRequiredService<EventStoreDbContext>();
+    //TODO: Causes issues with debezium :(
     dbContext.Database.EnsureDeleted();
     dbContext.Database.EnsureCreated();
 }
