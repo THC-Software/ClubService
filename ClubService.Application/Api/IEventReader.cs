@@ -1,6 +1,6 @@
 namespace ClubService.Infrastructure.Api;
 
-public interface IEventReader
+public interface IEventReader : IDisposable
 {
     Task ConsumeMessagesAsync();
 }
