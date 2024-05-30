@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\ClubService.Application\ClubService.Application.csproj" />
         <ProjectReference Include="..\ClubService.Domain\ClubService.Domain.csproj" />
     </ItemGroup>
 
@@ -25,6 +26,10 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
         <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Api\" />
     </ItemGroup>
 
 </Project>
