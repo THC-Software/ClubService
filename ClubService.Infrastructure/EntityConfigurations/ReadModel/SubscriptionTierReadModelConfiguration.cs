@@ -1,4 +1,5 @@
-﻿using ClubService.Domain.ReadModel;
+﻿using ClubService.Domain.Model.ValueObject;
+using ClubService.Domain.ReadModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,7 +12,14 @@ public class SubscriptionTierReadModelConfiguration : IEntityTypeConfiguration<S
         builder.ToTable("SubscriptionTier");
         
         builder.HasKey(s => s.Id);
-        builder.Property(s => s.Name).IsRequired();
-        builder.Property(s => s.MaxMemberCount).IsRequired();
+        builder.Property(s => s.Id)
+            .IsRequired()
+            .HasConversion(
+                v => v.Id,
+                v => new SubscriptionTierId(v));
+        builder.Property(s => s.Name)
+            .IsRequired();
+        builder.Property(s => s.MaxMemberCount)
+            .IsRequired();
     }
 }
