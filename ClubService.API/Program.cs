@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using ClubService.API;
-using ClubService.Application;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.EventHandlers;
@@ -44,7 +43,11 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
-builder.Services.AddSingleton<IEventReader>(sp => new RedisEventReader(new CancellationTokenSource().Token, new ChainEventHandler()));
+var chainEventHandler = new ChainEventHandler();
+//chainEventHandler.RegisterEventHandler(new MemberEventHandler(builder.Services.GetRequiredService<IEventRepository>())); //injects the repository of the projection
+
+builder.Services.AddSingleton<IEventReader>(sp =>
+    new RedisEventReader(new CancellationTokenSource().Token, chainEventHandler));
 
 builder.Services.AddHostedService<EventReaderScheduler>();
 builder.Services.AddControllers();
