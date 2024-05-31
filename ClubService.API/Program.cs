@@ -4,6 +4,7 @@ using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.EventHandlers;
 using ClubService.Application.EventHandlers.AdminEventHandlers;
+using ClubService.Application.EventHandlers.MemberEventHandlers;
 using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
 using ClubService.Application.EventHandlers.TennisClubEventHandlers;
 using ClubService.Application.Impl;
@@ -33,6 +34,7 @@ builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
 builder.Services.AddScoped<ISubscriptionTierReadModelRepository, SubscriptionTierReadModelRepository>();
 builder.Services.AddScoped<ITennisClubReadModelRepository, TennisClubReadModelRepository>();
 builder.Services.AddScoped<IAdminReadModelRepository, AdminReadModelRepository>();
+builder.Services.AddScoped<IMemberReadModelRepository, MemberReadModelRepository>();
 
 // Services
 builder.Services.AddScoped<IRegisterMemberService, RegisterMemberService>();
@@ -110,16 +112,19 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 var subscriptionTierReadModelRepository = services.GetRequiredService<ISubscriptionTierReadModelRepository>();
 var tennisClubReadModelRepository = services.GetRequiredService<ITennisClubReadModelRepository>();
 var adminReadModelRepository = services.GetRequiredService<IAdminReadModelRepository>();
+var memberReadModelRepository = services.GetRequiredService<IMemberReadModelRepository>();
 
 // Event Handlers
 var subscriptionTierCreatedEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);
 var tennisClubRegisteredEventHandler = new TennisClubRegisteredEventHandler(tennisClubReadModelRepository);
 var adminRegisteredEventHandler = new AdminRegisteredEventHandler(adminReadModelRepository);
+var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadModelRepository);
 
 // Registration of Event Handlers
 chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
 chainEventHandler.RegisterEventHandler(tennisClubRegisteredEventHandler);
 chainEventHandler.RegisterEventHandler(adminRegisteredEventHandler);
+chainEventHandler.RegisterEventHandler(memberRegisteredEventHandler);
 
 app.MapControllers();
 app.UseExceptionHandler();
