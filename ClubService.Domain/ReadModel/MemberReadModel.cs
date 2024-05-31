@@ -12,9 +12,10 @@ public class MemberReadModel
     public TennisClubId TennisClubId { get; } = null!;
     public MemberStatus Status { get; }
     
+    // needed by efcore
     private MemberReadModel()
     {
-    } // needed by efcore
+    }
     
     private MemberReadModel(
         MemberId memberId,

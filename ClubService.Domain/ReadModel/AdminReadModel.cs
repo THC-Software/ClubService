@@ -6,15 +6,16 @@ namespace ClubService.Domain.ReadModel;
 
 public class AdminReadModel
 {
-    public AdminId AdminId { get; }
-    public string Username { get; }
-    public FullName Name { get; }
-    public TennisClubId TennisClubId { get; }
+    public AdminId AdminId { get; } = null!;
+    public string Username { get; } = null!;
+    public FullName Name { get; } = null!;
+    public TennisClubId TennisClubId { get; } = null!;
     public AdminStatus Status { get; }
     
+    // needed by efcore
     private AdminReadModel()
     {
-    } // needed by efcore
+    }
     
     private AdminReadModel(
         AdminId adminId,
