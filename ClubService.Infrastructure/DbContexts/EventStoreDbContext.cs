@@ -54,7 +54,7 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 new SubscriptionTierCreatedEvent(
                     new SubscriptionTierId(new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7")),
                     "Bison Subscription Tier",
-                    150)
+                    250)
             ),
             new DomainEnvelope<ISubscriptionTierDomainEvent>(
                 new Guid("36db98d7-8fea-4715-923c-74192b147752"),
@@ -65,7 +65,7 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 new SubscriptionTierCreatedEvent(
                     new SubscriptionTierId(new Guid("4c148d45-ebc8-4bbf-aa9a-d491eb185ad5")),
                     "Guinea Pig Subscription Tier",
-                    150)
+                    100)
             ),
             new DomainEnvelope<ISubscriptionTierDomainEvent>(
                 new Guid("3b591696-d9c9-4e30-a6a1-6a1439c5580b"),
@@ -76,7 +76,7 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 new SubscriptionTierCreatedEvent(
                     new SubscriptionTierId(new Guid("2bebd11c-bf8e-4448-886f-0cb8608af7ca")),
                     "Woolf Subscription Tier",
-                    100)
+                    150)
             ),
             // Tennis Clubs
             new DomainEnvelope<ITennisClubDomainEvent>(

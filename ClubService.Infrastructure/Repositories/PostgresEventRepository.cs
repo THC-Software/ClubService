@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Npgsql;
 
-namespace ClubService.Infrastructure;
+namespace ClubService.Infrastructure.Repositories;
 
 public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : IEventRepository
 {
