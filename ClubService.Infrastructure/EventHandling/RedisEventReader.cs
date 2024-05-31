@@ -62,7 +62,7 @@ public class RedisEventReader : IEventReader
                     try
                     {
                         DomainEnvelope<IDomainEvent> parsedEvent = EventParser.ParseEvent(eventInfo);
-                        _eventHandler.Handle(parsedEvent);
+                        await _eventHandler.Handle(parsedEvent);
                     }
                     catch (InvalidOperationException e)
                     {

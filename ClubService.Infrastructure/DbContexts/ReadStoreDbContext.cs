@@ -8,6 +8,7 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
 {
     public DbSet<SubscriptionTierReadModel> SubscriptionTiers { get; init; }
     public DbSet<TennisClubReadModel> TennisClubs { get; init; }
+    public DbSet<AdminReadModel> Admins { get; init; }
     public DbSet<MemberReadModel> Members { get; init; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -21,6 +22,7 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new SubscriptionTierReadModelConfiguration());
         modelBuilder.ApplyConfiguration(new TennisClubReadModelConfiguration());
+        modelBuilder.ApplyConfiguration(new AdminReadModelConfig());
         modelBuilder.ApplyConfiguration(new MemberReadModelConfiguration());
     }
 }

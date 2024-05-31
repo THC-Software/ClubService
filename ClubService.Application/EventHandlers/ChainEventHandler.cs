@@ -12,7 +12,7 @@ public class ChainEventHandler : IEventHandler
         Console.WriteLine(domainEnvelope.ToString());
         foreach (var eventHandler in EventHandlers)
         {
-            Console.WriteLine("Handling event in " + nameof(eventHandler));
+            Console.WriteLine("Handling event in " + eventHandler.GetType().Name);
             await eventHandler.Handle(domainEnvelope);
         }
     }
