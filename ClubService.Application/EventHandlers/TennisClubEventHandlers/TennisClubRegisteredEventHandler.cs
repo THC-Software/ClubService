@@ -9,7 +9,7 @@ namespace ClubService.Application.EventHandlers.TennisClubEventHandlers;
 public class TennisClubRegisteredEventHandler(ITennisClubReadModelRepository tennisClubReadModelRepository)
     : IEventHandler
 {
-    public void Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
+    public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         if (!Supports(domainEnvelope))
         {
@@ -17,7 +17,7 @@ public class TennisClubRegisteredEventHandler(ITennisClubReadModelRepository ten
         }
         
         var tennisClub = TennisClubReadModel.FromDomainEvent((TennisClubRegisteredEvent)domainEnvelope.EventData);
-        tennisClubReadModelRepository.Add(tennisClub);
+        await tennisClubReadModelRepository.Add(tennisClub);
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

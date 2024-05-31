@@ -4,6 +4,7 @@ using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.EventHandlers;
 using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
+using ClubService.Application.EventHandlers.TennisClubEventHandlers;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.Api;
@@ -29,6 +30,7 @@ builder.Services.AddDbContext<ReadStoreDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
 builder.Services.AddScoped<ISubscriptionTierReadModelRepository, SubscriptionTierReadModelRepository>();
+builder.Services.AddScoped<ITennisClubReadModelRepository, TennisClubReadModelRepository>();
 
 // Services
 builder.Services.AddScoped<IRegisterMemberService, RegisterMemberService>();
@@ -102,9 +104,17 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     await readStoreDbContext.Database.EnsureCreatedAsync();
 }
 
+// Read Model Repositories
 var subscriptionTierReadModelRepository = services.GetRequiredService<ISubscriptionTierReadModelRepository>();
-var subscriptionTierEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);
-chainEventHandler.RegisterEventHandler(subscriptionTierEventHandler);
+var tennisClubReadModelRepository = services.GetRequiredService<ITennisClubReadModelRepository>();
+
+// Event Handlers
+var subscriptionTierCreatedEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);
+var tennisClubRegisteredEventHandler = new TennisClubRegisteredEventHandler(tennisClubReadModelRepository);
+
+// Registration of Event Handlers
+chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
+chainEventHandler.RegisterEventHandler(tennisClubRegisteredEventHandler);
 
 app.MapControllers();
 app.UseExceptionHandler();

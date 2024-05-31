@@ -4,5 +4,5 @@ namespace ClubService.Domain.Repository;
 
 public interface ITennisClubReadModelRepository
 {
-    void Add(TennisClubReadModel tennisClubReadModel);
+    Task Add(TennisClubReadModel tennisClubReadModel);
 }
