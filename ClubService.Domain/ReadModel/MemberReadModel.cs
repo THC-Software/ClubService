@@ -6,10 +6,10 @@ namespace ClubService.Domain.ReadModel;
 
 public class MemberReadModel
 {
-    public MemberId MemberId { get; }
-    public FullName Name { get; }
-    public string Email { get; }
-    public TennisClubId TennisClubId { get; }
+    public MemberId MemberId { get; } = null!;
+    public FullName Name { get; } = null!;
+    public string Email { get; } = null!;
+    public TennisClubId TennisClubId { get; } = null!;
     public MemberStatus Status { get; }
     
     private MemberReadModel()
