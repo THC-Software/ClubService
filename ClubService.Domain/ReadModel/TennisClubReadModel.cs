@@ -45,4 +45,9 @@ public class TennisClubReadModel
     {
         Status = TennisClubStatus.LOCKED;
     }
+    
+    public void ChangeSubscriptionTier(SubscriptionTierId subscriptionTierId)
+    {
+        SubscriptionTierId = subscriptionTierId;
+    }
 }
