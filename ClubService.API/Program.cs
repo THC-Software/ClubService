@@ -111,10 +111,12 @@ var tennisClubReadModelRepository = services.GetRequiredService<ITennisClubReadM
 // Event Handlers
 var subscriptionTierCreatedEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);
 var tennisClubRegisteredEventHandler = new TennisClubRegisteredEventHandler(tennisClubReadModelRepository);
+var tennisClubLockedEventHandler = new TennisClubLockedEventHandler(tennisClubReadModelRepository);
 
 // Registration of Event Handlers
 chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
 chainEventHandler.RegisterEventHandler(tennisClubRegisteredEventHandler);
+chainEventHandler.RegisterEventHandler(tennisClubLockedEventHandler);
 
 app.MapControllers();
 app.UseExceptionHandler();

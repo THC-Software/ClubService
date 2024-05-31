@@ -36,7 +36,6 @@ services:
     ports:
       - "54326:8080"
     depends_on:
-      - club-service
       - debezium-postgres
     volumes:
       - ./debezium-conf:/debezium/conf

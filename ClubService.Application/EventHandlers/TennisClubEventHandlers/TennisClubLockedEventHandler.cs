@@ -13,7 +13,18 @@ public class TennisClubLockedEventHandler(ITennisClubReadModelRepository tennisC
             return;
         }
         
-        await tennisClubReadModelRepository.Update();
+        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+        
+        if (tennisClub != null)
+        {
+            tennisClub.Lock();
+            await tennisClubReadModelRepository.Update();
+        }
+        else
+        {
+            // TODO: Add logging
+            Console.WriteLine($"Could not lock tennis club with id {domainEnvelope.EntityId}!");
+        }
     }
     
     private bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
