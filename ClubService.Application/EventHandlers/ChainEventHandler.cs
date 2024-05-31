@@ -5,15 +5,15 @@ namespace ClubService.Application.EventHandlers;
 
 public class ChainEventHandler : IEventHandler
 {
-    private List<IEventHandler> EventHandlers { get; set; } = new();
+    private List<IEventHandler> EventHandlers { get; } = new();
     
-    public void Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
+    public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         Console.WriteLine(domainEnvelope.ToString());
         foreach (var eventHandler in EventHandlers)
         {
             Console.WriteLine("Handling event in " + nameof(eventHandler));
-            eventHandler.Handle(domainEnvelope);
+            await eventHandler.Handle(domainEnvelope);
         }
     }
     

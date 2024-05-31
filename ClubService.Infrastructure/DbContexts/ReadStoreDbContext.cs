@@ -7,6 +7,7 @@ namespace ClubService.Infrastructure.DbContexts;
 public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : DbContext(options)
 {
     public DbSet<SubscriptionTierReadModel> SubscriptionTiers { get; init; }
+    public DbSet<TennisClubReadModel> TennisClubs { get; init; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -18,5 +19,6 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new SubscriptionTierReadModelConfiguration());
+        modelBuilder.ApplyConfiguration(new TennisClubReadModelConfiguration());
     }
 }

@@ -9,7 +9,7 @@ namespace ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
 public class SubscriptionTierCreatedEventHandler(
     ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository) : IEventHandler
 {
-    public void Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
+    public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         if (!Supports(domainEnvelope))
         {
@@ -18,7 +18,7 @@ public class SubscriptionTierCreatedEventHandler(
         
         var subscriptionTierReadModel =
             SubscriptionTierReadModel.FromDomainEvent((SubscriptionTierCreatedEvent)domainEnvelope.EventData);
-        subscriptionTierReadModelRepository.Add(subscriptionTierReadModel);
+        await subscriptionTierReadModelRepository.Add(subscriptionTierReadModel);
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
