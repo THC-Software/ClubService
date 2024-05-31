@@ -28,8 +28,4 @@
         <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Api\" />
-    </ItemGroup>
-
 </Project>
