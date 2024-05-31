@@ -25,4 +25,10 @@ public class TennisClubReadModelRepository(ReadStoreDbContext readStoreDbContext
             .Where(tennisClub => tennisClub.TennisClubId == new TennisClubId(id))
             .SingleOrDefaultAsync();
     }
+    
+    public async Task Delete(TennisClubReadModel tennisClub)
+    {
+        readStoreDbContext.TennisClubs.Remove(tennisClub);
+        await readStoreDbContext.SaveChangesAsync();
+    }
 }
