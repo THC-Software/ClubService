@@ -16,8 +16,8 @@ public class SubscriptionTierCreatedEventHandler(
             return;
         }
         
-        var subscriptionTierReadModel =
-            SubscriptionTierReadModel.FromDomainEvent((SubscriptionTierCreatedEvent)domainEnvelope.EventData);
+        var subscriptionTierCreatedEvent = (SubscriptionTierCreatedEvent)domainEnvelope.EventData;
+        var subscriptionTierReadModel = SubscriptionTierReadModel.FromDomainEvent(subscriptionTierCreatedEvent);
         await subscriptionTierReadModelRepository.Add(subscriptionTierReadModel);
     }
     
