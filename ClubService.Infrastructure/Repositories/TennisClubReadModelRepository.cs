@@ -11,4 +11,9 @@ public class TennisClubReadModelRepository(ReadStoreDbContext readStoreDbContext
         await readStoreDbContext.TennisClubs.AddAsync(tennisClubReadModel);
         await readStoreDbContext.SaveChangesAsync();
     }
+    
+    public Task Update()
+    {
+        throw new NotImplementedException();
+    }
 }
