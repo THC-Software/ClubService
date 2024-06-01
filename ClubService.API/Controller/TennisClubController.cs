@@ -36,6 +36,22 @@ public class TennisClubController(
         return Ok(tennisClubs);
     }
     
+    [HttpGet("{clubId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TennisClubReadModel>> GetTennisClub(string clubId)
+    {
+        var clubIdGuid = new Guid(clubId);
+        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(clubIdGuid);
+        
+        if (tennisClub == null)
+        {
+            return NotFound($"Tennis Club with id {clubId} not found!");
+        }
+        
+        return Ok(tennisClub);
+    }
+    
     [HttpGet("{clubId}/members")]
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByClub(string clubId)
     {
