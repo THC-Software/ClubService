@@ -26,7 +26,7 @@ public class TennisClubNameChangedEventHandler(ITennisClubReadModelRepository te
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not lock tennis club with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Could not change name of tennis club with id {domainEnvelope.EntityId}!");
         }
     }
     

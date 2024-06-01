@@ -1,4 +1,4 @@
-﻿using ClubService.Infrastructure.Api;
+﻿using ClubService.Application.Api;
 using Microsoft.Extensions.Hosting;
 
 namespace ClubService.Infrastructure.EventHandling;

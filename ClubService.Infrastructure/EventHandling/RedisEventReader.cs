@@ -1,7 +1,6 @@
 using System.Text.Json.Nodes;
 using ClubService.Application.Api;
 using ClubService.Domain.Event;
-using ClubService.Infrastructure.Api;
 using StackExchange.Redis;
 
 namespace ClubService.Infrastructure.EventHandling;

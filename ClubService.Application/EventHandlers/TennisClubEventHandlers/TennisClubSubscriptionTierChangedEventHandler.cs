@@ -26,7 +26,7 @@ public class TennisClubSubscriptionTierChangedEventHandler(ITennisClubReadModelR
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not lock tennis club with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Could not change subscription tier of tennis club with id {domainEnvelope.EntityId}!");
         }
     }
     
