@@ -18,4 +18,9 @@ public class SubscriptionTierReadModelRepository(ReadStoreDbContext readStoreDbC
     {
         return await readStoreDbContext.SubscriptionTiers.ToListAsync();
     }
+    
+    public Task<SubscriptionTierReadModel?> GetSubscriptionTierById(Guid subscriptionTierGuid)
+    {
+        throw new NotImplementedException();
+    }
 }
