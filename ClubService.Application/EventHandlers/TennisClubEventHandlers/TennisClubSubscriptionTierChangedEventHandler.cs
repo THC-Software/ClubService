@@ -26,7 +26,7 @@ public class TennisClubSubscriptionTierChangedEventHandler(ITennisClubReadModelR
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not change subscription tier of tennis club with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
         }
     }
     

@@ -23,7 +23,7 @@ public class TennisClubLockedEventHandler(ITennisClubReadModelRepository tennisC
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not lock tennis club with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
         }
     }
     

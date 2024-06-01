@@ -59,6 +59,27 @@ public class Admin
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminChangeFullNameCommand(FullName fullName)
+    {
+        if (Status.Equals(AdminStatus.DELETED))
+        {
+            throw new InvalidOperationException("Admin is already deleted!");
+        }
+        
+        var adminChangedFullNameEvent = new AdminFullNameChangedEvent(fullName);
+        
+        var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
+            Guid.NewGuid(),
+            AdminId.Id,
+            EventType.ADMIN_FULL_NAME_CHANGED,
+            EntityType.ADMIN,
+            DateTime.UtcNow,
+            adminChangedFullNameEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<IAdminDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -68,6 +89,9 @@ public class Admin
                 break;
             case EventType.ADMIN_DELETED:
                 Apply((AdminDeletedEvent)domainEnvelope.EventData);
+                break;
+            case EventType.ADMIN_FULL_NAME_CHANGED:
+                Apply((AdminFullNameChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.TENNIS_CLUB_REGISTERED:
             case EventType.MEMBER_REGISTERED:
@@ -94,6 +118,11 @@ public class Admin
         Name = adminRegisteredEvent.Name;
         TennisClubId = adminRegisteredEvent.TennisClubId;
         Status = adminRegisteredEvent.Status;
+    }
+    
+    private void Apply(AdminFullNameChangedEvent adminFullNameChangedEvent)
+    {
+        Name = adminFullNameChangedEvent.Name;
     }
     
     // Parameter is only in method signature to distinguish the Apply method from the others

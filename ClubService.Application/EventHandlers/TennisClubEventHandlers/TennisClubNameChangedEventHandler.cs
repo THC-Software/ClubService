@@ -26,7 +26,7 @@ public class TennisClubNameChangedEventHandler(ITennisClubReadModelRepository te
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not change name of tennis club with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
         }
     }
     

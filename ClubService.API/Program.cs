@@ -45,6 +45,7 @@ builder.Services.AddScoped<IUpdateTennisClubService, UpdateTennisClubService>();
 builder.Services.AddScoped<IDeleteTennisClubService, DeleteTennisClubService>();
 builder.Services.AddScoped<IRegisterAdminService, RegisterAdminService>();
 builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
+builder.Services.AddScoped<IUpdateAdminService, UpdateAdminService>();
 
 // Transaction
 builder.Services.AddScoped<IReadStoreTransactionManager, ReadStoreReadStoreTransactionManager>();

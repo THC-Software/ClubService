@@ -23,7 +23,7 @@ public class MemberLockedEventHandler(IMemberReadModelRepository memberReadModel
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not lock member with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
         }
     }
     

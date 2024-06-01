@@ -44,7 +44,7 @@ public class MemberRegisteredEventHandler(
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not add member with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
         }
     }
     

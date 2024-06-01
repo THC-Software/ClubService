@@ -24,7 +24,7 @@ public class TennisClubUnlockedEventHandler(ITennisClubReadModelRepository tenni
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not unlock tennis club with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
         }
     }
     
