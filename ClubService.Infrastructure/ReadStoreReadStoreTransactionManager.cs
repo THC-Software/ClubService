@@ -15,34 +15,45 @@ public class ReadStoreReadStoreTransactionManager(ReadStoreDbContext readStoreDb
     
     public async Task CommitTransactionAsync()
     {
-        if (_transaction != null)
+        if (_transaction == null)
         {
-            await _transaction.CommitAsync();
-            await DisposeTransactionAsync();
+            return;
         }
+        
+        await _transaction.CommitAsync();
+        await DisposeTransactionAsync();
     }
     
     public async Task RollbackTransactionAsync()
     {
-        if (_transaction != null)
+        if (_transaction == null)
         {
-            await _transaction.RollbackAsync();
-            await DisposeTransactionAsync();
+            return;
         }
+        
+        await _transaction.RollbackAsync();
+        await DisposeTransactionAsync();
     }
     
     private async Task DisposeTransactionAsync()
     {
-        if (_transaction != null)
+        if (_transaction == null)
         {
-            await _transaction.DisposeAsync();
-            _transaction = null;
+            return;
         }
+        
+        await _transaction.DisposeAsync();
+        _transaction = null;
     }
     
     public void Dispose()
     {
-        _transaction?.Dispose();
+        if (_transaction == null)
+        {
+            return;
+        }
+        
+        _transaction.Dispose();
         _transaction = null;
     }
 }
