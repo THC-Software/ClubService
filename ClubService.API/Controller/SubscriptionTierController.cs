@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using ClubService.Application.Dtos;
+using ClubService.Domain.ReadModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -10,9 +10,8 @@ namespace ClubService.API.Controller;
 public class SubscriptionTierController
 {
     [HttpGet]
-    public async Task<ActionResult<List<SubscriptionTierDto>>> GetAllSubscriptionTiers()
+    public async Task<ActionResult<List<SubscriptionTierReadModel>>> GetAllSubscriptionTiers()
     {
-        var subscriptionTiers = new List<SubscriptionTierDto>();
-        return await Task.FromResult(subscriptionTiers);
+        throw new NotImplementedException();
     }
 }
