@@ -6,4 +6,5 @@ public interface IAdminReadModelRepository
 {
     Task Add(AdminReadModel adminReadModel);
     Task Delete(AdminReadModel adminReadModel);
+    Task<AdminReadModel?> GetAdminById(Guid id);
 }
