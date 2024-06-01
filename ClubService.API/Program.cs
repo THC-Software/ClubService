@@ -135,6 +135,7 @@ var adminDeletedEventHandler = new AdminDeletedEventHandler(adminReadModelReposi
 // member
 var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadModelRepository,
     tennisClubReadModelRepository, readStoreTransactionManager);
+var memberLockedEventHandler = new MemberLockedEventHandler(memberReadModelRepository);
 
 // Registration of Event Handlers
 chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
@@ -150,6 +151,7 @@ chainEventHandler.RegisterEventHandler(adminRegisteredEventHandler);
 chainEventHandler.RegisterEventHandler(adminDeletedEventHandler);
 // member
 chainEventHandler.RegisterEventHandler(memberRegisteredEventHandler);
+chainEventHandler.RegisterEventHandler(memberLockedEventHandler);
 
 app.MapControllers();
 app.UseExceptionHandler();
