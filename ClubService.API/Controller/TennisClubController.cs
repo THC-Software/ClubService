@@ -39,7 +39,7 @@ public class TennisClubController(
     [HttpGet("{clubId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TennisClubReadModel>> GetTennisClub(string clubId)
+    public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(clubIdGuid);
