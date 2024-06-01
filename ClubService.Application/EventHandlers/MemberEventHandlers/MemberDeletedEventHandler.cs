@@ -18,39 +18,37 @@ public class MemberDeletedEventHandler(
         
         var memberReadModel = await memberReadModelRepository.GetMemberById(domainEnvelope.EntityId);
         
-        if (memberReadModel != null)
-        {
-            var tennisClubReadModel =
-                await tennisClubReadModelRepository.GetTennisClubById(memberReadModel.TennisClubId.Id);
-            
-            if (tennisClubReadModel != null)
-            {
-                try
-                {
-                    await readStoreTransactionManager.BeginTransactionAsync();
-                    
-                    tennisClubReadModel.DecreaseMemberCount();
-                    await tennisClubReadModelRepository.Update();
-                    
-                    await memberReadModelRepository.Delete(memberReadModel);
-                    
-                    await readStoreTransactionManager.CommitTransactionAsync();
-                }
-                catch (Exception)
-                {
-                    await readStoreTransactionManager.RollbackTransactionAsync();
-                }
-            }
-            else
-            {
-                // TODO: Add logging
-                Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
-            }
-        }
-        else
+        if (memberReadModel == null)
         {
             // TODO: Add logging
             Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+            return;
+        }
+        
+        var tennisClubReadModel =
+            await tennisClubReadModelRepository.GetTennisClubById(memberReadModel.TennisClubId.Id);
+        
+        if (tennisClubReadModel == null)
+        {
+            // TODO: Add logging
+            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            return;
+        }
+        
+        try
+        {
+            await readStoreTransactionManager.BeginTransactionAsync();
+            
+            tennisClubReadModel.DecreaseMemberCount();
+            await tennisClubReadModelRepository.Update();
+            
+            await memberReadModelRepository.Delete(memberReadModel);
+            
+            await readStoreTransactionManager.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await readStoreTransactionManager.RollbackTransactionAsync();
         }
     }
     
