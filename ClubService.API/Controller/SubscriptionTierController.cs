@@ -1,5 +1,6 @@
 using Asp.Versioning;
-using ClubService.Application.Dtos;
+using ClubService.Domain.ReadModel;
+using ClubService.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -7,12 +8,14 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/subscriptionTiers")]
 [ApiController]
 [ApiVersion("1.0")]
-public class SubscriptionTierController
+public class SubscriptionTierController(ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository)
+    : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<SubscriptionTierDto>>> GetAllSubscriptionTiers()
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<SubscriptionTierReadModel>>> GetAllSubscriptionTiers()
     {
-        var subscriptionTiers = new List<SubscriptionTierDto>();
-        return await Task.FromResult(subscriptionTiers);
+        var subscriptionTiers = await subscriptionTierReadModelRepository.GetAllSubscriptionTiers();
+        return Ok(subscriptionTiers);
     }
 }

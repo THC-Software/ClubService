@@ -1,6 +1,7 @@
 ﻿using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClubService.Infrastructure.Repositories;
 
@@ -11,5 +12,10 @@ public class SubscriptionTierReadModelRepository(ReadStoreDbContext readStoreDbC
     {
         await readStoreDbContext.SubscriptionTiers.AddAsync(subscriptionTierReadModel);
         await readStoreDbContext.SaveChangesAsync();
+    }
+    
+    public async Task<List<SubscriptionTierReadModel>> GetAllSubscriptionTiers()
+    {
+        return await readStoreDbContext.SubscriptionTiers.ToListAsync();
     }
 }
