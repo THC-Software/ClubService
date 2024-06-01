@@ -65,4 +65,14 @@ public class TennisClubReadModel
     {
         MemberCount++;
     }
+    
+    public void DecreaseMemberCount()
+    {
+        if (MemberCount <= 0)
+        {
+            return;
+        }
+        
+        MemberCount--;
+    }
 }

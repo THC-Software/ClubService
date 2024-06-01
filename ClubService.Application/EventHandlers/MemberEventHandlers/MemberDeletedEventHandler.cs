@@ -1,12 +1,10 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Domain.Event;
-using ClubService.Domain.Event.Member;
-using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
-public class MemberRegisteredEventHandler(
+public class MemberDeletedEventHandler(
     IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
     IReadStoreTransactionManager readStoreTransactionManager) : IEventHandler
@@ -18,14 +16,22 @@ public class MemberRegisteredEventHandler(
             return;
         }
         
-        var memberRegisteredEvent = (MemberRegisteredEvent)domainEnvelope.EventData;
+        var memberReadModel = await memberReadModelRepository.GetMemberById(domainEnvelope.EntityId);
+        
+        if (memberReadModel == null)
+        {
+            // TODO: Add logging
+            Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+            return;
+        }
+        
         var tennisClubReadModel =
-            await tennisClubReadModelRepository.GetTennisClubById(memberRegisteredEvent.TennisClubId.Id);
+            await tennisClubReadModelRepository.GetTennisClubById(memberReadModel.TennisClubId.Id);
         
         if (tennisClubReadModel == null)
         {
             // TODO: Add logging
-            Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
             return;
         }
         
@@ -33,11 +39,10 @@ public class MemberRegisteredEventHandler(
         {
             await readStoreTransactionManager.BeginTransactionAsync();
             
-            tennisClubReadModel.IncreaseMemberCount();
+            tennisClubReadModel.DecreaseMemberCount();
             await tennisClubReadModelRepository.Update();
             
-            var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
-            await memberReadModelRepository.Add(memberReadModel);
+            await memberReadModelRepository.Delete(memberReadModel);
             
             await readStoreTransactionManager.CommitTransactionAsync();
         }
@@ -49,6 +54,6 @@ public class MemberRegisteredEventHandler(
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
-        return domainEnvelope.EventType.Equals(EventType.MEMBER_REGISTERED);
+        return domainEnvelope.EventType.Equals(EventType.MEMBER_DELETED);
     }
 }

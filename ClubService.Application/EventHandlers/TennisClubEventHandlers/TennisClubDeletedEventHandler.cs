@@ -15,15 +15,14 @@ public class TennisClubDeletedEventHandler(ITennisClubReadModelRepository tennis
         
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
         
-        if (tennisClub != null)
-        {
-            await tennisClubReadModelRepository.Delete(tennisClub);
-        }
-        else
+        if (tennisClub == null)
         {
             // TODO: Add logging
             Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            return;
         }
+        
+        await tennisClubReadModelRepository.Delete(tennisClub);
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
