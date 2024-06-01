@@ -46,4 +46,9 @@ public class MemberReadModel
     {
         Status = MemberStatus.LOCKED;
     }
+    
+    public void Unlock()
+    {
+        Status = MemberStatus.ACTIVE;
+    }
 }
