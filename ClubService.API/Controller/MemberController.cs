@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using ClubService.Application.Api;
 using ClubService.Application.Commands;
-using ClubService.Application.Dtos;
+using ClubService.Domain.ReadModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -16,12 +16,11 @@ public class MemberController(
     : ControllerBase
 {
     [HttpGet("{memberId}")]
-    [ProducesResponseType(typeof(MemberDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(MemberReadModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<MemberDto>> GetMemberById(string memberId)
+    public async Task<ActionResult<MemberReadModel>> GetMemberById(string memberId)
     {
-        return await Task.FromResult(
-            new MemberDto("", "", "", "", false));
+        throw new NotImplementedException();
     }
     
     [HttpPost]

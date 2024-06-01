@@ -131,8 +131,10 @@ var tennisClubDeletedEventHandler = new TennisClubDeletedEventHandler(tennisClub
 var tennisClubUnlockedEventHandler = new TennisClubUnlockedEventHandler(tennisClubReadModelRepository);
 // admin
 var adminRegisteredEventHandler = new AdminRegisteredEventHandler(adminReadModelRepository);
+var adminDeletedEventHandler = new AdminDeletedEventHandler(adminReadModelRepository);
 // member
-var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadModelRepository, tennisClubReadModelRepository, readStoreTransactionManager);
+var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadModelRepository,
+    tennisClubReadModelRepository, readStoreTransactionManager);
 
 // Registration of Event Handlers
 chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
@@ -145,6 +147,7 @@ chainEventHandler.RegisterEventHandler(tennisClubDeletedEventHandler);
 chainEventHandler.RegisterEventHandler(tennisClubUnlockedEventHandler);
 // admin
 chainEventHandler.RegisterEventHandler(adminRegisteredEventHandler);
+chainEventHandler.RegisterEventHandler(adminDeletedEventHandler);
 // member
 chainEventHandler.RegisterEventHandler(memberRegisteredEventHandler);
 
