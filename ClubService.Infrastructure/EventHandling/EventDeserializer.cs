@@ -52,6 +52,14 @@ public static class EventDeserializer
                 }
                 
                 break;
+            case EventType.ADMIN_FULL_NAME_CHANGED:
+                if (JsonConvert.DeserializeObject<AdminFullNameChangedEvent>(eventDataJson) is T
+                    adminFullNameChangedEvent)
+                {
+                    return adminFullNameChangedEvent;
+                }
+                
+                break;
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
                 if (JsonConvert.DeserializeObject<TennisClubSubscriptionTierChangedEvent>(eventDataJson) is T
                     tennisClubSubscriptionTierChangedEvent)

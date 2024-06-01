@@ -8,7 +8,7 @@ public class AdminReadModel
 {
     public AdminId AdminId { get; } = null!;
     public string Username { get; } = null!;
-    public FullName Name { get; } = null!;
+    public FullName Name { get; private set; } = null!;
     public TennisClubId TennisClubId { get; } = null!;
     public AdminStatus Status { get; }
     
@@ -40,5 +40,10 @@ public class AdminReadModel
             adminRegisteredEvent.TennisClubId,
             adminRegisteredEvent.Status
         );
+    }
+    
+    public void ChangeFullName(FullName name)
+    {
+        Name = name;
     }
 }
