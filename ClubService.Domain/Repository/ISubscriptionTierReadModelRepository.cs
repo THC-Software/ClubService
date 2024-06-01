@@ -6,5 +6,5 @@ public interface ISubscriptionTierReadModelRepository
 {
     Task Add(SubscriptionTierReadModel subscriptionTierReadModel);
     Task<List<SubscriptionTierReadModel>> GetAllSubscriptionTiers();
-    Task<SubscriptionTierReadModel?> GetSubscriptionTierById(Guid subscriptionTierGuid);
+    Task<SubscriptionTierReadModel?> GetSubscriptionTierById(Guid id);
 }

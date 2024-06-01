@@ -1,4 +1,5 @@
-﻿using ClubService.Domain.ReadModel;
+﻿using ClubService.Domain.Model.ValueObject;
+using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +20,10 @@ public class SubscriptionTierReadModelRepository(ReadStoreDbContext readStoreDbC
         return await readStoreDbContext.SubscriptionTiers.ToListAsync();
     }
     
-    public Task<SubscriptionTierReadModel?> GetSubscriptionTierById(Guid subscriptionTierGuid)
+    public async Task<SubscriptionTierReadModel?> GetSubscriptionTierById(Guid id)
     {
-        throw new NotImplementedException();
+        return await readStoreDbContext.SubscriptionTiers
+            .Where(subscriptionTier => subscriptionTier.Id == new SubscriptionTierId(id))
+            .SingleOrDefaultAsync();
     }
 }
