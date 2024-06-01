@@ -15,7 +15,9 @@ public class MemberRegisteredEventHandler(IMemberReadModelRepository memberReadM
             return;
         }
         
-        var memberReadModel = MemberReadModel.FromDomainEvent((MemberRegisteredEvent)domainEnvelope.EventData);
+        var memberRegisteredEvent = (MemberRegisteredEvent)domainEnvelope.EventData;
+        var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
+        
         await memberReadModelRepository.Add(memberReadModel);
     }
     
