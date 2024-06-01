@@ -9,7 +9,7 @@ using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
 using ClubService.Application.EventHandlers.TennisClubEventHandlers;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
-using ClubService.Infrastructure.Api;
+using ClubService.Infrastructure;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
 using ClubService.Infrastructure.Repositories;
@@ -45,6 +45,9 @@ builder.Services.AddScoped<IUpdateTennisClubService, UpdateTennisClubService>();
 builder.Services.AddScoped<IDeleteTennisClubService, DeleteTennisClubService>();
 builder.Services.AddScoped<IRegisterAdminService, RegisterAdminService>();
 builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
+
+// Transaction
+builder.Services.AddScoped<IReadStoreTransactionManager, ReadStoreReadStoreTransactionManager>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -107,6 +110,9 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     await readStoreDbContext.Database.EnsureCreatedAsync();
 }
 
+// TransactionManager
+var readStoreTransactionManager = services.GetRequiredService<IReadStoreTransactionManager>();
+
 // Read Model Repositories
 var subscriptionTierReadModelRepository = services.GetRequiredService<ISubscriptionTierReadModelRepository>();
 var tennisClubReadModelRepository = services.GetRequiredService<ITennisClubReadModelRepository>();
@@ -126,7 +132,7 @@ var tennisClubUnlockedEventHandler = new TennisClubUnlockedEventHandler(tennisCl
 // admin
 var adminRegisteredEventHandler = new AdminRegisteredEventHandler(adminReadModelRepository);
 // member
-var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadModelRepository);
+var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadModelRepository, tennisClubReadModelRepository, readStoreTransactionManager);
 
 // Registration of Event Handlers
 chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);

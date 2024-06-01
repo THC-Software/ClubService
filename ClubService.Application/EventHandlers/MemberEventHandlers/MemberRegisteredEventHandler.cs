@@ -6,7 +6,10 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
-public class MemberRegisteredEventHandler(IMemberReadModelRepository memberReadModelRepository) : IEventHandler
+public class MemberRegisteredEventHandler(
+    IMemberReadModelRepository memberReadModelRepository,
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    IReadStoreTransactionManager readStoreTransactionManager) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
@@ -16,9 +19,32 @@ public class MemberRegisteredEventHandler(IMemberReadModelRepository memberReadM
         }
         
         var memberRegisteredEvent = (MemberRegisteredEvent)domainEnvelope.EventData;
-        var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(memberRegisteredEvent.TennisClubId.Id);
         
-        await memberReadModelRepository.Add(memberReadModel);
+        if (tennisClubReadModel != null)
+        {
+            try
+            {
+                await readStoreTransactionManager.BeginTransactionAsync();
+                
+                tennisClubReadModel.IncreaseMemberCount();
+                await tennisClubReadModelRepository.Update();
+                
+                var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
+                await memberReadModelRepository.Add(memberReadModel);
+                
+                await readStoreTransactionManager.CommitTransactionAsync();
+            }
+            catch (Exception)
+            {
+                await readStoreTransactionManager.RollbackTransactionAsync();
+            }
+        }
+        else
+        {
+            // TODO: Add logging
+            Console.WriteLine($"Could not add member with id {domainEnvelope.EntityId}!");
+        }
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
