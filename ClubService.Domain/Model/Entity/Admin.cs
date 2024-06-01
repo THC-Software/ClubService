@@ -59,6 +59,27 @@ public class Admin
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminChangeFullNameCommand(FullName fullName)
+    {
+        if (Status.Equals(AdminStatus.DELETED))
+        {
+            throw new InvalidOperationException("Admin is already deleted!");
+        }
+        
+        var adminChangedFullNameEvent = new AdminFullNameChangedEvent(fullName);
+        
+        var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
+            Guid.NewGuid(),
+            AdminId.Id,
+            EventType.FULL_NAME_CHANGED,
+            EntityType.ADMIN,
+            DateTime.UtcNow,
+            adminChangedFullNameEvent
+        );
+        
+        return [domainEnvelope];
+    }
+    
     public void Apply(DomainEnvelope<IAdminDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
