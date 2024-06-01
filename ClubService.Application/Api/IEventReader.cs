@@ -1,4 +1,4 @@
-namespace ClubService.Infrastructure.Api;
+namespace ClubService.Application.Api;
 
 public interface IEventReader : IDisposable
 {
