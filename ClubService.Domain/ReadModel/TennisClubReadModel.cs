@@ -6,6 +6,12 @@ namespace ClubService.Domain.ReadModel;
 
 public class TennisClubReadModel
 {
+    public TennisClubId TennisClubId { get; private set; } = null!;
+    public string Name { get; private set; } = null!;
+    public SubscriptionTierId SubscriptionTierId { get; private set; } = null!;
+    public TennisClubStatus Status { get; private set; }
+    public int MemberCount { get; private set; }
+    
     private TennisClubReadModel()
     {
     }
@@ -23,12 +29,6 @@ public class TennisClubReadModel
         Status = status;
         MemberCount = memberCount;
     }
-    
-    public TennisClubId TennisClubId { get; private set; }
-    public string Name { get; private set; }
-    public SubscriptionTierId SubscriptionTierId { get; private set; }
-    public TennisClubStatus Status { get; private set; }
-    public int MemberCount { get; private set; }
     
     public static TennisClubReadModel FromDomainEvent(TennisClubRegisteredEvent tennisClubRegisteredEvent)
     {
