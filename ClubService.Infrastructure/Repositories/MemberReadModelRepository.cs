@@ -25,4 +25,10 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
             .Where(memberReadModel => memberReadModel.MemberId == new MemberId(id))
             .SingleOrDefaultAsync();
     }
+    
+    public async Task Delete(MemberReadModel memberReadModel)
+    {
+        readStoreDbContext.Members.Remove(memberReadModel);
+        await readStoreDbContext.SaveChangesAsync();
+    }
 }
