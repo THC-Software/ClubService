@@ -71,7 +71,7 @@ public class Admin
         var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
             Guid.NewGuid(),
             AdminId.Id,
-            EventType.FULL_NAME_CHANGED,
+            EventType.ADMIN_FULL_NAME_CHANGED,
             EntityType.ADMIN,
             DateTime.UtcNow,
             adminChangedFullNameEvent
