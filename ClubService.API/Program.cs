@@ -118,6 +118,7 @@ var memberReadModelRepository = services.GetRequiredService<IMemberReadModelRepo
 var subscriptionTierCreatedEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);
 var tennisClubRegisteredEventHandler = new TennisClubRegisteredEventHandler(tennisClubReadModelRepository);
 var tennisClubLockedEventHandler = new TennisClubLockedEventHandler(tennisClubReadModelRepository);
+var tennisClubNameChangedEventHandler = new TennisClubNameChangedEventHandler(tennisClubReadModelRepository);
 var tennisClubSubscriptionTierChangedEventHandler =
     new TennisClubSubscriptionTierChangedEventHandler(tennisClubReadModelRepository);
 var tennisClubUnlockedEventHandler = new TennisClubUnlockedEventHandler(tennisClubReadModelRepository);
@@ -128,6 +129,7 @@ var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadMo
 chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
 chainEventHandler.RegisterEventHandler(tennisClubRegisteredEventHandler);
 chainEventHandler.RegisterEventHandler(tennisClubLockedEventHandler);
+chainEventHandler.RegisterEventHandler(tennisClubNameChangedEventHandler);
 chainEventHandler.RegisterEventHandler(tennisClubSubscriptionTierChangedEventHandler);
 chainEventHandler.RegisterEventHandler(tennisClubUnlockedEventHandler);
 chainEventHandler.RegisterEventHandler(adminRegisteredEventHandler);
