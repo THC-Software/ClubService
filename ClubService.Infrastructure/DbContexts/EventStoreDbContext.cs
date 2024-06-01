@@ -206,6 +206,16 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 EntityType.ADMIN,
                 DateTime.UtcNow.AddHours(1),
                 new AdminDeletedEvent()
+            ),
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("4e252abf-08e9-4e6d-a674-f99d4ee740d5"),
+                new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
+                EventType.ADMIN_FULL_NAME_CHANGED,
+                EntityType.ADMIN,
+                DateTime.UtcNow.AddHours(2),
+                new AdminFullNameChangedEvent(
+                    new FullName("Michael", "Spiegel")
+                )
             )
         );
     }
