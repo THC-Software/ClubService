@@ -19,7 +19,8 @@ public class MemberRegisteredEventHandler(
         }
         
         var memberRegisteredEvent = (MemberRegisteredEvent)domainEnvelope.EventData;
-        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(memberRegisteredEvent.TennisClubId.Id);
+        var tennisClubReadModel =
+            await tennisClubReadModelRepository.GetTennisClubById(memberRegisteredEvent.TennisClubId.Id);
         
         if (tennisClubReadModel != null)
         {
