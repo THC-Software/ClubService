@@ -90,6 +90,9 @@ public class Admin
             case EventType.ADMIN_DELETED:
                 Apply((AdminDeletedEvent)domainEnvelope.EventData);
                 break;
+            case EventType.ADMIN_FULL_NAME_CHANGED:
+                Apply((AdminFullNameChangedEvent)domainEnvelope.EventData);
+                break;
             case EventType.TENNIS_CLUB_REGISTERED:
             case EventType.MEMBER_REGISTERED:
             case EventType.MEMBER_DELETED:
@@ -115,6 +118,11 @@ public class Admin
         Name = adminRegisteredEvent.Name;
         TennisClubId = adminRegisteredEvent.TennisClubId;
         Status = adminRegisteredEvent.Status;
+    }
+    
+    private void Apply(AdminFullNameChangedEvent adminFullNameChangedEvent)
+    {
+        Name = adminFullNameChangedEvent.Name;
     }
     
     // Parameter is only in method signature to distinguish the Apply method from the others
