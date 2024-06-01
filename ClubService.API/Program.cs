@@ -117,7 +117,7 @@ var memberReadModelRepository = services.GetRequiredService<IMemberReadModelRepo
 // Event Handlers
 var subscriptionTierCreatedEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);
 var tennisClubRegisteredEventHandler = new TennisClubRegisteredEventHandler(tennisClubReadModelRepository);
-var tennisClubLockedEventHandler = new TennisClubLockedEventHandler(tennisClubReadModelRepository);n
+var tennisClubLockedEventHandler = new TennisClubLockedEventHandler(tennisClubReadModelRepository);
 var tennisClubSubscriptionTierChangedEventHandler =
     new TennisClubSubscriptionTierChangedEventHandler(tennisClubReadModelRepository);
 var tennisClubUnlockedEventHandler = new TennisClubUnlockedEventHandler(tennisClubReadModelRepository);
