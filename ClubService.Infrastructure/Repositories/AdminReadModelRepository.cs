@@ -20,6 +20,11 @@ public class AdminReadModelRepository(ReadStoreDbContext readStoreDbContext) : I
         await readStoreDbContext.SaveChangesAsync();
     }
     
+    public async Task Update()
+    {
+        await readStoreDbContext.SaveChangesAsync();
+    }
+    
     public async Task<AdminReadModel?> GetAdminById(Guid id)
     {
         return await readStoreDbContext.Admins
