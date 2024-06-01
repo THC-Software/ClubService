@@ -2,6 +2,8 @@ using Asp.Versioning;
 using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Application.Dtos;
+using ClubService.Domain.ReadModel;
+using ClubService.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -12,8 +14,17 @@ namespace ClubService.API.Controller;
 public class TennisClubController(
     IRegisterTennisClubService registerTennisClubService,
     IUpdateTennisClubService updateTennisClubService,
-    IDeleteTennisClubService deleteTennisClubService) : ControllerBase
+    IDeleteTennisClubService deleteTennisClubService,
+    ITennisClubReadModelRepository tennisClubReadModelRepository) : ControllerBase
 {
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<TennisClubReadModel>>> GetAllTennisClubs()
+    {
+        var tennisClubs = await tennisClubReadModelRepository.GetAllTennisClubs();
+        return Ok(tennisClubs);
+    }
+    
     [HttpGet("{clubId}/members")]
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByClub(string clubId)
     {

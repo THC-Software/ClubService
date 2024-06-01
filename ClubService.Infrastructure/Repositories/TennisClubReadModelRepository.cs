@@ -31,4 +31,9 @@ public class TennisClubReadModelRepository(ReadStoreDbContext readStoreDbContext
         readStoreDbContext.TennisClubs.Remove(tennisClub);
         await readStoreDbContext.SaveChangesAsync();
     }
+    
+    public Task<List<TennisClubReadModel>> GetAllTennisClubs()
+    {
+        throw new NotImplementedException();
+    }
 }
