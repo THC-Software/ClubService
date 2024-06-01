@@ -84,11 +84,11 @@ public static class EventDeserializer
                 }
                 
                 break;
-            case EventType.MEMBER_UPDATED:
-                if (JsonConvert.DeserializeObject<MemberUpdatedEvent>(eventDataJson) is T
-                    memberUpdatedEvent)
+            case EventType.MEMBER_FULL_NAME_CHANGED:
+                if (JsonConvert.DeserializeObject<MemberFullNameChangedEvent>(eventDataJson) is T
+                    memberFullNameChangedEvent)
                 {
-                    return memberUpdatedEvent;
+                    return memberFullNameChangedEvent;
                 }
                 
                 break;

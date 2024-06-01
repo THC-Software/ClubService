@@ -124,7 +124,7 @@ public class Member
             case EventType.MEMBER_UNLOCKED:
                 Apply((MemberUnlockedEvent)domainEnvelope.EventData);
                 break;
-            case EventType.MEMBER_UPDATED:
+            case EventType.MEMBER_FULL_NAME_CHANGED:
                 break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
