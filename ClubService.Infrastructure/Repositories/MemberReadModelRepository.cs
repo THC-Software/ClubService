@@ -11,4 +11,9 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
         await readStoreDbContext.Members.AddAsync(memberReadModel);
         await readStoreDbContext.SaveChangesAsync();
     }
+    
+    public async Task Update()
+    {
+        await readStoreDbContext.SaveChangesAsync();
+    }
 }
