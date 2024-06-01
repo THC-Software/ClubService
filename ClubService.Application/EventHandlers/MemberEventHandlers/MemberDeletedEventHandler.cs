@@ -32,8 +32,7 @@ public class MemberDeletedEventHandler(
                     tennisClubReadModel.DecreaseMemberCount();
                     await tennisClubReadModelRepository.Update();
                     
-                    memberReadModel.Lock();
-                    await memberReadModelRepository.Update();
+                    await memberReadModelRepository.Delete(memberReadModel);
                     
                     await readStoreTransactionManager.CommitTransactionAsync();
                 }
