@@ -46,6 +46,11 @@ public class TennisClubReadModel
         Status = TennisClubStatus.LOCKED;
     }
     
+    public void Unlock()
+    {
+        Status = TennisClubStatus.ACTIVE;
+    }
+
     public void ChangeName(string name)
     {
         Name = name;
