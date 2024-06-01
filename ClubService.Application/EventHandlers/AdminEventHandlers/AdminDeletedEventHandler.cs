@@ -21,7 +21,7 @@ public class AdminDeletedEventHandler(IAdminReadModelRepository adminReadModelRe
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Admin with id {domainEnvelope.EntityId} does not exist!");
+            Console.WriteLine($"Admin with id {domainEnvelope.EntityId} not found!");
         }
     }
     

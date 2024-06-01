@@ -9,7 +9,10 @@ namespace ClubService.API.Controller;
 [Route("api/v{version:apiVersion}/admins")]
 [ApiController]
 [ApiVersion("1.0")]
-public class AdminController(IRegisterAdminService registerAdminService, IDeleteAdminService deleteAdminService)
+public class AdminController(
+    IRegisterAdminService registerAdminService,
+    IDeleteAdminService deleteAdminService,
+    IUpdateAdminService updateAdminService)
     : ControllerBase
 {
     [HttpPost]
@@ -33,5 +36,20 @@ public class AdminController(IRegisterAdminService registerAdminService, IDelete
     {
         var deletedAdminId = await deleteAdminService.DeleteAdmin(id);
         return Ok(deletedAdminId);
+    }
+    
+    [HttpPatch("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> UpdateAdmin(string id, [FromBody] AdminUpdateCommand adminUpdateCommand)
+    {
+        var updatedAdminId = await updateAdminService.ChangeFullName(
+            id,
+            adminUpdateCommand.FirstName,
+            adminUpdateCommand.LastName
+        );
+        return Ok(updatedAdminId);
     }
 }
