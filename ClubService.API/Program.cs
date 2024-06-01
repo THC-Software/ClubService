@@ -48,7 +48,7 @@ builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
 builder.Services.AddScoped<IUpdateAdminService, UpdateAdminService>();
 
 // Transaction
-builder.Services.AddScoped<IReadStoreTransactionManager, ReadStoreReadStoreTransactionManager>();
+builder.Services.AddScoped<IReadStoreTransactionManager, ReadStoreTransactionManager>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>

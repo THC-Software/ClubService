@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ClubService.Infrastructure;
 
-public class ReadStoreReadStoreTransactionManager(ReadStoreDbContext readStoreDbContext) : IReadStoreTransactionManager
+public class ReadStoreTransactionManager(ReadStoreDbContext readStoreDbContext) : IReadStoreTransactionManager
 {
     private IDbContextTransaction? _transaction;
     
