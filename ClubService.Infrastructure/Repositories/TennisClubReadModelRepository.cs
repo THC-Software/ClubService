@@ -32,8 +32,15 @@ public class TennisClubReadModelRepository(ReadStoreDbContext readStoreDbContext
         await readStoreDbContext.SaveChangesAsync();
     }
     
-    public async Task<List<TennisClubReadModel>> GetAllTennisClubs()
+    public async Task<List<TennisClubReadModel>> GetAllTennisClubs(int pageSize = 0, int pageNumber = 1)
     {
-        return await readStoreDbContext.TennisClubs.ToListAsync();
+        IQueryable<TennisClubReadModel> tennisClubs = readStoreDbContext.TennisClubs;
+        
+        if (pageSize > 0)
+        {
+            tennisClubs = tennisClubs.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+        }
+        
+        return await tennisClubs.ToListAsync();
     }
 }

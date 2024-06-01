@@ -5,6 +5,7 @@ using ClubService.Application.Dtos;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ClubService.API.Controller;
 
@@ -19,9 +20,19 @@ public class TennisClubController(
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<TennisClubReadModel>>> GetAllTennisClubs()
+    public async Task<ActionResult<List<TennisClubReadModel>>> GetAllTennisClubs(
+        [FromQuery] int pageSize = 0,
+        int pageNumber = 1)
     {
-        var tennisClubs = await tennisClubReadModelRepository.GetAllTennisClubs();
+        var tennisClubs = await tennisClubReadModelRepository.GetAllTennisClubs(pageSize, pageNumber);
+        
+        var metadata = new
+        {
+            pageSize,
+            pageNumber
+        };
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+        
         return Ok(tennisClubs);
     }
     

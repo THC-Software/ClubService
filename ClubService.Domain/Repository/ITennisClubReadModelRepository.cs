@@ -8,5 +8,5 @@ public interface ITennisClubReadModelRepository
     Task Update();
     Task<TennisClubReadModel?> GetTennisClubById(Guid id);
     Task Delete(TennisClubReadModel tennisClub);
-    Task<List<TennisClubReadModel>> GetAllTennisClubs();
+    Task<List<TennisClubReadModel>> GetAllTennisClubs(int pageSize = 0, int pageNumber = 1);
 }
