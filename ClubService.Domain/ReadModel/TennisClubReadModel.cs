@@ -55,4 +55,9 @@ public class TennisClubReadModel
     {
         Name = name;
     }
+  
+    public void ChangeSubscriptionTier(SubscriptionTierId subscriptionTierId)
+    {
+        SubscriptionTierId = subscriptionTierId;
+    }
 }
