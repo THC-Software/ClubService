@@ -5,13 +5,13 @@ namespace ClubService.Domain.ReadModel;
 
 public class SubscriptionTierReadModel
 {
-    public SubscriptionTierId Id { get; }
+    public SubscriptionTierId SubscriptionTierId { get; }
     public string Name { get; }
     public int MaxMemberCount { get; }
     
-    private SubscriptionTierReadModel(SubscriptionTierId id, string name, int maxMemberCount)
+    private SubscriptionTierReadModel(SubscriptionTierId subscriptionTierId, string name, int maxMemberCount)
     {
-        Id = id;
+        SubscriptionTierId = subscriptionTierId;
         Name = name;
         MaxMemberCount = maxMemberCount;
     }

@@ -23,7 +23,7 @@ public class SubscriptionTierReadModelRepository(ReadStoreDbContext readStoreDbC
     public async Task<SubscriptionTierReadModel?> GetSubscriptionTierById(Guid id)
     {
         return await readStoreDbContext.SubscriptionTiers
-            .Where(subscriptionTier => subscriptionTier.Id == new SubscriptionTierId(id))
+            .Where(subscriptionTier => subscriptionTier.SubscriptionTierId == new SubscriptionTierId(id))
             .SingleOrDefaultAsync();
     }
 }
