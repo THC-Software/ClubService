@@ -6,4 +6,5 @@ public interface IMemberReadModelRepository
 {
     Task Add(MemberReadModel memberReadModel);
     Task Update();
+    Task<MemberReadModel?> GetMemberById(Guid id);
 }
