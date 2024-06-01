@@ -31,4 +31,16 @@ public class TennisClubReadModelRepository(ReadStoreDbContext readStoreDbContext
         readStoreDbContext.TennisClubs.Remove(tennisClub);
         await readStoreDbContext.SaveChangesAsync();
     }
+    
+    public async Task<List<TennisClubReadModel>> GetAllTennisClubs(int pageSize = 0, int pageNumber = 1)
+    {
+        IQueryable<TennisClubReadModel> tennisClubs = readStoreDbContext.TennisClubs;
+        
+        if (pageSize > 0)
+        {
+            tennisClubs = tennisClubs.Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+        }
+        
+        return await tennisClubs.ToListAsync();
+    }
 }

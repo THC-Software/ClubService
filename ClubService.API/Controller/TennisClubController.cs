@@ -2,7 +2,10 @@ using Asp.Versioning;
 using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Application.Dtos;
+using ClubService.Domain.ReadModel;
+using ClubService.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ClubService.API.Controller;
 
@@ -12,8 +15,27 @@ namespace ClubService.API.Controller;
 public class TennisClubController(
     IRegisterTennisClubService registerTennisClubService,
     IUpdateTennisClubService updateTennisClubService,
-    IDeleteTennisClubService deleteTennisClubService) : ControllerBase
+    IDeleteTennisClubService deleteTennisClubService,
+    ITennisClubReadModelRepository tennisClubReadModelRepository) : ControllerBase
 {
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<TennisClubReadModel>>> GetAllTennisClubs(
+        [FromQuery] int pageSize = 0,
+        int pageNumber = 1)
+    {
+        var tennisClubs = await tennisClubReadModelRepository.GetAllTennisClubs(pageSize, pageNumber);
+        
+        var metadata = new
+        {
+            pageSize,
+            pageNumber
+        };
+        Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+        
+        return Ok(tennisClubs);
+    }
+    
     [HttpGet("{clubId}/members")]
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByClub(string clubId)
     {
