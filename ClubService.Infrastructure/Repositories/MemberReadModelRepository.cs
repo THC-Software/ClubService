@@ -1,5 +1,4 @@
-﻿using ClubService.Domain.Event;
-using ClubService.Domain.ReadModel;
+﻿using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 
