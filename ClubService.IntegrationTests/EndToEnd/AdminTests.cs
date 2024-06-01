@@ -109,4 +109,40 @@ public class AdminTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Does.Contain("Admin is already deleted!"));
     }
+    
+    [Test]
+    public async Task GivenUpdateAdminCommand_WhenAdminFullNameChanged_ThenAdminFullNameChangedEventExistsInRepository()
+    {
+        // Given
+        var numberOfEventsExpected = 2;
+        var adminIdExpected = new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe");
+        var eventTypeExpected = EventType.ADMIN_FULL_NAME_CHANGED;
+        var entityTypeExpected = EntityType.ADMIN;
+        var eventDataTypeExpected = typeof(AdminFullNameChangedEvent);
+        var nameExpected = new FullName("Jane", "Doe");
+        var updateAdminCommand = new AdminUpdateCommand(nameExpected.FirstName,
+            nameExpected.LastName);
+        var httpContent = new StringContent(JsonConvert.SerializeObject(updateAdminCommand), Encoding.UTF8,
+            "application/json");
+        
+        // When
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{adminIdExpected.ToString()}", httpContent);
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        
+        var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(adminIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var storedEvent = storedEvents[numberOfEventsExpected - 1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
+            Assert.That(storedEvent.EntityId, Is.EqualTo(adminIdExpected));
+            Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
+    }
 }
