@@ -22,7 +22,7 @@ public class TennisClubDeletedEventHandler(ITennisClubReadModelRepository tennis
         else
         {
             // TODO: Add logging
-            Console.WriteLine($"Could not delete tennis club with id {domainEnvelope.EntityId}!");
+            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} does not exist!");
         }
     }
     
