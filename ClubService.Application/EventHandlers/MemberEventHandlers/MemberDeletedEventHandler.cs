@@ -4,10 +4,59 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
-public class MemberDeletedEventHandler(IMemberReadModelRepository memberReadModelRepository) : IEventHandler
+public class MemberDeletedEventHandler(
+    IMemberReadModelRepository memberReadModelRepository,
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    IReadStoreTransactionManager readStoreTransactionManager) : IEventHandler
 {
-    public Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
+    public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
-        throw new NotImplementedException();
+        if (!Supports(domainEnvelope))
+        {
+            return;
+        }
+        
+        var memberReadModel = await memberReadModelRepository.GetMemberById(domainEnvelope.EntityId);
+        
+        if (memberReadModel != null)
+        {
+            var tennisClubReadModel =
+                await tennisClubReadModelRepository.GetTennisClubById(memberReadModel.TennisClubId.Id);
+            
+            if (tennisClubReadModel != null)
+            {
+                try
+                {
+                    await readStoreTransactionManager.BeginTransactionAsync();
+                    
+                    tennisClubReadModel.DecreaseMemberCount();
+                    await tennisClubReadModelRepository.Update();
+                    
+                    memberReadModel.Lock();
+                    await memberReadModelRepository.Update();
+                    
+                    await readStoreTransactionManager.CommitTransactionAsync();
+                }
+                catch (Exception)
+                {
+                    await readStoreTransactionManager.RollbackTransactionAsync();
+                }
+            }
+            else
+            {
+                // TODO: Add logging
+                Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            }
+        }
+        else
+        {
+            // TODO: Add logging
+            Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+        }
+    }
+    
+    private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
+    {
+        return domainEnvelope.EventType.Equals(EventType.MEMBER_DELETED);
     }
 }
