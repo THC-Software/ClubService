@@ -50,4 +50,14 @@ public class TennisClubReadModel
     {
         Status = TennisClubStatus.ACTIVE;
     }
+
+    public void ChangeName(string name)
+    {
+        Name = name;
+    }
+  
+    public void ChangeSubscriptionTier(SubscriptionTierId subscriptionTierId)
+    {
+        SubscriptionTierId = subscriptionTierId;
+    }
 }
