@@ -15,16 +15,15 @@ public class TennisClubLockedEventHandler(ITennisClubReadModelRepository tennisC
         
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
         
-        if (tennisClub != null)
-        {
-            tennisClub.Lock();
-            await tennisClubReadModelRepository.Update();
-        }
-        else
+        if (tennisClub == null)
         {
             // TODO: Add logging
             Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            return;
         }
+        
+        tennisClub.Lock();
+        await tennisClubReadModelRepository.Update();
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

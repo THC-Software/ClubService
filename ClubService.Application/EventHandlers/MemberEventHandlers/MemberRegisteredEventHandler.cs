@@ -22,29 +22,28 @@ public class MemberRegisteredEventHandler(
         var tennisClubReadModel =
             await tennisClubReadModelRepository.GetTennisClubById(memberRegisteredEvent.TennisClubId.Id);
         
-        if (tennisClubReadModel != null)
-        {
-            try
-            {
-                await readStoreTransactionManager.BeginTransactionAsync();
-                
-                tennisClubReadModel.IncreaseMemberCount();
-                await tennisClubReadModelRepository.Update();
-                
-                var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
-                await memberReadModelRepository.Add(memberReadModel);
-                
-                await readStoreTransactionManager.CommitTransactionAsync();
-            }
-            catch (Exception)
-            {
-                await readStoreTransactionManager.RollbackTransactionAsync();
-            }
-        }
-        else
+        if (tennisClubReadModel == null)
         {
             // TODO: Add logging
             Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+            return;
+        }
+        
+        try
+        {
+            await readStoreTransactionManager.BeginTransactionAsync();
+            
+            tennisClubReadModel.IncreaseMemberCount();
+            await tennisClubReadModelRepository.Update();
+            
+            var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
+            await memberReadModelRepository.Add(memberReadModel);
+            
+            await readStoreTransactionManager.CommitTransactionAsync();
+        }
+        catch (Exception)
+        {
+            await readStoreTransactionManager.RollbackTransactionAsync();
         }
     }
     

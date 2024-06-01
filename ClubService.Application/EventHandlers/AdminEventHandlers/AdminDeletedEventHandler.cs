@@ -14,15 +14,14 @@ public class AdminDeletedEventHandler(IAdminReadModelRepository adminReadModelRe
         }
         
         var adminReadModel = await adminReadModelRepository.GetAdminById(domainEnvelope.EntityId);
-        if (adminReadModel != null)
-        {
-            await adminReadModelRepository.Delete(adminReadModel);
-        }
-        else
+        if (adminReadModel == null)
         {
             // TODO: Add logging
             Console.WriteLine($"Admin with id {domainEnvelope.EntityId} not found!");
+            return;
         }
+        
+        await adminReadModelRepository.Delete(adminReadModel);
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

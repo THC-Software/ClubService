@@ -15,16 +15,15 @@ public class MemberUnlockedEventHandler(IMemberReadModelRepository memberReadMod
         
         var memberReadModel = await memberReadModelRepository.GetMemberById(domainEnvelope.EntityId);
         
-        if (memberReadModel != null)
-        {
-            memberReadModel.Unlock();
-            await memberReadModelRepository.Update();
-        }
-        else
+        if (memberReadModel == null)
         {
             // TODO: Add logging
             Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+            return;
         }
+        
+        memberReadModel.Unlock();
+        await memberReadModelRepository.Update();
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
