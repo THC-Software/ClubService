@@ -10,7 +10,7 @@ public class MemberReadModel
     public FullName Name { get; } = null!;
     public string Email { get; } = null!;
     public TennisClubId TennisClubId { get; } = null!;
-    public MemberStatus Status { get; }
+    public MemberStatus Status { get; private set; }
     
     // needed by efcore
     private MemberReadModel()
@@ -40,5 +40,10 @@ public class MemberReadModel
             memberRegisteredEvent.TennisClubId,
             memberRegisteredEvent.Status
         );
+    }
+    
+    public void Lock()
+    {
+        Status = MemberStatus.LOCKED;
     }
 }

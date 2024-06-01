@@ -1,6 +1,8 @@
-﻿using ClubService.Domain.ReadModel;
+﻿using ClubService.Domain.Model.ValueObject;
+using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClubService.Infrastructure.Repositories;
 
@@ -10,5 +12,17 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
     {
         await readStoreDbContext.Members.AddAsync(memberReadModel);
         await readStoreDbContext.SaveChangesAsync();
+    }
+    
+    public async Task Update()
+    {
+        await readStoreDbContext.SaveChangesAsync();
+    }
+    
+    public async Task<MemberReadModel?> GetMemberById(Guid id)
+    {
+        return await readStoreDbContext.Members
+            .Where(memberReadModel => memberReadModel.MemberId == new MemberId(id))
+            .SingleOrDefaultAsync();
     }
 }
