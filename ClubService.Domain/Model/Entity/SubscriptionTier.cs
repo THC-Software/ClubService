@@ -6,7 +6,7 @@ namespace ClubService.Domain.Model.Entity;
 
 public class SubscriptionTier
 {
-    private SubscriptionTierId Id { get; set; } = null!;
+    private SubscriptionTierId SubscriptionTierId { get; set; } = null!;
     public string Name { get; private set; } = null!;
     public int MaxMemberCount { get; private set; }
     
@@ -36,14 +36,14 @@ public class SubscriptionTier
     
     private void Apply(SubscriptionTierCreatedEvent subscriptionTierCreatedEvent)
     {
-        Id = subscriptionTierCreatedEvent.Id;
+        SubscriptionTierId = subscriptionTierCreatedEvent.Id;
         Name = subscriptionTierCreatedEvent.Name;
         MaxMemberCount = subscriptionTierCreatedEvent.MaxMemberCount;
     }
     
     protected bool Equals(SubscriptionTier other)
     {
-        return Id.Equals(other.Id);
+        return SubscriptionTierId.Equals(other.SubscriptionTierId);
     }
     
     public override bool Equals(object? obj)
@@ -68,6 +68,6 @@ public class SubscriptionTier
     
     public override int GetHashCode()
     {
-        return Id.GetHashCode();
+        return SubscriptionTierId.GetHashCode();
     }
 }

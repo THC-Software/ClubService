@@ -18,4 +18,20 @@ public class SubscriptionTierController(ISubscriptionTierReadModelRepository sub
         var subscriptionTiers = await subscriptionTierReadModelRepository.GetAllSubscriptionTiers();
         return Ok(subscriptionTiers);
     }
+    
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TennisClubReadModel>> GetSubscriptionTierById(string id)
+    {
+        var subscriptionTierGuid = new Guid(id);
+        var subscriptionTier = await subscriptionTierReadModelRepository.GetSubscriptionTierById(subscriptionTierGuid);
+        
+        if (subscriptionTier == null)
+        {
+            return NotFound($"Subscription Tier with id {id} not found!");
+        }
+        
+        return Ok(subscriptionTier);
+    }
 }

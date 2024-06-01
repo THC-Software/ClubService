@@ -11,8 +11,8 @@ public class SubscriptionTierReadModelConfiguration : IEntityTypeConfiguration<S
     {
         builder.ToTable("SubscriptionTier");
         
-        builder.HasKey(s => s.Id);
-        builder.Property(s => s.Id)
+        builder.HasKey(s => s.SubscriptionTierId);
+        builder.Property(s => s.SubscriptionTierId)
             .IsRequired()
             .HasConversion(
                 v => v.Id,
