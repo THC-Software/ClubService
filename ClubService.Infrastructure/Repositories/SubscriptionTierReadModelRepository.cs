@@ -12,4 +12,9 @@ public class SubscriptionTierReadModelRepository(ReadStoreDbContext readStoreDbC
         await readStoreDbContext.SubscriptionTiers.AddAsync(subscriptionTierReadModel);
         await readStoreDbContext.SaveChangesAsync();
     }
+    
+    public Task<List<SubscriptionTierReadModel>> GetAllSubscriptionTiers()
+    {
+        throw new NotImplementedException();
+    }
 }
