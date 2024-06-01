@@ -30,7 +30,7 @@ public class TennisClubNameChangedEventHandler(ITennisClubReadModelRepository te
         }
     }
     
-    private bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
+    private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_NAME_CHANGED);
     }

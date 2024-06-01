@@ -28,7 +28,7 @@ public class TennisClubUnlockedEventHandler(ITennisClubReadModelRepository tenni
         }
     }
     
-    private bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
+    private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_UNLOCKED);
     }

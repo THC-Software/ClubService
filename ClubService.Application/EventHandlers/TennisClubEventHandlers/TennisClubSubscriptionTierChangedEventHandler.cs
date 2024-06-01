@@ -30,7 +30,7 @@ public class TennisClubSubscriptionTierChangedEventHandler(ITennisClubReadModelR
         }
     }
     
-    private bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
+    private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED);
     }
