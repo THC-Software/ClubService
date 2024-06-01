@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using ClubService.Application.Api;
 using ClubService.Application.Commands;
-using ClubService.Application.Dtos;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -53,10 +52,9 @@ public class TennisClubController(
     }
     
     [HttpGet("{clubId}/members")]
-    public async Task<ActionResult<IEnumerable<MemberDto>>> GetMembersByClub(string clubId)
+    public async Task<ActionResult<IEnumerable<MemberReadModel>>> GetMembersByClub(string clubId)
     {
-        var memberDtos = new List<MemberDto>();
-        return await Task.FromResult(memberDtos);
+        throw new NotImplementedException();
     }
     
     [HttpPost]
