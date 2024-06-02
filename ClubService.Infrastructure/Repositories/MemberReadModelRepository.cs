@@ -19,6 +19,12 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
         await readStoreDbContext.SaveChangesAsync();
     }
     
+    public async Task Delete(MemberReadModel memberReadModel)
+    {
+        readStoreDbContext.Members.Remove(memberReadModel);
+        await readStoreDbContext.SaveChangesAsync();
+    }
+    
     public async Task<MemberReadModel?> GetMemberById(Guid id)
     {
         return await readStoreDbContext.Members
@@ -26,9 +32,10 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
             .SingleOrDefaultAsync();
     }
     
-    public async Task Delete(MemberReadModel memberReadModel)
+    public Task<List<MemberReadModel>> GetMembersByTennisClubId(Guid tennisClubId)
     {
-        readStoreDbContext.Members.Remove(memberReadModel);
-        await readStoreDbContext.SaveChangesAsync();
+        return readStoreDbContext.Members
+            .Where(memberReadModel => memberReadModel.TennisClubId == new TennisClubId(tennisClubId))
+            .ToListAsync();
     }
 }

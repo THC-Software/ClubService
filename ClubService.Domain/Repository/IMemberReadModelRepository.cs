@@ -6,6 +6,7 @@ public interface IMemberReadModelRepository
 {
     Task Add(MemberReadModel memberReadModel);
     Task Update();
-    Task<MemberReadModel?> GetMemberById(Guid id);
     Task Delete(MemberReadModel memberReadModel);
+    Task<MemberReadModel?> GetMemberById(Guid id);
+    Task<List<MemberReadModel>> GetMembersByTennisClubId(Guid tennisClubId);
 }
