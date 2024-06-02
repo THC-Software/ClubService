@@ -113,6 +113,11 @@ public class Member
         switch (Status)
         {
             case MemberStatus.ACTIVE:
+                if (fullName.Equals(Name))
+                {
+                    throw new InvalidOperationException("This name is already set!");
+                }
+                
                 var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
                 var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
                     Guid.NewGuid(),

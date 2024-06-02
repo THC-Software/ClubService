@@ -65,6 +65,10 @@ public class Admin
         {
             throw new InvalidOperationException("Admin is already deleted!");
         }
+        if (fullName.Equals(Name))
+        {
+            throw new InvalidOperationException("This name is already set!");
+        }
         
         var adminChangedFullNameEvent = new AdminFullNameChangedEvent(fullName);
         
