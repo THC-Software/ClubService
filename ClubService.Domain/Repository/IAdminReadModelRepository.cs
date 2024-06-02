@@ -8,4 +8,5 @@ public interface IAdminReadModelRepository
     Task Delete(AdminReadModel adminReadModel);
     Task Update();
     Task<AdminReadModel?> GetAdminById(Guid id);
+    Task<List<AdminReadModel>> GetAdminsByTennisClubById(Guid tennisClubId);
 }

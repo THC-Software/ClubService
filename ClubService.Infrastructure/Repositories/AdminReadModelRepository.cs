@@ -31,4 +31,11 @@ public class AdminReadModelRepository(ReadStoreDbContext readStoreDbContext) : I
             .Where(admin => admin.AdminId == new AdminId(id))
             .SingleOrDefaultAsync();
     }
+    
+    public Task<List<AdminReadModel>> GetAdminsByTennisClubById(Guid tennisClubId)
+    {
+        return readStoreDbContext.Admins
+            .Where(admin => admin.TennisClubId == new TennisClubId(tennisClubId))
+            .ToListAsync();
+    }
 }
