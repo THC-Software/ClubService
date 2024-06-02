@@ -262,6 +262,40 @@ public class MemberTests : TestBase
     }
     
     [Test]
+    public async Task GivenUpdateMemberCommand_WhenMemberEmailChanged_ThenMemberEmailChangedEventExistsInRepository()
+    {
+        // Given
+        var numberOfEventsExpected = 2;
+        var memberIdExpected = new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc");
+        var eventTypeExpected = EventType.MEMBER_EMAIL_CHANGED;
+        var entityTypeExpected = EntityType.MEMBER;
+        var eventDataTypeExpected = typeof(MemberEmailChangedEvent);
+        var updateMemberCommand = new MemberUpdateCommand(null, null, "armin.otter@fhv.gorillaKaefig");
+        var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
+            "application/json");
+        
+        // When
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var storedEvent = storedEvents[numberOfEventsExpected - 1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(storedEvent.EventType, Is.EqualTo(eventTypeExpected));
+            Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
+            Assert.That(storedEvent.EntityId, Is.EqualTo(memberIdExpected));
+            Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
+    }
+    
+    [Test]
     public async Task GivenUpdateMemberCommand_WhenEmptyUpdateMemberCommand_ThenErrorResponseIsReturned()
     {
         // Given
