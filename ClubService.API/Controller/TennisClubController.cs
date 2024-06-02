@@ -59,7 +59,7 @@ public class TennisClubController(
     public async Task<ActionResult<TennisClubReadModel>> GetAdminsByTennisClubId(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
-        var admins = await adminReadModelRepository.GetAdminsByTennisClubById(clubIdGuid);
+        var admins = await adminReadModelRepository.GetAdminsByTennisClubId(clubIdGuid);
         
         if (admins.Count == 0)
         {
