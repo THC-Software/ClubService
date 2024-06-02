@@ -137,6 +137,35 @@ public class Member
         }
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
+    {
+        switch (Status)
+        {
+            case MemberStatus.ACTIVE:
+                if (email.Equals(Email))
+                {
+                    throw new InvalidOperationException("This email is already set!");
+                }
+                
+                var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_EMAIL_CHANGED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberEmailChangedEvent
+                );
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -155,6 +184,9 @@ public class Member
                 break;
             case EventType.MEMBER_FULL_NAME_CHANGED:
                 Apply((MemberFullNameChangedEvent)domainEnvelope.EventData);
+                break;
+            case EventType.MEMBER_EMAIL_CHANGED:
+                Apply((MemberEmailChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
@@ -198,6 +230,11 @@ public class Member
     private void Apply(MemberFullNameChangedEvent memberFullNameChangedEvent)
     {
         Name = memberFullNameChangedEvent.Name;
+    }
+    
+    private void Apply(MemberEmailChangedEvent memberEmailChangedEvent)
+    {
+        Email = memberEmailChangedEvent.Email;
     }
     
     protected bool Equals(Member other)
