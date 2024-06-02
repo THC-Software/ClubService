@@ -2,6 +2,8 @@ using Asp.Versioning;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
+using ClubService.Domain.ReadModel;
+using ClubService.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -12,7 +14,8 @@ namespace ClubService.API.Controller;
 public class AdminController(
     IRegisterAdminService registerAdminService,
     IDeleteAdminService deleteAdminService,
-    IUpdateAdminService updateAdminService)
+    IUpdateAdminService updateAdminService,
+    IAdminReadModelRepository adminReadModelRepository)
     : ControllerBase
 {
     [HttpPost]
@@ -51,5 +54,22 @@ public class AdminController(
             adminUpdateCommand.LastName
         );
         return Ok(updatedAdminId);
+    }
+    
+    
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AdminReadModel>> GetAdminById(string id)
+    {
+        var adminId = new Guid(id);
+        var tennisClub = await adminReadModelRepository.GetAdminById(adminId);
+        
+        if (tennisClub == null)
+        {
+            return NotFound($"Admin with id {id} not found!");
+        }
+        
+        return Ok(tennisClub);
     }
 }

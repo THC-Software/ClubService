@@ -15,7 +15,9 @@ public class TennisClubController(
     IRegisterTennisClubService registerTennisClubService,
     IUpdateTennisClubService updateTennisClubService,
     IDeleteTennisClubService deleteTennisClubService,
-    ITennisClubReadModelRepository tennisClubReadModelRepository) : ControllerBase
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    IAdminReadModelRepository adminReadModelRepository
+) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -49,6 +51,22 @@ public class TennisClubController(
         }
         
         return Ok(tennisClub);
+    }
+    
+    [HttpGet("{clubId}/admins")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<TennisClubReadModel>> GetAdminsByTennisClubId(string clubId)
+    {
+        var clubIdGuid = new Guid(clubId);
+        var admins = await adminReadModelRepository.GetAdminsByTennisClubId(clubIdGuid);
+        
+        if (admins.Count == 0)
+        {
+            return NotFound($"No Admins found for Tennis Club with id {clubId}!");
+        }
+        
+        return Ok(admins);
     }
     
     [HttpGet("{clubId}/members")]
