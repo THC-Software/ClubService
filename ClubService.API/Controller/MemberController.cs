@@ -53,7 +53,8 @@ public class MemberController(
         
         if (memberUpdateCommand.Email != null)
         {
-            throw new NotImplementedException();
+            var updatedMemberId = await updateMemberService.ChangeEmail(id, memberUpdateCommand.Email);
+            return Ok(updatedMemberId);
         }
         
         return BadRequest("You have to provide either first and last name or an e-mail address!");
