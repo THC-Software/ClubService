@@ -156,6 +156,9 @@ public class Member
             case EventType.MEMBER_FULL_NAME_CHANGED:
                 Apply((MemberFullNameChangedEvent)domainEnvelope.EventData);
                 break;
+            case EventType.MEMBER_EMAIL_CHANGED:
+                Apply((MemberEmailChangedEvent)domainEnvelope.EventData);
+                break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
             case EventType.TENNIS_CLUB_REGISTERED:
@@ -198,6 +201,11 @@ public class Member
     private void Apply(MemberFullNameChangedEvent memberFullNameChangedEvent)
     {
         Name = memberFullNameChangedEvent.Name;
+    }
+    
+    private void Apply(MemberEmailChangedEvent memberEmailChangedEvent)
+    {
+        Email = memberEmailChangedEvent.Email;
     }
     
     protected bool Equals(Member other)
