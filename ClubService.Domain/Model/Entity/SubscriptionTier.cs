@@ -28,6 +28,10 @@ public class SubscriptionTier
             case EventType.MEMBER_FULL_NAME_CHANGED:
             case EventType.TENNIS_CLUB_LOCKED:
             case EventType.TENNIS_CLUB_UNLOCKED:
+            case EventType.MEMBER_EMAIL_CHANGED:
+            case EventType.ADMIN_FULL_NAME_CHANGED:
+            case EventType.TENNIS_CLUB_DELETED:
+            case EventType.TENNIS_CLUB_NAME_CHANGED:
             default:
                 throw new ArgumentException(
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity TennisClub!");

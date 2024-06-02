@@ -194,6 +194,10 @@ public class Member
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
             case EventType.TENNIS_CLUB_LOCKED:
             case EventType.TENNIS_CLUB_UNLOCKED:
+            case EventType.ADMIN_FULL_NAME_CHANGED:
+            case EventType.SUBSCRIPTION_TIER_CREATED:
+            case EventType.TENNIS_CLUB_DELETED:
+            case EventType.TENNIS_CLUB_NAME_CHANGED:
             default:
                 throw new ArgumentException(
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity Member!");
