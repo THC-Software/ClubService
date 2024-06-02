@@ -108,6 +108,30 @@ public class Member
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeFullNameCommand(FullName fullName)
+    {
+        switch (Status)
+        {
+            case MemberStatus.ACTIVE:
+                var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_FULL_NAME_CHANGED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberFullNameChangedEvent
+                );
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
