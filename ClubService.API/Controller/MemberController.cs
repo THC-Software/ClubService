@@ -15,10 +15,10 @@ public class MemberController(
     IDeleteMemberService deleteMemberService)
     : ControllerBase
 {
-    [HttpGet("{memberId}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(typeof(MemberReadModel), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<MemberReadModel>> GetMemberById(string memberId)
+    public async Task<ActionResult<MemberReadModel>> GetMemberById(string id)
     {
         throw new NotImplementedException();
     }
@@ -34,10 +34,24 @@ public class MemberController(
         return CreatedAtAction(nameof(RegisterMember), new { id = registeredMemberId }, registeredMemberId);
     }
     
-    [HttpPut("{memberId}")]
-    public async Task<ActionResult<string>> UpdateMember(string memberId, MemberUpdateCommand memberUpdateCommand)
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string>> UpdateMember(string id, MemberUpdateCommand memberUpdateCommand)
     {
-        return await Task.FromResult("");
+        if (memberUpdateCommand.FirstName != null && memberUpdateCommand.LastName != null)
+        {
+            throw new NotImplementedException();
+        }
+        
+        if (memberUpdateCommand.Email != null)
+        {
+            throw new NotImplementedException();
+        }
+        
+        return BadRequest("You have to provide either a full name or a email!");
     }
     
     [HttpDelete("{id}")]
