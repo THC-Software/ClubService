@@ -34,7 +34,7 @@ public class MemberController(
         return CreatedAtAction(nameof(RegisterMember), new { id = registeredMemberId }, registeredMemberId);
     }
     
-    [HttpPut("{id}")]
+    [HttpPatch("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
