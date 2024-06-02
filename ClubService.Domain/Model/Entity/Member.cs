@@ -149,6 +149,7 @@ public class Member
                 Apply((MemberUnlockedEvent)domainEnvelope.EventData);
                 break;
             case EventType.MEMBER_FULL_NAME_CHANGED:
+                Apply((MemberFullNameChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
@@ -187,6 +188,11 @@ public class Member
     private void Apply(MemberDeletedEvent memberDeletedEvent)
     {
         Status = MemberStatus.DELETED;
+    }
+    
+    private void Apply(MemberFullNameChangedEvent memberFullNameChangedEvent)
+    {
+        Name = memberFullNameChangedEvent.Name;
     }
     
     protected bool Equals(Member other)
