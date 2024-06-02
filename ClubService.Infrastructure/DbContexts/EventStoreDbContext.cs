@@ -163,11 +163,21 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 )
             ),
             new DomainEnvelope<IDomainEvent>(
+                new Guid("fd3e1a64-7dfc-475e-a62b-cd6398f5ad74"),
+                new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649"),
+                EventType.MEMBER_FULL_NAME_CHANGED,
+                EntityType.MEMBER,
+                DateTime.UtcNow.AddMilliseconds(10.0),
+                new MemberFullNameChangedEvent(
+                    new FullName("Michael", "Doe")
+                )
+            ),
+            new DomainEnvelope<IDomainEvent>(
                 new Guid("7e13eab3-169e-40ec-87fe-3facc64c81bb"),
                 new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649"),
                 EventType.MEMBER_DELETED,
                 EntityType.MEMBER,
-                DateTime.UtcNow.AddHours(1),
+                DateTime.UtcNow.AddMilliseconds(1000.0),
                 new MemberDeletedEvent()
             ),
             // Admins
@@ -200,22 +210,22 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 )
             ),
             new DomainEnvelope<IAdminDomainEvent>(
-                new Guid("b9832de8-542e-4a3c-b745-b39f8ffc3223"),
-                new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
-                EventType.ADMIN_DELETED,
-                EntityType.ADMIN,
-                DateTime.UtcNow.AddHours(1),
-                new AdminDeletedEvent()
-            ),
-            new DomainEnvelope<IAdminDomainEvent>(
                 new Guid("4e252abf-08e9-4e6d-a674-f99d4ee740d5"),
                 new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
                 EventType.ADMIN_FULL_NAME_CHANGED,
                 EntityType.ADMIN,
-                DateTime.UtcNow.AddHours(2),
+                DateTime.UtcNow.AddMilliseconds(10.0),
                 new AdminFullNameChangedEvent(
                     new FullName("Michael", "Spiegel")
                 )
+            ),
+            new DomainEnvelope<IAdminDomainEvent>(
+                new Guid("b9832de8-542e-4a3c-b745-b39f8ffc3223"),
+                new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
+                EventType.ADMIN_DELETED,
+                EntityType.ADMIN,
+                DateTime.UtcNow.AddMilliseconds(1000.0),
+                new AdminDeletedEvent()
             )
         );
     }

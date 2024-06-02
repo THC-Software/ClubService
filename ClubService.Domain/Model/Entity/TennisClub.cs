@@ -172,7 +172,7 @@ public class TennisClub
             case EventType.MEMBER_DELETED:
             case EventType.MEMBER_LOCKED:
             case EventType.MEMBER_UNLOCKED:
-            case EventType.MEMBER_UPDATED:
+            case EventType.MEMBER_FULL_NAME_CHANGED:
             default:
                 throw new ArgumentException(
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity TennisClub!");

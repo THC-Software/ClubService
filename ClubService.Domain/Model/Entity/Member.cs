@@ -108,6 +108,35 @@ public class Member
         return [domainEnvelope];
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeFullNameCommand(FullName fullName)
+    {
+        switch (Status)
+        {
+            case MemberStatus.ACTIVE:
+                if (fullName.Equals(Name))
+                {
+                    throw new InvalidOperationException("This name is already set!");
+                }
+                
+                var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_FULL_NAME_CHANGED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberFullNameChangedEvent
+                );
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -124,7 +153,8 @@ public class Member
             case EventType.MEMBER_UNLOCKED:
                 Apply((MemberUnlockedEvent)domainEnvelope.EventData);
                 break;
-            case EventType.MEMBER_UPDATED:
+            case EventType.MEMBER_FULL_NAME_CHANGED:
+                Apply((MemberFullNameChangedEvent)domainEnvelope.EventData);
                 break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
@@ -163,6 +193,11 @@ public class Member
     private void Apply(MemberDeletedEvent memberDeletedEvent)
     {
         Status = MemberStatus.DELETED;
+    }
+    
+    private void Apply(MemberFullNameChangedEvent memberFullNameChangedEvent)
+    {
+        Name = memberFullNameChangedEvent.Name;
     }
     
     protected bool Equals(Member other)

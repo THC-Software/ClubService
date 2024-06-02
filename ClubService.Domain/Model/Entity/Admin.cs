@@ -65,6 +65,10 @@ public class Admin
         {
             throw new InvalidOperationException("Admin is already deleted!");
         }
+        if (fullName.Equals(Name))
+        {
+            throw new InvalidOperationException("This name is already set!");
+        }
         
         var adminChangedFullNameEvent = new AdminFullNameChangedEvent(fullName);
         
@@ -99,7 +103,7 @@ public class Admin
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
             case EventType.MEMBER_LOCKED:
             case EventType.MEMBER_UNLOCKED:
-            case EventType.MEMBER_UPDATED:
+            case EventType.MEMBER_FULL_NAME_CHANGED:
             case EventType.TENNIS_CLUB_LOCKED:
             case EventType.TENNIS_CLUB_UNLOCKED:
             case EventType.SUBSCRIPTION_TIER_CREATED:
