@@ -127,4 +127,44 @@ public class UpdateMemberService(IEventRepository eventRepository) : IUpdateMemb
         
         return id;
     }
+    
+    public async Task<string> ChangeEmail(string id, string email)
+    {
+        var memberId = Guid.Parse(id);
+        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId);
+        
+        if (existingMemberDomainEvents.Count == 0)
+        {
+            throw new MemberNotFoundException(memberId);
+        }
+        
+        var member = new Member();
+        
+        foreach (var domainEvent in existingMemberDomainEvents)
+        {
+            member.Apply(domainEvent);
+        }
+        
+        try
+        {
+            var domainEvents = member.ProcessMemberChangeEmailCommand(email);
+            var expectedEventCount = existingMemberDomainEvents.Count;
+            
+            foreach (var domainEvent in domainEvents)
+            {
+                member.Apply(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            throw new ConflictException(ex.Message, ex);
+        }
+        catch (DataException ex)
+        {
+            throw new ConcurrencyException(ex.Message, ex);
+        }
+        
+        return id;
+    }
 }

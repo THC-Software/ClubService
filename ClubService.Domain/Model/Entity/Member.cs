@@ -137,6 +137,35 @@ public class Member
         }
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
+    {
+        switch (Status)
+        {
+            case MemberStatus.ACTIVE:
+                if (email.Equals(Email))
+                {
+                    throw new InvalidOperationException("This email is already set!");
+                }
+                
+                var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_EMAIL_CHANGED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberEmailChangedEvent
+                );
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -156,12 +185,19 @@ public class Member
             case EventType.MEMBER_FULL_NAME_CHANGED:
                 Apply((MemberFullNameChangedEvent)domainEnvelope.EventData);
                 break;
+            case EventType.MEMBER_EMAIL_CHANGED:
+                Apply((MemberEmailChangedEvent)domainEnvelope.EventData);
+                break;
             case EventType.ADMIN_REGISTERED:
             case EventType.ADMIN_DELETED:
             case EventType.TENNIS_CLUB_REGISTERED:
             case EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED:
             case EventType.TENNIS_CLUB_LOCKED:
             case EventType.TENNIS_CLUB_UNLOCKED:
+            case EventType.ADMIN_FULL_NAME_CHANGED:
+            case EventType.SUBSCRIPTION_TIER_CREATED:
+            case EventType.TENNIS_CLUB_DELETED:
+            case EventType.TENNIS_CLUB_NAME_CHANGED:
             default:
                 throw new ArgumentException(
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity Member!");
@@ -198,6 +234,11 @@ public class Member
     private void Apply(MemberFullNameChangedEvent memberFullNameChangedEvent)
     {
         Name = memberFullNameChangedEvent.Name;
+    }
+    
+    private void Apply(MemberEmailChangedEvent memberEmailChangedEvent)
+    {
+        Email = memberEmailChangedEvent.Email;
     }
     
     protected bool Equals(Member other)

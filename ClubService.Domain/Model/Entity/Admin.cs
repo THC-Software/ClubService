@@ -109,6 +109,7 @@ public class Admin
             case EventType.SUBSCRIPTION_TIER_CREATED:
             case EventType.TENNIS_CLUB_NAME_CHANGED:
             case EventType.TENNIS_CLUB_DELETED:
+            case EventType.MEMBER_EMAIL_CHANGED:
             default:
                 throw new ArgumentException(
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity Admin!");
