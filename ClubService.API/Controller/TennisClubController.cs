@@ -22,6 +22,7 @@ public class TennisClubController(
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<TennisClubReadModel>>> GetAllTennisClubs(
         [FromQuery] int pageSize = 0,
         int pageNumber = 1)
@@ -41,6 +42,7 @@ public class TennisClubController(
     [HttpGet("{clubId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
@@ -57,6 +59,7 @@ public class TennisClubController(
     [HttpGet("{clubId}/admins")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
@@ -73,6 +76,7 @@ public class TennisClubController(
     [HttpGet("{clubId}/members")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
