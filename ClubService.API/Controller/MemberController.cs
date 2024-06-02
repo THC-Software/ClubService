@@ -43,7 +43,12 @@ public class MemberController(
     {
         if (memberUpdateCommand.FirstName != null && memberUpdateCommand.LastName != null)
         {
-            throw new NotImplementedException();
+            var updatedMemberId = await updateMemberService.ChangeFullName(
+                id,
+                memberUpdateCommand.FirstName,
+                memberUpdateCommand.LastName
+            );
+            return Ok(updatedMemberId);
         }
         
         if (memberUpdateCommand.Email != null)
@@ -51,7 +56,7 @@ public class MemberController(
             throw new NotImplementedException();
         }
         
-        return BadRequest("You have to provide either a full name or a email!");
+        return BadRequest("You have to provide either first and last name or an e-mail address!");
     }
     
     [HttpDelete("{id}")]
