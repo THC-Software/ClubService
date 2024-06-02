@@ -92,6 +92,13 @@ public static class EventDeserializer
                 }
                 
                 break;
+            case EventType.MEMBER_EMAIL_CHANGED:
+                if (JsonConvert.DeserializeObject<MemberEmailChangedEvent>(eventDataJson) is T memberEmailChangedEvent)
+                {
+                    return memberEmailChangedEvent;
+                }
+                
+                break;
             case EventType.TENNIS_CLUB_LOCKED:
                 if (JsonConvert.DeserializeObject<TennisClubLockedEvent>(eventDataJson) is T tennisClubLockedEvent)
                 {
