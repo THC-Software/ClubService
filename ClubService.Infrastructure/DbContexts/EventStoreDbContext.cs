@@ -173,6 +173,14 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 )
             ),
             new DomainEnvelope<IDomainEvent>(
+                new Guid("890a8c5b-11b6-401d-824f-f000d302031d"),
+                new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649"),
+                EventType.MEMBER_EMAIL_CHANGED,
+                EntityType.MEMBER,
+                DateTime.UtcNow.AddMilliseconds(100.0),
+                new MemberEmailChangedEvent("jane.doe@fhv.gorillaKaefig")
+            ),
+            new DomainEnvelope<IDomainEvent>(
                 new Guid("7e13eab3-169e-40ec-87fe-3facc64c81bb"),
                 new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649"),
                 EventType.MEMBER_DELETED,
