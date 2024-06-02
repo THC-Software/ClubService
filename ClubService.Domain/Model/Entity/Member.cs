@@ -137,6 +137,35 @@ public class Member
         }
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
+    {
+        switch (Status)
+        {
+            case MemberStatus.ACTIVE:
+                if (email.Equals(Email))
+                {
+                    throw new InvalidOperationException("This email is already set!");
+                }
+                
+                var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_EMAIL_CHANGED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberEmailChangedEvent
+                );
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
