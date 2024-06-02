@@ -16,7 +16,8 @@ public class TennisClubController(
     IUpdateTennisClubService updateTennisClubService,
     IDeleteTennisClubService deleteTennisClubService,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    IAdminReadModelRepository adminReadModelRepository
+    IAdminReadModelRepository adminReadModelRepository,
+    IMemberReadModelRepository memberReadModelRepository
 ) : ControllerBase
 {
     [HttpGet]
@@ -56,7 +57,7 @@ public class TennisClubController(
     [HttpGet("{clubId}/admins")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TennisClubReadModel>> GetAdminsByTennisClubId(string clubId)
+    public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
         var admins = await adminReadModelRepository.GetAdminsByTennisClubId(clubIdGuid);
@@ -70,9 +71,19 @@ public class TennisClubController(
     }
     
     [HttpGet("{clubId}/members")]
-    public async Task<ActionResult<IEnumerable<MemberReadModel>>> GetMembersByClub(string clubId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(string clubId)
     {
-        throw new NotImplementedException();
+        var clubIdGuid = new Guid(clubId);
+        var members = await memberReadModelRepository.GetMembersByTennisClubId(clubIdGuid);
+        
+        if (members.Count == 0)
+        {
+            return NotFound($"No Members found for Tennis Club with id {clubId}!");
+        }
+        
+        return Ok(members);
     }
     
     [HttpPost]
