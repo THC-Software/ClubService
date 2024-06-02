@@ -2,6 +2,7 @@ using Asp.Versioning;
 using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Domain.ReadModel;
+using ClubService.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -12,15 +13,25 @@ namespace ClubService.API.Controller;
 public class MemberController(
     IRegisterMemberService registerMemberService,
     IUpdateMemberService updateMemberService,
-    IDeleteMemberService deleteMemberService)
+    IDeleteMemberService deleteMemberService,
+    IMemberReadModelRepository memberReadModelRepository)
     : ControllerBase
 {
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(MemberReadModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<MemberReadModel>> GetMemberById(string id)
     {
-        throw new NotImplementedException();
+        var memberId = new Guid(id);
+        var memberReadModel = await memberReadModelRepository.GetMemberById(memberId);
+        
+        if (memberReadModel == null)
+        {
+            return NotFound($"Member with id {id} not found!");
+        }
+        
+        return Ok(memberReadModel);
     }
     
     [HttpPost]

@@ -19,16 +19,16 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
         await readStoreDbContext.SaveChangesAsync();
     }
     
+    public async Task Delete(MemberReadModel memberReadModel)
+    {
+        readStoreDbContext.Members.Remove(memberReadModel);
+        await readStoreDbContext.SaveChangesAsync();
+    }
+    
     public async Task<MemberReadModel?> GetMemberById(Guid id)
     {
         return await readStoreDbContext.Members
             .Where(memberReadModel => memberReadModel.MemberId == new MemberId(id))
             .SingleOrDefaultAsync();
-    }
-    
-    public async Task Delete(MemberReadModel memberReadModel)
-    {
-        readStoreDbContext.Members.Remove(memberReadModel);
-        await readStoreDbContext.SaveChangesAsync();
     }
 }
