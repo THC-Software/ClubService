@@ -10,7 +10,10 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.Impl;
 
-public class RegisterMemberService(IEventRepository eventRepository) : IRegisterMemberService
+public class RegisterMemberService(
+    IEventRepository eventRepository,
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository) : IRegisterMemberService
 {
     public async Task<string> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
@@ -34,13 +37,24 @@ public class RegisterMemberService(IEventRepository eventRepository) : IRegister
             throw new ConflictException("Tennis club is locked!");
         }
         
-        var subscriptionTierId = tennisClub.SubscriptionTierId;
-        var existingSubscriptionTierDomainEvents =
-            await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id);
-        
-        if (existingSubscriptionTierDomainEvents.Count == 0)
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(tennisClubId.Id);
+        if (tennisClubReadModel == null)
         {
-            throw new SubscriptionTierNotFoundException(subscriptionTierId.Id);
+            throw new TennisClubNotFoundException(tennisClubId.Id);
+        }
+        
+        var subscriptionTierReadModel =
+            await subscriptionTierReadModelRepository
+                .GetSubscriptionTierById(tennisClubReadModel.SubscriptionTierId.Id);
+        
+        if (subscriptionTierReadModel == null)
+        {
+            throw new SubscriptionTierNotFoundException(tennisClubReadModel.SubscriptionTierId.Id);
+        }
+        
+        if (tennisClubReadModel.MemberCount >= subscriptionTierReadModel.MaxMemberCount)
+        {
+            throw new MemberLimitExceededException(subscriptionTierReadModel.MaxMemberCount);
         }
         
         var member = new Member();
