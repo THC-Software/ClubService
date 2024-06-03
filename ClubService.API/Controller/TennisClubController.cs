@@ -64,12 +64,6 @@ public class TennisClubController(
     {
         var clubIdGuid = new Guid(clubId);
         var admins = await adminReadModelRepository.GetAdminsByTennisClubId(clubIdGuid);
-        
-        if (admins.Count == 0)
-        {
-            return NotFound($"No Admins found for Tennis Club with id {clubId}!");
-        }
-        
         return Ok(admins);
     }
     
@@ -81,12 +75,6 @@ public class TennisClubController(
     {
         var clubIdGuid = new Guid(clubId);
         var members = await memberReadModelRepository.GetMembersByTennisClubId(clubIdGuid);
-        
-        if (members.Count == 0)
-        {
-            return NotFound($"No Members found for Tennis Club with id {clubId}!");
-        }
-        
         return Ok(members);
     }
     
