@@ -1,8 +1,3 @@
-using ClubService.Domain.Event.SubscriptionTier;
-using ClubService.Domain.Event.TennisClub;
-using ClubService.Domain.Model.Enum;
-using ClubService.Domain.Model.ValueObject;
-using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +11,8 @@ public class TestBase
     private EventStoreDbContext _eventStoreDbContext;
     private WebAppFactory _factory;
     private PostgreSqlContainer _postgresContainer;
-    private Mock<ITennisClubReadModelRepository> _mockTennisClubReadModelRepository;
-    private Mock<ISubscriptionTierReadModelRepository> _mockSubscriptionTierReadModelRepository;
+    protected Mock<ITennisClubReadModelRepository> MockTennisClubReadModelRepository;
+    protected Mock<ISubscriptionTierReadModelRepository> MockSubscriptionTierReadModelRepository;
     protected IEventRepository EventRepository;
     protected HttpClient HttpClient;
     
@@ -36,14 +31,14 @@ public class TestBase
         
         await _postgresContainer.StartAsync();
         
-        // these two mock repositories are needed for the write side RegisterMember integration test 
-        _mockTennisClubReadModelRepository = new Mock<ITennisClubReadModelRepository>();
-        _mockSubscriptionTierReadModelRepository = new Mock<ISubscriptionTierReadModelRepository>();
+        // mock repositories for write side integration tests
+        MockTennisClubReadModelRepository = new Mock<ITennisClubReadModelRepository>();
+        MockSubscriptionTierReadModelRepository = new Mock<ISubscriptionTierReadModelRepository>();
         
         _factory = new WebAppFactory(
             _postgresContainer.GetConnectionString(),
-            _mockTennisClubReadModelRepository,
-            _mockSubscriptionTierReadModelRepository
+            MockTennisClubReadModelRepository,
+            MockSubscriptionTierReadModelRepository
         );
         HttpClient = _factory.CreateClient();
         
@@ -57,28 +52,6 @@ public class TestBase
         EventRepository = scope.ServiceProvider.GetService<IEventRepository>() ??
                           throw new Exception("Could not get EventRepository");
         await _eventStoreDbContext.Database.EnsureCreatedAsync();
-        
-        // tennisClub and subscriptionTier mock
-        var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
-            new TennisClubId(Guid.NewGuid()),
-            "Sample Tennis Club",
-            new SubscriptionTierId(Guid.NewGuid()),
-            TennisClubStatus.ACTIVE
-        );
-        var tennisClubReadModel = TennisClubReadModel.FromDomainEvent(tennisClubRegisteredEvent);
-        _mockTennisClubReadModelRepository
-            .Setup(repo => repo.GetTennisClubById(It.IsAny<Guid>()))
-            .ReturnsAsync(tennisClubReadModel);
-        
-        var subscriptionTierCreatedEvent = new SubscriptionTierCreatedEvent(
-            new SubscriptionTierId(Guid.NewGuid()),
-            "Standard",
-            10
-        );
-        var subscriptionTierReadModel = SubscriptionTierReadModel.FromDomainEvent(subscriptionTierCreatedEvent);
-        _mockSubscriptionTierReadModelRepository
-            .Setup(repo => repo.GetSubscriptionTierById(It.IsAny<Guid>()))
-            .ReturnsAsync(subscriptionTierReadModel);
     }
     
     [TearDown]

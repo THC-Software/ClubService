@@ -33,7 +33,7 @@ public class WebAppFactory(
         services.AddDbContext<EventStoreDbContext>(options =>
             options.UseNpgsql(connectionString));
         
-        // Add the mock repositories
+        // mock repositories for write side integration tests
         services.AddScoped(_ => mockTennisClubReadModelRepository.Object);
         services.AddScoped(_ => mockSubscriptionTierReadModelRepository.Object);
     }
