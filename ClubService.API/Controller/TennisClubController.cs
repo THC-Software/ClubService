@@ -16,11 +16,13 @@ public class TennisClubController(
     IUpdateTennisClubService updateTennisClubService,
     IDeleteTennisClubService deleteTennisClubService,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    IAdminReadModelRepository adminReadModelRepository
+    IAdminReadModelRepository adminReadModelRepository,
+    IMemberReadModelRepository memberReadModelRepository
 ) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<TennisClubReadModel>>> GetAllTennisClubs(
         [FromQuery] int pageSize = 0,
         int pageNumber = 1)
@@ -40,6 +42,7 @@ public class TennisClubController(
     [HttpGet("{clubId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
@@ -56,23 +59,23 @@ public class TennisClubController(
     [HttpGet("{clubId}/admins")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TennisClubReadModel>> GetAdminsByTennisClubId(string clubId)
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(string clubId)
     {
         var clubIdGuid = new Guid(clubId);
         var admins = await adminReadModelRepository.GetAdminsByTennisClubId(clubIdGuid);
-        
-        if (admins.Count == 0)
-        {
-            return NotFound($"No Admins found for Tennis Club with id {clubId}!");
-        }
-        
         return Ok(admins);
     }
     
     [HttpGet("{clubId}/members")]
-    public async Task<ActionResult<IEnumerable<MemberReadModel>>> GetMembersByClub(string clubId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(string clubId)
     {
-        throw new NotImplementedException();
+        var clubIdGuid = new Guid(clubId);
+        var members = await memberReadModelRepository.GetMembersByTennisClubId(clubIdGuid);
+        return Ok(members);
     }
     
     [HttpPost]

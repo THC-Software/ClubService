@@ -31,4 +31,11 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
             .Where(memberReadModel => memberReadModel.MemberId == new MemberId(id))
             .SingleOrDefaultAsync();
     }
+    
+    public Task<List<MemberReadModel>> GetMembersByTennisClubId(Guid tennisClubId)
+    {
+        return readStoreDbContext.Members
+            .Where(memberReadModel => memberReadModel.TennisClubId == new TennisClubId(tennisClubId))
+            .ToListAsync();
+    }
 }
