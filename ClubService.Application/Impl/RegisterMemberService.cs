@@ -37,7 +37,7 @@ public class RegisterMemberService(
                     throw new SubscriptionTierNotFoundException(tennisClubReadModel.SubscriptionTierId.Id);
                 }
                 
-                if (tennisClubReadModel.MemberCount >= subscriptionTierReadModel.MaxMemberCount)
+                if (tennisClubReadModel.MemberCount + 1 > subscriptionTierReadModel.MaxMemberCount)
                 {
                     throw new MemberLimitExceededException(subscriptionTierReadModel.MaxMemberCount);
                 }
