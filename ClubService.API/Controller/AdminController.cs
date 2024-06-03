@@ -56,10 +56,10 @@ public class AdminController(
         return Ok(updatedAdminId);
     }
     
-    
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<AdminReadModel>> GetAdminById(string id)
     {
         var adminId = new Guid(id);
