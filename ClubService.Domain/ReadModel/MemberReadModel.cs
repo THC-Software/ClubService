@@ -7,7 +7,7 @@ namespace ClubService.Domain.ReadModel;
 public class MemberReadModel
 {
     public MemberId MemberId { get; } = null!;
-    public FullName Name { get; } = null!;
+    public FullName Name { get; private set; } = null!;
     public string Email { get; } = null!;
     public TennisClubId TennisClubId { get; } = null!;
     public MemberStatus Status { get; private set; }
@@ -50,5 +50,10 @@ public class MemberReadModel
     public void Unlock()
     {
         Status = MemberStatus.ACTIVE;
+    }
+    
+    public void ChangeFullName(FullName name)
+    {
+        Name = name;
     }
 }
