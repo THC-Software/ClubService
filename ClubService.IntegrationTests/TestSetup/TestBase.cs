@@ -16,10 +16,10 @@ public class TestBase
     private EventStoreDbContext _eventStoreDbContext;
     private WebAppFactory _factory;
     private PostgreSqlContainer _postgresContainer;
-    protected IEventRepository EventRepository;
-    protected HttpClient HttpClient;
     private Mock<ITennisClubReadModelRepository> _mockTennisClubReadModelRepository;
     private Mock<ISubscriptionTierReadModelRepository> _mockSubscriptionTierReadModelRepository;
+    protected IEventRepository EventRepository;
+    protected HttpClient HttpClient;
     
     [SetUp]
     public async Task Setup()
