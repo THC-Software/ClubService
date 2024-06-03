@@ -20,6 +20,8 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             case TennisClubNotFoundException:
             case SubscriptionTierNotFoundException:
+            case MemberNotFoundException:
+            case AdminNotFoundException:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.5";
                 problemDetails.Status = StatusCodes.Status404NotFound;
                 problemDetails.Title = "Not Found";
