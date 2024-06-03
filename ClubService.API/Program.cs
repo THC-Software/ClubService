@@ -142,6 +142,7 @@ var memberUnlockedEventHandler = new MemberUnlockedEventHandler(memberReadModelR
 var memberDeletedEventHandler = new MemberDeletedEventHandler(memberReadModelRepository, tennisClubReadModelRepository,
     readStoreTransactionManager);
 var memberFullNameChangedEventHandler = new MemberFullNameChangedEventHandler(memberReadModelRepository);
+var memberEmailChangedEventHandler = new MemberEmailChangedEventHandler(memberReadModelRepository);
 
 // Registration of Event Handlers
 chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
@@ -162,6 +163,7 @@ chainEventHandler.RegisterEventHandler(memberLockedEventHandler);
 chainEventHandler.RegisterEventHandler(memberUnlockedEventHandler);
 chainEventHandler.RegisterEventHandler(memberDeletedEventHandler);
 chainEventHandler.RegisterEventHandler(memberFullNameChangedEventHandler);
+chainEventHandler.RegisterEventHandler(memberEmailChangedEventHandler);
 
 app.MapControllers();
 app.UseExceptionHandler();
