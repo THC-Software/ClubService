@@ -16,8 +16,7 @@ public class MemberTests : TestBase
     private const string BaseUrl = "/api/v1.0/members";
     
     [Test]
-    public async Task
-        GivenRegisterMemberCommand_WhenRegisterMember_ThenMemberRegisteredEventExistsInRepository()
+    public async Task GivenRegisterMemberCommand_WhenRegisterMember_ThenMemberRegisteredEventExistsInRepository()
     {
         // Given
         var numberOfEventsExpected = 1;

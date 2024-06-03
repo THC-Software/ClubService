@@ -1,12 +1,17 @@
+using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace ClubService.IntegrationTests.TestSetup;
 
-public class WebAppFactory(string connectionString) : WebApplicationFactory<Program>
+public class WebAppFactory(
+    string connectionString,
+    Mock<ITennisClubReadModelRepository> mockTennisClubReadModelRepository,
+    Mock<ISubscriptionTierReadModelRepository> mockSubscriptionTierReadModelRepository) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -27,5 +32,9 @@ public class WebAppFactory(string connectionString) : WebApplicationFactory<Prog
         
         services.AddDbContext<EventStoreDbContext>(options =>
             options.UseNpgsql(connectionString));
+        
+        // Add the mock repositories
+        services.AddScoped(_ => mockTennisClubReadModelRepository.Object);
+        services.AddScoped(_ => mockSubscriptionTierReadModelRepository.Object);
     }
 }
