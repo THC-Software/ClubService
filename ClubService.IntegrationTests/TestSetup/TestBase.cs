@@ -1,6 +1,7 @@
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Testcontainers.PostgreSql;
 
 namespace ClubService.IntegrationTests.TestSetup;
@@ -10,6 +11,8 @@ public class TestBase
     private EventStoreDbContext _eventStoreDbContext;
     private WebAppFactory _factory;
     private PostgreSqlContainer _postgresContainer;
+    protected Mock<ITennisClubReadModelRepository> MockTennisClubReadModelRepository;
+    protected Mock<ISubscriptionTierReadModelRepository> MockSubscriptionTierReadModelRepository;
     protected IEventRepository EventRepository;
     protected HttpClient HttpClient;
     
@@ -28,7 +31,15 @@ public class TestBase
         
         await _postgresContainer.StartAsync();
         
-        _factory = new WebAppFactory(_postgresContainer.GetConnectionString());
+        // mock repositories for write side integration tests
+        MockTennisClubReadModelRepository = new Mock<ITennisClubReadModelRepository>();
+        MockSubscriptionTierReadModelRepository = new Mock<ISubscriptionTierReadModelRepository>();
+        
+        _factory = new WebAppFactory(
+            _postgresContainer.GetConnectionString(),
+            MockTennisClubReadModelRepository,
+            MockSubscriptionTierReadModelRepository
+        );
         HttpClient = _factory.CreateClient();
         
         var scopeFactory = _factory.Services.GetService<IServiceScopeFactory>() ??

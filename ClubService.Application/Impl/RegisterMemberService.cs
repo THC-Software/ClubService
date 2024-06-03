@@ -10,55 +10,61 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.Impl;
 
-public class RegisterMemberService(IEventRepository eventRepository) : IRegisterMemberService
+public class RegisterMemberService(
+    IEventRepository eventRepository,
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository) : IRegisterMemberService
 {
     public async Task<string> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
         var tennisClubId = new TennisClubId(new Guid(memberRegisterCommand.TennisClubId));
-        var existingTennisClubDomainEvents = await eventRepository
-            .GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(tennisClubId.Id);
         
-        if (existingTennisClubDomainEvents.Count == 0)
+        if (tennisClubReadModel == null)
         {
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var tennisClub = new TennisClub();
-        foreach (var domainEvent in existingTennisClubDomainEvents)
+        switch (tennisClubReadModel.Status)
         {
-            tennisClub.Apply(domainEvent);
+            case TennisClubStatus.ACTIVE:
+                var subscriptionTierReadModel = await subscriptionTierReadModelRepository.GetSubscriptionTierById(
+                    tennisClubReadModel.SubscriptionTierId.Id
+                );
+                
+                if (subscriptionTierReadModel == null)
+                {
+                    throw new SubscriptionTierNotFoundException(tennisClubReadModel.SubscriptionTierId.Id);
+                }
+                
+                if (tennisClubReadModel.MemberCount + 1 > subscriptionTierReadModel.MaxMemberCount)
+                {
+                    throw new MemberLimitExceededException(subscriptionTierReadModel.MaxMemberCount);
+                }
+                
+                var member = new Member();
+                
+                var domainEvents = member.ProcessMemberRegisterCommand(
+                    memberRegisterCommand.FirstName,
+                    memberRegisterCommand.LastName,
+                    memberRegisterCommand.Email,
+                    memberRegisterCommand.TennisClubId
+                );
+                var expectedEventCount = 0;
+                
+                foreach (var domainEvent in domainEvents)
+                {
+                    member.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+                
+                return member.MemberId.Id.ToString();
+            case TennisClubStatus.LOCKED:
+                throw new ConflictException("Tennis club is locked!");
+            case TennisClubStatus.DELETED:
+                throw new ConflictException("Tennis club already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        
-        if (tennisClub.Status.Equals(TennisClubStatus.LOCKED))
-        {
-            throw new ConflictException("Tennis club is locked!");
-        }
-        
-        var subscriptionTierId = tennisClub.SubscriptionTierId;
-        var existingSubscriptionTierDomainEvents =
-            await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id);
-        
-        if (existingSubscriptionTierDomainEvents.Count == 0)
-        {
-            throw new SubscriptionTierNotFoundException(subscriptionTierId.Id);
-        }
-        
-        var member = new Member();
-        
-        var domainEvents = member.ProcessMemberRegisterCommand(
-            memberRegisterCommand.FirstName,
-            memberRegisterCommand.LastName,
-            memberRegisterCommand.Email,
-            memberRegisterCommand.TennisClubId
-        );
-        var expectedEventCount = 0;
-        
-        foreach (var domainEvent in domainEvents)
-        {
-            member.Apply(domainEvent);
-            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-        }
-        
-        return member.MemberId.Id.ToString();
     }
 }

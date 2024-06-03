@@ -3,9 +3,13 @@ using System.Text;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
+using ClubService.Domain.Event.SubscriptionTier;
+using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
+using ClubService.Domain.ReadModel;
 using ClubService.IntegrationTests.TestSetup;
+using Moq;
 using Newtonsoft.Json;
 
 namespace ClubService.IntegrationTests.EndToEnd;
@@ -16,10 +20,30 @@ public class MemberTests : TestBase
     private const string BaseUrl = "/api/v1.0/members";
     
     [Test]
-    public async Task
-        GivenRegisterMemberCommand_WhenRegisterMember_ThenMemberRegisteredEventExistsInRepository()
+    public async Task GivenRegisterMemberCommand_WhenRegisterMember_ThenMemberRegisteredEventExistsInRepository()
     {
         // Given
+        var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
+            new TennisClubId(Guid.NewGuid()),
+            "Sample Tennis Club",
+            new SubscriptionTierId(Guid.NewGuid()),
+            TennisClubStatus.ACTIVE
+        );
+        var tennisClubReadModel = TennisClubReadModel.FromDomainEvent(tennisClubRegisteredEvent);
+        MockTennisClubReadModelRepository
+            .Setup(repo => repo.GetTennisClubById(It.IsAny<Guid>()))
+            .ReturnsAsync(tennisClubReadModel);
+        
+        var subscriptionTierCreatedEvent = new SubscriptionTierCreatedEvent(
+            new SubscriptionTierId(Guid.NewGuid()),
+            "Standard",
+            10
+        );
+        var subscriptionTierReadModel = SubscriptionTierReadModel.FromDomainEvent(subscriptionTierCreatedEvent);
+        MockSubscriptionTierReadModelRepository
+            .Setup(repo => repo.GetSubscriptionTierById(It.IsAny<Guid>()))
+            .ReturnsAsync(subscriptionTierReadModel);
+        
         var numberOfEventsExpected = 1;
         var eventTypeExpected = EventType.MEMBER_REGISTERED;
         var entityTypeExpected = EntityType.MEMBER;
