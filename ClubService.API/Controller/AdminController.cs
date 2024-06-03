@@ -63,13 +63,13 @@ public class AdminController(
     public async Task<ActionResult<AdminReadModel>> GetAdminById(string id)
     {
         var adminId = new Guid(id);
-        var tennisClub = await adminReadModelRepository.GetAdminById(adminId);
+        var adminReadModel = await adminReadModelRepository.GetAdminById(adminId);
         
-        if (tennisClub == null)
+        if (adminReadModel == null)
         {
             return NotFound($"Admin with id {id} not found!");
         }
         
-        return Ok(tennisClub);
+        return Ok(adminReadModel);
     }
 }
