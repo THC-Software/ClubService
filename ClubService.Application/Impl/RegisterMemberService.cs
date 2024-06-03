@@ -43,15 +43,15 @@ public class RegisterMemberService(
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
-        var subscriptionTierReadModel =
-            await subscriptionTierReadModelRepository.GetSubscriptionTierById(
-                tennisClubReadModel.SubscriptionTierId.Id
-            );
+        var subscriptionTierReadModel = await subscriptionTierReadModelRepository.GetSubscriptionTierById(
+            tennisClubReadModel.SubscriptionTierId.Id
+        );
         
         if (subscriptionTierReadModel == null)
         {
             throw new SubscriptionTierNotFoundException(tennisClubReadModel.SubscriptionTierId.Id);
         }
+        
         if (tennisClubReadModel.MemberCount >= subscriptionTierReadModel.MaxMemberCount)
         {
             throw new MemberLimitExceededException(subscriptionTierReadModel.MaxMemberCount);
