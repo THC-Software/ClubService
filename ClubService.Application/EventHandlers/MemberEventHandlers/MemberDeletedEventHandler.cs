@@ -1,6 +1,7 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Domain.Event;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 

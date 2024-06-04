@@ -9,6 +9,7 @@ using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
 using ClubService.Application.EventHandlers.TennisClubEventHandlers;
 using ClubService.Application.Impl;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 using ClubService.Infrastructure;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
@@ -20,13 +21,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Database
 builder.Services.AddDbContext<EventStoreDbContext>(options =>
 {
-    options
-        .UseNpgsql(builder.Configuration.GetConnectionString("event-store-connection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("event-store-connection"));
 });
 builder.Services.AddDbContext<ReadStoreDbContext>(options =>
 {
-    options
-        .UseNpgsql(builder.Configuration.GetConnectionString("read-store-connection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("read-store-connection"));
 });
 
 // Repositories
@@ -48,7 +47,8 @@ builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
 builder.Services.AddScoped<IUpdateAdminService, UpdateAdminService>();
 
 // Transaction
-builder.Services.AddScoped<IReadStoreTransactionManager, ReadStoreTransactionManager>();
+builder.Services.AddScoped<IReadStoreTransactionManager, TransactionManager<ReadStoreDbContext>>();
+builder.Services.AddScoped<IEventStoreTransactionManager, TransactionManager<EventStoreDbContext>>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -62,10 +62,9 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
-
 var chainEventHandler = new ChainEventHandler();
 
-//TODO: Logging/errorhandling?
+// TODO: Logging/errorhandling?
 var redisHost = builder.Configuration["RedisConfig:Host"];
 var redisStreamName = builder.Configuration["RedisConfig:StreamName"];
 var redisGroupName = builder.Configuration["RedisConfig:ConsumerGroup"];

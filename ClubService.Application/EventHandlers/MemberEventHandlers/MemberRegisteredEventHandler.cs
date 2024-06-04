@@ -3,12 +3,13 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
 public class MemberRegisteredEventHandler(
     IMemberReadModelRepository memberReadModelRepository,
-    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ITennisClubReadModelRepository tennisClubReadModelRepository, 
     IReadStoreTransactionManager readStoreTransactionManager) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
