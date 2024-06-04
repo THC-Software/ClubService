@@ -5,10 +5,13 @@ using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
-public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdateTennisClubService
+public class UpdateTennisClubService(
+    IEventRepository eventRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager) : IUpdateTennisClubService
 {
     public async Task<string> LockTennisClub(string clubId)
     {
@@ -33,19 +36,18 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             var domainEvents = tennisClub.ProcessTennisClubLockCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
-            foreach (var domainEvent in domainEvents)
+            await eventStoreTransactionManager.TransactionScope(async () =>
             {
-                tennisClub.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
+                foreach (var domainEvent in domainEvents)
+                {
+                    tennisClub.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return clubId;

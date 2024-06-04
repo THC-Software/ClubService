@@ -4,10 +4,13 @@ using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
-public class DeleteAdminService(IEventRepository eventRepository) : IDeleteAdminService
+public class DeleteAdminService(
+    IEventRepository eventRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager) : IDeleteAdminService
 {
     public async Task<string> DeleteAdmin(string id)
     {
@@ -30,19 +33,18 @@ public class DeleteAdminService(IEventRepository eventRepository) : IDeleteAdmin
             var domainEvents = admin.ProcessAdminDeleteCommand();
             var expectedEventCount = existingAdminDomainEvents.Count;
             
-            foreach (var domainEvent in domainEvents)
+            await eventStoreTransactionManager.TransactionScope(async () =>
             {
-                admin.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
+                foreach (var domainEvent in domainEvents)
+                {
+                    admin.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return id;

@@ -4,10 +4,13 @@ using ClubService.Application.Commands;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
-public class RegisterTennisClubService(IEventRepository eventRepository)
+public class RegisterTennisClubService(
+    IEventRepository eventRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager)
     : IRegisterTennisClubService
 {
     public async Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
@@ -28,11 +31,14 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
                 tennisClubRegisterCommand.SubscriptionTierId);
         var expectedEventCount = 0;
         
-        foreach (var domainEvent in domainEvents)
+        await eventStoreTransactionManager.TransactionScope(async () =>
         {
-            tennisClub.Apply(domainEvent);
-            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-        }
+            foreach (var domainEvent in domainEvents)
+            {
+                tennisClub.Apply(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+            }
+        });
         
         return tennisClub.TennisClubId.Id.ToString();
     }
