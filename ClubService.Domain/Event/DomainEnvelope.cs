@@ -6,7 +6,8 @@ public class DomainEnvelope<T>(
     EventType eventType,
     EntityType entityType,
     DateTime timestamp,
-    T eventData) where T : IDomainEvent
+    T eventData,
+    Guid? correlationId = null) where T : IDomainEvent
 {
     public Guid EventId { get; } = eventId;
     public Guid EntityId { get; } = entityId;
@@ -14,10 +15,12 @@ public class DomainEnvelope<T>(
     public EntityType EntityType { get; } = entityType;
     public DateTime Timestamp { get; } = timestamp;
     public T EventData { get; } = eventData;
+    public Guid? CorrelationId { get; } = correlationId;
     
     public override string ToString()
     {
         return
-            $"EventId: {EventId}, EntityId: {EntityId}, EventType: {EventType}, EntityType: {EntityType}, Timestamp: {Timestamp}, EventData: {EventData}";
+            $"EventId: {EventId}, EntityId: {EntityId}, EventType: {EventType}, EntityType: {EntityType}, " +
+            $"Timestamp: {Timestamp}, EventData: {EventData}, CorrelationId: {CorrelationId}";
     }
 }
