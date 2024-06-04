@@ -1,4 +1,6 @@
-﻿using ClubService.Domain.Repository.Transaction;
+﻿using System.Data;
+using ClubService.Application.Api.Exceptions;
+using ClubService.Domain.Repository.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -34,6 +36,21 @@ public class TransactionManager<TDbContext>(TDbContext dbContext)
         
         await _transaction.RollbackAsync();
         await DisposeTransactionAsync();
+    }
+    
+    public async Task TransactionScope(Func<Task> transactionalFunction)
+    {
+        try
+        {
+            await BeginTransactionAsync();
+            await transactionalFunction();
+            await CommitTransactionAsync();
+        }
+        catch (DataException ex)
+        {
+            await RollbackTransactionAsync();
+            throw new ConcurrencyException(ex.Message, ex);
+        }
     }
     
     public void Dispose()
