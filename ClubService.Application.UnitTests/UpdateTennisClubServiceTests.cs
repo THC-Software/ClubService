@@ -5,6 +5,7 @@ using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 using Moq;
 
 namespace ClubService.Application.UnitTests;
@@ -12,15 +13,26 @@ namespace ClubService.Application.UnitTests;
 [TestFixture]
 public class UpdateTennisClubServiceTests
 {
+    private Mock<IEventRepository> _eventRepositoryMock;
+    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private UpdateTennisClubService _updateTennisClubService;
+    
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
-        _updateTennisClubService = new UpdateTennisClubService(_eventRepositoryMock.Object);
+        _eventStoreTransactionManagerMock = new Mock<IEventStoreTransactionManager>();
+        
+        // set up the TransactionScope method to call the passed function
+        _eventStoreTransactionManagerMock
+            .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> transactionalOperation) => transactionalOperation());
+        
+        _updateTennisClubService = new UpdateTennisClubService(
+            _eventRepositoryMock.Object,
+            _eventStoreTransactionManagerMock.Object
+        );
     }
-    
-    private UpdateTennisClubService _updateTennisClubService;
-    private Mock<IEventRepository> _eventRepositoryMock;
     
     [Test]
     public async Task GivenUnlockedTennisClub_WhenLockTennisClub_ThenRepoIsCalledWithExpectedEvent()
