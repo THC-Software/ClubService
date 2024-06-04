@@ -6,6 +6,7 @@ using ClubService.Infrastructure.EventHandling;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Npgsql;
+using NpgsqlTypes;
 
 namespace ClubService.Infrastructure.Repositories;
 
@@ -19,8 +20,8 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
     ";
     
     private const string InsertSqlQuery = @"
-        INSERT INTO ""DomainEvent""(""eventId"", ""entityId"", ""eventType"", ""entityType"", ""timestamp"", ""eventData"")
-        SELECT @eventId, @entityId, @eventType, @entityType, @timestamp, @eventData
+        INSERT INTO ""DomainEvent""(""eventId"", ""entityId"", ""eventType"", ""entityType"", ""timestamp"", ""eventData"", ""correlationId"")
+        SELECT @eventId, @entityId, @eventType, @entityType, @timestamp, @eventData, @correlationId
         WHERE (SELECT COUNT(*) FROM ""DomainEvent"" WHERE ""entityId"" = @entityId) = @expectedEventCount;
     ";
     
@@ -39,6 +40,18 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
         insertCommand.Parameters.Add(new NpgsqlParameter("@timestamp", domainEnvelope.Timestamp));
         insertCommand.Parameters.Add(new NpgsqlParameter("@eventData", jsonSerializedEventData));
         insertCommand.Parameters.Add(new NpgsqlParameter("@expectedEventCount", expectedEventCount));
+        
+        if (domainEnvelope.CorrelationId == null)
+        {
+            insertCommand.Parameters.Add(new NpgsqlParameter
+            {
+                ParameterName = "@correlationId", NpgsqlDbType = NpgsqlDbType.Uuid, Value = DBNull.Value
+            });
+        }
+        else
+        {
+            insertCommand.Parameters.Add(new NpgsqlParameter("@correlationId", domainEnvelope.CorrelationId));
+        }
         
         var affectedRows = await insertCommand.ExecuteNonQueryAsync();
         await eventStoreDbContext.Database.CloseConnectionAsync();
@@ -71,6 +84,12 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
                 result.GetString(result.GetOrdinal("EntityType")));
             var eventDataJson = result.GetString(result.GetOrdinal("EventData"));
             
+            Guid? correlationId = null;
+            if (!result["CorrelationId"].Equals(DBNull.Value))
+            {
+                correlationId = new Guid(result["CorrelationId"].ToString()!);
+            }
+            
             // Determine the type of event and deserialize accordingly
             var eventData = EventDeserializer.DeserializeEventData<T>(eventType, eventDataJson);
             
@@ -80,7 +99,8 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
                 eventType,
                 entityType,
                 result.GetDateTime(result.GetOrdinal("Timestamp")),
-                eventData
+                eventData,
+                correlationId
             ));
         }
         
