@@ -1,16 +1,17 @@
-﻿using ClubService.Domain.Repository;
-using ClubService.Infrastructure.DbContexts;
+﻿using ClubService.Domain.Repository.Transaction;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ClubService.Infrastructure;
 
-public class ReadStoreTransactionManager(ReadStoreDbContext readStoreDbContext) : IReadStoreTransactionManager
+public class TransactionManager<TDbContext>(TDbContext dbContext)
+    : IReadStoreTransactionManager, IEventStoreTransactionManager where TDbContext : DbContext
 {
     private IDbContextTransaction? _transaction;
     
     public async Task BeginTransactionAsync()
     {
-        _transaction = await readStoreDbContext.Database.BeginTransactionAsync();
+        _transaction = await dbContext.Database.BeginTransactionAsync();
     }
     
     public async Task CommitTransactionAsync()
@@ -35,17 +36,6 @@ public class ReadStoreTransactionManager(ReadStoreDbContext readStoreDbContext) 
         await DisposeTransactionAsync();
     }
     
-    private async Task DisposeTransactionAsync()
-    {
-        if (_transaction == null)
-        {
-            return;
-        }
-        
-        await _transaction.DisposeAsync();
-        _transaction = null;
-    }
-    
     public void Dispose()
     {
         if (_transaction == null)
@@ -54,6 +44,17 @@ public class ReadStoreTransactionManager(ReadStoreDbContext readStoreDbContext) 
         }
         
         _transaction.Dispose();
+        _transaction = null;
+    }
+    
+    private async Task DisposeTransactionAsync()
+    {
+        if (_transaction == null)
+        {
+            return;
+        }
+        
+        await _transaction.DisposeAsync();
         _transaction = null;
     }
 }

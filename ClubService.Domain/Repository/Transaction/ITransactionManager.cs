@@ -1,6 +1,6 @@
-﻿namespace ClubService.Domain.Repository;
+﻿namespace ClubService.Domain.Repository.Transaction;
 
-public interface IReadStoreTransactionManager : IDisposable
+public interface ITransactionManager : IDisposable
 {
     Task BeginTransactionAsync();
     Task CommitTransactionAsync();
