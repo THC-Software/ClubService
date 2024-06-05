@@ -11,7 +11,8 @@ namespace ClubService.IntegrationTests.TestSetup;
 public class WebAppFactory(
     string connectionString,
     Mock<ITennisClubReadModelRepository> mockTennisClubReadModelRepository,
-    Mock<ISubscriptionTierReadModelRepository> mockSubscriptionTierReadModelRepository) : WebApplicationFactory<Program>
+    Mock<ISubscriptionTierReadModelRepository> mockSubscriptionTierReadModelRepository,
+    Mock<IAdminReadModelRepository> mockAdminReadModelRepository) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -36,5 +37,6 @@ public class WebAppFactory(
         // mock repositories for write side integration tests
         services.AddScoped(_ => mockTennisClubReadModelRepository.Object);
         services.AddScoped(_ => mockSubscriptionTierReadModelRepository.Object);
+        services.AddScoped(_ => mockAdminReadModelRepository.Object);
     }
 }
