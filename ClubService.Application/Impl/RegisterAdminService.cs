@@ -12,6 +12,7 @@ namespace ClubService.Application.Impl;
 
 public class RegisterAdminService(
     IEventRepository eventRepository,
+    IAdminReadModelRepository adminReadModelRepository,
     IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterAdminService
 {
     public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
@@ -35,6 +36,17 @@ public class RegisterAdminService(
         switch (tennisClub.Status)
         {
             case TennisClubStatus.ACTIVE:
+                var admins = await adminReadModelRepository.GetAdminsByTennisClubId(tennisClubId.Id);
+                
+                if (admins.Any(admin => admin.Username == adminRegisterCommand.Username))
+                {
+                    throw new AdminUsernameAlreadyExists(
+                        adminRegisterCommand.Username,
+                        tennisClub.Name,
+                        tennisClubId.Id
+                    );
+                }
+                
                 var admin = new Admin();
                 var domainEvents = admin.ProcessAdminRegisterCommand(
                     adminRegisterCommand.Username,

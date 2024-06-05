@@ -6,6 +6,7 @@ using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.IntegrationTests.TestSetup;
+using Moq;
 using Newtonsoft.Json;
 
 namespace ClubService.IntegrationTests.EndToEnd;
@@ -32,6 +33,10 @@ public class AdminTests : TestBase
             nameExpected.LastName, tennisClubIdExpected.Id);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerAdminCommand), Encoding.UTF8,
             "application/json");
+        
+        MockAdminReadModelRepository
+            .Setup(repo => repo.GetAdminsByTennisClubId(It.IsAny<Guid>()))
+            .ReturnsAsync([]);
         
         // When
         var response = await HttpClient.PostAsync(BaseUrl, httpContent);
