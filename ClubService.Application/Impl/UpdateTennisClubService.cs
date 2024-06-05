@@ -76,19 +76,18 @@ public class UpdateTennisClubService(
             var domainEvents = tennisClub.ProcessTennisClubUnlockCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
-            foreach (var domainEvent in domainEvents)
+            await eventStoreTransactionManager.TransactionScope(async () =>
             {
-                tennisClub.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
+                foreach (var domainEvent in domainEvents)
+                {
+                    tennisClub.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return id;
@@ -118,19 +117,18 @@ public class UpdateTennisClubService(
             var domainEvents = tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierId);
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
-            foreach (var domainEvent in domainEvents)
+            await eventStoreTransactionManager.TransactionScope(async () =>
             {
-                tennisClub.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
+                foreach (var domainEvent in domainEvents)
+                {
+                    tennisClub.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return clubId;
@@ -159,19 +157,18 @@ public class UpdateTennisClubService(
             var domainEvents = tennisClub.ProcessTennisClubChangeNameCommand(name);
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
-            foreach (var domainEvent in domainEvents)
+            await eventStoreTransactionManager.TransactionScope(async () =>
             {
-                tennisClub.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
+                foreach (var domainEvent in domainEvents)
+                {
+                    tennisClub.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
         }
         
         return clubId;
