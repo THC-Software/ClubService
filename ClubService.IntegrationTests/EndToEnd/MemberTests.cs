@@ -63,8 +63,9 @@ public class MemberTests : TestBase
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
+        var id = JsonConvert.DeserializeObject<Guid>(responseContent);
         
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(Guid.Parse(responseContent));
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(id);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[numberOfEventsExpected - 1];

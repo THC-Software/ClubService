@@ -22,7 +22,7 @@ public class AdminController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> RegisterAdmin(
+    public async Task<ActionResult<Guid>> RegisterAdmin(
         [FromBody] AdminRegisterCommand adminRegisterCommand)
     {
         var registeredAdminId = await registerAdminService.RegisterAdmin(adminRegisterCommand);

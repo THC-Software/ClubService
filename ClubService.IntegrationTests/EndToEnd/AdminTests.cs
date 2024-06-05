@@ -40,8 +40,9 @@ public class AdminTests : TestBase
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
+        var id = JsonConvert.DeserializeObject<Guid>(responseContent);
         
-        var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(Guid.Parse(responseContent));
+        var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(id);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[numberOfEventsExpected - 1];

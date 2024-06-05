@@ -10,7 +10,7 @@ namespace ClubService.Application.Impl;
 
 public class RegisterAdminService(IEventRepository eventRepository) : IRegisterAdminService
 {
-    public async Task<string> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
+    public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
     {
         var tennisClubId = new TennisClubId(new Guid(adminRegisterCommand.TennisClubId));
         var admin = new Admin();
@@ -35,6 +35,6 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
             expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
         }
         
-        return admin.AdminId.Id.ToString();
+        return admin.AdminId.Id;
     }
 }

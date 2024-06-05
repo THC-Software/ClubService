@@ -4,5 +4,5 @@ namespace ClubService.Application.Api;
 
 public interface IRegisterAdminService
 {
-    Task<string> RegisterAdmin(AdminRegisterCommand adminRegisterCommand);
+    Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand);
 }
