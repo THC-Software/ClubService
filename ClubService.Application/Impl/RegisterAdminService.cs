@@ -12,7 +12,7 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
 {
     public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
     {
-        var tennisClubId = new TennisClubId(new Guid(adminRegisterCommand.TennisClubId));
+        var tennisClubId = new TennisClubId(adminRegisterCommand.TennisClubId);
         var admin = new Admin();
         
         var tennisClubDomainEvents =
@@ -26,7 +26,7 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
         
         var domainEvents = admin.ProcessAdminRegisterCommand(adminRegisterCommand.Username,
             new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName),
-            new TennisClubId(new Guid(adminRegisterCommand.TennisClubId)));
+            new TennisClubId(adminRegisterCommand.TennisClubId));
         var expectedEventCount = 0;
         
         foreach (var domainEvent in domainEvents)

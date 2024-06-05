@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ClubService.Application.Commands;
 
-public class AdminRegisterCommand(string username, string firstName, string lastName, string tennisClubId)
+public class AdminRegisterCommand(string username, string firstName, string lastName, Guid tennisClubId)
 {
     [Required]
     public string Username { get; } = username;
@@ -14,5 +14,5 @@ public class AdminRegisterCommand(string username, string firstName, string last
     public string LastName { get; } = lastName;
     
     [Required]
-    public string TennisClubId { get; } = tennisClubId;
+    public Guid TennisClubId { get; } = tennisClubId;
 }

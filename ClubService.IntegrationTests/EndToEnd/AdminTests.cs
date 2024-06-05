@@ -29,7 +29,7 @@ public class AdminTests : TestBase
         var statusExpected = AdminStatus.ACTIVE;
         var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
         var registerAdminCommand = new AdminRegisterCommand(usernameExpected, nameExpected.FirstName,
-            nameExpected.LastName, tennisClubIdExpected.Id.ToString());
+            nameExpected.LastName, tennisClubIdExpected.Id);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerAdminCommand), Encoding.UTF8,
             "application/json");
         
