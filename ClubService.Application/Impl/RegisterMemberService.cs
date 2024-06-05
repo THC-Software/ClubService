@@ -7,13 +7,15 @@ using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
 public class RegisterMemberService(
     IEventRepository eventRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository) : IRegisterMemberService
+    ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterMemberService
 {
     public async Task<string> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
@@ -52,11 +54,14 @@ public class RegisterMemberService(
                 );
                 var expectedEventCount = 0;
                 
-                foreach (var domainEvent in domainEvents)
+                await eventStoreTransactionManager.TransactionScope(async () =>
                 {
-                    member.Apply(domainEvent);
-                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-                }
+                    foreach (var domainEvent in domainEvents)
+                    {
+                        member.Apply(domainEvent);
+                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                    }
+                });
                 
                 return member.MemberId.Id.ToString();
             case TennisClubStatus.LOCKED:
