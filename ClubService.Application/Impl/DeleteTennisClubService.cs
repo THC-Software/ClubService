@@ -1,4 +1,3 @@
-using System.Data;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.TennisClub;
