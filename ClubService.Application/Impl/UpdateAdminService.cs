@@ -14,14 +14,13 @@ public class UpdateAdminService(
     IEventRepository eventRepository,
     IEventStoreTransactionManager eventStoreTransactionManager) : IUpdateAdminService
 {
-    public async Task<string> ChangeFullName(string id, string firstName, string lastName)
+    public async Task<Guid> ChangeFullName(Guid id, string firstName, string lastName)
     {
-        var adminId = Guid.Parse(id);
-        var existingAdminDomainEvents = await eventRepository.GetEventsForEntity<IAdminDomainEvent>(adminId);
+        var existingAdminDomainEvents = await eventRepository.GetEventsForEntity<IAdminDomainEvent>(id);
         
         if (existingAdminDomainEvents.Count == 0)
         {
-            throw new AdminNotFoundException(adminId);
+            throw new AdminNotFoundException(id);
         }
         
         var admin = new Admin();

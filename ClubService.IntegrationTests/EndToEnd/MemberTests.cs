@@ -52,7 +52,7 @@ public class MemberTests : TestBase
         var statusExpected = MemberStatus.ACTIVE;
         var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
         var registerMemberCommand = new MemberRegisterCommand(nameExpected.FirstName, nameExpected.LastName,
-            "john.doe@dev.com", tennisClubIdExpected.Id.ToString());
+            "john.doe@dev.com", tennisClubIdExpected.Id);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerMemberCommand), Encoding.UTF8,
             "application/json");
         
@@ -63,8 +63,9 @@ public class MemberTests : TestBase
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
+        var id = JsonConvert.DeserializeObject<Guid>(responseContent);
         
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(Guid.Parse(responseContent));
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(id);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -102,7 +103,8 @@ public class MemberTests : TestBase
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(memberIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -134,7 +136,8 @@ public class MemberTests : TestBase
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(memberIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -166,7 +169,8 @@ public class MemberTests : TestBase
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(memberIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(memberIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));

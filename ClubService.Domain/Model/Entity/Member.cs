@@ -17,13 +17,13 @@ public class Member
         string firstName,
         string lastName,
         string email,
-        string tennisClubId)
+        TennisClubId tennisClubId)
     {
         var memberRegisteredEvent = new MemberRegisteredEvent(
             new MemberId(Guid.NewGuid()),
             new FullName(firstName, lastName),
             email,
-            new TennisClubId(new Guid(tennisClubId)),
+            tennisClubId,
             MemberStatus.ACTIVE
         );
         

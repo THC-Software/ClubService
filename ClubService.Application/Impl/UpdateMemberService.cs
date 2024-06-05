@@ -15,9 +15,9 @@ public class UpdateMemberService(
     IEventRepository eventRepository,
     IEventStoreTransactionManager eventStoreTransactionManager) : IUpdateMemberService
 {
-    public async Task<string> LockMember(string id)
+    public async Task<Guid> LockMember(Guid id)
     {
-        var memberId = new MemberId(new Guid(id));
+        var memberId = new MemberId(id);
         var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)
@@ -72,9 +72,9 @@ public class UpdateMemberService(
         }
     }
     
-    public async Task<string> UnlockMember(string id)
+    public async Task<Guid> UnlockMember(Guid id)
     {
-        var memberId = new MemberId(new Guid(id));
+        var memberId = new MemberId(id);
         var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)
@@ -130,9 +130,9 @@ public class UpdateMemberService(
         }
     }
     
-    public async Task<string> ChangeFullName(string id, string firstName, string lastName)
+    public async Task<Guid> ChangeFullName(Guid id, string firstName, string lastName)
     {
-        var memberId = Guid.Parse(id);
+        var memberId = id;
         var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId);
         
         if (existingMemberDomainEvents.Count == 0)
@@ -189,9 +189,9 @@ public class UpdateMemberService(
         }
     }
     
-    public async Task<string> ChangeEmail(string id, string email)
+    public async Task<Guid> ChangeEmail(Guid id, string email)
     {
-        var memberId = Guid.Parse(id);
+        var memberId = id;
         var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId);
         
         if (existingMemberDomainEvents.Count == 0)

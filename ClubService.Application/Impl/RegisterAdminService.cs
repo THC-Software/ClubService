@@ -14,9 +14,10 @@ public class RegisterAdminService(
     IEventRepository eventRepository,
     IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterAdminService
 {
-    public async Task<string> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
+    public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
     {
-        var tennisClubId = new TennisClubId(new Guid(adminRegisterCommand.TennisClubId));
+        var tennisClubId = new TennisClubId(adminRegisterCommand.TennisClubId);
+        
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
         
@@ -51,7 +52,7 @@ public class RegisterAdminService(
                     }
                 });
                 
-                return admin.AdminId.Id.ToString();
+                return admin.AdminId.Id;
             case TennisClubStatus.LOCKED:
                 throw new ConflictException("Tennis club is locked!");
             case TennisClubStatus.DELETED:

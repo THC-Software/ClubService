@@ -20,14 +20,13 @@ public class SubscriptionTierController(ISubscriptionTierReadModelRepository sub
         return Ok(subscriptionTiers);
     }
     
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<TennisClubReadModel>> GetSubscriptionTierById(string id)
+    public async Task<ActionResult<TennisClubReadModel>> GetSubscriptionTierById(Guid id)
     {
-        var subscriptionTierGuid = new Guid(id);
-        var subscriptionTier = await subscriptionTierReadModelRepository.GetSubscriptionTierById(subscriptionTierGuid);
+        var subscriptionTier = await subscriptionTierReadModelRepository.GetSubscriptionTierById(id);
         
         if (subscriptionTier == null)
         {
