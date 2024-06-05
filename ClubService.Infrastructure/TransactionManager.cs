@@ -11,31 +11,15 @@ public class TransactionManager<TDbContext>(TDbContext dbContext)
 {
     private IDbContextTransaction? _transaction;
     
-    public async Task BeginTransactionAsync()
-    {
-        _transaction = await dbContext.Database.BeginTransactionAsync();
-    }
-    
-    public async Task CommitTransactionAsync()
+    public void Dispose()
     {
         if (_transaction == null)
         {
             return;
         }
         
-        await _transaction.CommitAsync();
-        await DisposeTransactionAsync();
-    }
-    
-    public async Task RollbackTransactionAsync()
-    {
-        if (_transaction == null)
-        {
-            return;
-        }
-        
-        await _transaction.RollbackAsync();
-        await DisposeTransactionAsync();
+        _transaction.Dispose();
+        _transaction = null;
     }
     
     public async Task TransactionScope(Func<Task> transactionalFunction)
@@ -53,15 +37,32 @@ public class TransactionManager<TDbContext>(TDbContext dbContext)
         }
     }
     
-    public void Dispose()
+    
+    private async Task BeginTransactionAsync()
+    {
+        _transaction = await dbContext.Database.BeginTransactionAsync();
+    }
+    
+    private async Task CommitTransactionAsync()
     {
         if (_transaction == null)
         {
             return;
         }
         
-        _transaction.Dispose();
-        _transaction = null;
+        await _transaction.CommitAsync();
+        await DisposeTransactionAsync();
+    }
+    
+    private async Task RollbackTransactionAsync()
+    {
+        if (_transaction == null)
+        {
+            return;
+        }
+        
+        await _transaction.RollbackAsync();
+        await DisposeTransactionAsync();
     }
     
     private async Task DisposeTransactionAsync()
