@@ -1,5 +1,4 @@
-﻿using System.Data;
-using ClubService.Application.Api;
+﻿using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.TennisClub;
@@ -105,19 +104,18 @@ public class UpdateMemberService(
                     var domainEvents = member.ProcessMemberUnlockCommand();
                     var expectedEventCount = existingMemberDomainEvents.Count;
                     
-                    foreach (var domainEvent in domainEvents)
+                    await eventStoreTransactionManager.TransactionScope(async () =>
                     {
-                        member.Apply(domainEvent);
-                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-                    }
+                        foreach (var domainEvent in domainEvents)
+                        {
+                            member.Apply(domainEvent);
+                            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                        }
+                    });
                 }
                 catch (InvalidOperationException ex)
                 {
                     throw new ConflictException(ex.Message, ex);
-                }
-                catch (DataException ex)
-                {
-                    throw new ConcurrencyException(ex.Message, ex);
                 }
                 
                 return id;
@@ -164,19 +162,18 @@ public class UpdateMemberService(
                     var domainEvents = member.ProcessMemberChangeFullNameCommand(new FullName(firstName, lastName));
                     var expectedEventCount = existingMemberDomainEvents.Count;
                     
-                    foreach (var domainEvent in domainEvents)
+                    await eventStoreTransactionManager.TransactionScope(async () =>
                     {
-                        member.Apply(domainEvent);
-                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-                    }
+                        foreach (var domainEvent in domainEvents)
+                        {
+                            member.Apply(domainEvent);
+                            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                        }
+                    });
                 }
                 catch (InvalidOperationException ex)
                 {
                     throw new ConflictException(ex.Message, ex);
-                }
-                catch (DataException ex)
-                {
-                    throw new ConcurrencyException(ex.Message, ex);
                 }
                 
                 return id;
@@ -223,19 +220,18 @@ public class UpdateMemberService(
                     var domainEvents = member.ProcessMemberChangeEmailCommand(email);
                     var expectedEventCount = existingMemberDomainEvents.Count;
                     
-                    foreach (var domainEvent in domainEvents)
+                    await eventStoreTransactionManager.TransactionScope(async () =>
                     {
-                        member.Apply(domainEvent);
-                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-                    }
+                        foreach (var domainEvent in domainEvents)
+                        {
+                            member.Apply(domainEvent);
+                            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                        }
+                    });
                 }
                 catch (InvalidOperationException ex)
                 {
                     throw new ConflictException(ex.Message, ex);
-                }
-                catch (DataException ex)
-                {
-                    throw new ConcurrencyException(ex.Message, ex);
                 }
                 
                 return id;
