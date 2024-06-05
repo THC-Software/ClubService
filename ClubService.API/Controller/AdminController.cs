@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using ClubService.Application.Api;
-using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
@@ -30,23 +29,23 @@ public class AdminController(
         return CreatedAtAction(nameof(RegisterAdmin), new { id = registeredAdminId }, registeredAdminId);
     }
     
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> DeleteAdmin(string id)
+    public async Task<ActionResult<Guid>> DeleteAdmin(Guid id)
     {
         var deletedAdminId = await deleteAdminService.DeleteAdmin(id);
         return Ok(deletedAdminId);
     }
     
-    [HttpPatch("{id}")]
+    [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> UpdateAdmin(string id, [FromBody] AdminUpdateCommand adminUpdateCommand)
+    public async Task<ActionResult<Guid>> UpdateAdmin(Guid id, [FromBody] AdminUpdateCommand adminUpdateCommand)
     {
         var updatedAdminId = await updateAdminService.ChangeFullName(
             id,
@@ -56,14 +55,13 @@ public class AdminController(
         return Ok(updatedAdminId);
     }
     
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<AdminReadModel>> GetAdminById(string id)
+    public async Task<ActionResult<AdminReadModel>> GetAdminById(Guid id)
     {
-        var adminId = new Guid(id);
-        var adminReadModel = await adminReadModelRepository.GetAdminById(adminId);
+        var adminReadModel = await adminReadModelRepository.GetAdminById(id);
         
         if (adminReadModel == null)
         {

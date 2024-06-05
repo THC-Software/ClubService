@@ -73,13 +73,14 @@ public class AdminTests : TestBase
         var eventDataTypeExpected = typeof(AdminDeletedEvent);
         
         // When
-        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{adminIdExpected.ToString()}");
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{adminIdExpected}");
         
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(adminIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(adminIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(adminIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -101,7 +102,7 @@ public class AdminTests : TestBase
         var deletedAdminId = new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a");
         
         // When
-        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{deletedAdminId.ToString()}");
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{deletedAdminId}");
         
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
@@ -126,12 +127,14 @@ public class AdminTests : TestBase
             "application/json");
         
         // When
-        var response = await HttpClient.PatchAsync($"{BaseUrl}/{adminIdExpected.ToString()}", httpContent);
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{adminIdExpected}", httpContent);
         
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(adminIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(adminIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
