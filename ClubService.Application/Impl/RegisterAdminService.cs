@@ -25,8 +25,7 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
         }
         
         var domainEvents = admin.ProcessAdminRegisterCommand(adminRegisterCommand.Username,
-            new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName),
-            new TennisClubId(adminRegisterCommand.TennisClubId));
+            new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName), tennisClubId);
         var expectedEventCount = 0;
         
         foreach (var domainEvent in domainEvents)

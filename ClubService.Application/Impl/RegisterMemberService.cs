@@ -15,7 +15,7 @@ public class RegisterMemberService(
 {
     public async Task<Guid> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
-        var tennisClubId = new TennisClubId(new Guid(memberRegisterCommand.TennisClubId));
+        var tennisClubId = new TennisClubId(memberRegisterCommand.TennisClubId);
         var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(tennisClubId.Id);
         
         if (tennisClubReadModel == null)
@@ -46,7 +46,7 @@ public class RegisterMemberService(
                     memberRegisterCommand.FirstName,
                     memberRegisterCommand.LastName,
                     memberRegisterCommand.Email,
-                    memberRegisterCommand.TennisClubId
+                    tennisClubId
                 );
                 var expectedEventCount = 0;
                 
