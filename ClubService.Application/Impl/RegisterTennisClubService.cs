@@ -10,7 +10,7 @@ namespace ClubService.Application.Impl;
 public class RegisterTennisClubService(IEventRepository eventRepository)
     : IRegisterTennisClubService
 {
-    public async Task<string> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
+    public async Task<Guid> RegisterTennisClub(TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         var subscriptionTierId = new Guid(tennisClubRegisterCommand.SubscriptionTierId);
         var subscriptionTierDomainEvents =
@@ -34,6 +34,6 @@ public class RegisterTennisClubService(IEventRepository eventRepository)
             expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
         }
         
-        return tennisClub.TennisClubId.Id.ToString();
+        return tennisClub.TennisClubId.Id;
     }
 }

@@ -10,9 +10,9 @@ namespace ClubService.Application.Impl;
 
 public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdateTennisClubService
 {
-    public async Task<string> LockTennisClub(string clubId)
+    public async Task<Guid> LockTennisClub(Guid id)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(id);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -48,12 +48,12 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             throw new ConcurrencyException(ex.Message, ex);
         }
         
-        return clubId;
+        return id;
     }
     
-    public async Task<string> UnlockTennisClub(string clubId)
+    public async Task<Guid> UnlockTennisClub(Guid id)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(id);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -89,12 +89,12 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             throw new ConcurrencyException(ex.Message, ex);
         }
         
-        return clubId;
+        return id;
     }
     
-    public async Task<string> ChangeSubscriptionTier(string clubId, string subscriptionTierId)
+    public async Task<Guid> ChangeSubscriptionTier(Guid clubId, string subscriptionTierId)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(clubId);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -133,9 +133,9 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         return clubId;
     }
     
-    public async Task<string> ChangeName(string clubId, string name)
+    public async Task<Guid> ChangeName(Guid clubId, string name)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(clubId);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =

@@ -10,9 +10,9 @@ namespace ClubService.Application.Impl;
 
 public class DeleteTennisClubService(IEventRepository eventRepository) : IDeleteTennisClubService
 {
-    public async Task<string> DeleteTennisClub(string clubId)
+    public async Task<Guid> DeleteTennisClub(Guid id)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(id);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -49,6 +49,6 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
             throw new ConcurrencyException(ex.Message, ex);
         }
         
-        return tennisClub.TennisClubId.Id.ToString();
+        return tennisClub.TennisClubId.Id;
     }
 }

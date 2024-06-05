@@ -34,9 +34,10 @@ public class TennisClubTests : TestBase
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
+        var clubId = JsonConvert.DeserializeObject<Guid>(responseContent);
         
         var storedEvents =
-            await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(Guid.Parse(responseContent));
+            await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubId);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         var storedEvent = storedEvents[0];
         Assert.Multiple(() =>
@@ -66,13 +67,14 @@ public class TennisClubTests : TestBase
         var eventDataTypeExpected = typeof(TennisClubLockedEvent);
         
         // When
-        var response = await HttpClient.PostAsync($"{BaseUrl}/{clubIdExpected.ToString()}/lock", null);
+        var response = await HttpClient.PostAsync($"{BaseUrl}/{clubIdExpected}/lock", null);
         
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(clubIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -99,13 +101,14 @@ public class TennisClubTests : TestBase
         var eventDataTypeExpected = typeof(TennisClubUnlockedEvent);
         
         // When
-        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected.ToString()}/lock");
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected}/lock");
         
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(clubIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -135,13 +138,14 @@ public class TennisClubTests : TestBase
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
         
         // When
-        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected.ToString()}", content);
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
         
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(clubIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -176,13 +180,14 @@ public class TennisClubTests : TestBase
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
         
         // When
-        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected.ToString()}", content);
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
         
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(clubIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -214,13 +219,14 @@ public class TennisClubTests : TestBase
         var eventDataTypeExpected = typeof(TennisClubDeletedEvent);
         
         // When
-        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected.ToString()}");
+        var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected}");
         
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        Assert.That(responseContent, Is.EqualTo(clubIdExpected.ToString()));
+        var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
+        Assert.That(actualId, Is.EqualTo(clubIdExpected));
         
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));

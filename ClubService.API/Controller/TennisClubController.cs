@@ -39,42 +39,39 @@ public class TennisClubController(
         return Ok(tennisClubs);
     }
     
-    [HttpGet("{clubId}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(string clubId)
+    public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(Guid id)
     {
-        var clubIdGuid = new Guid(clubId);
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(clubIdGuid);
+        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(id);
         
         if (tennisClub == null)
         {
-            return NotFound($"Tennis Club with id {clubId} not found!");
+            return NotFound($"Tennis Club with id {id} not found!");
         }
         
         return Ok(tennisClub);
     }
     
-    [HttpGet("{clubId}/admins")]
+    [HttpGet("{id:guid}/admins")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(string clubId)
+    public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(Guid id)
     {
-        var clubIdGuid = new Guid(clubId);
-        var admins = await adminReadModelRepository.GetAdminsByTennisClubId(clubIdGuid);
+        var admins = await adminReadModelRepository.GetAdminsByTennisClubId(id);
         return Ok(admins);
     }
     
-    [HttpGet("{clubId}/members")]
+    [HttpGet("{id:guid}/members")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(string clubId)
+    public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(Guid id)
     {
-        var clubIdGuid = new Guid(clubId);
-        var members = await memberReadModelRepository.GetMembersByTennisClubId(clubIdGuid);
+        var members = await memberReadModelRepository.GetMembersByTennisClubId(id);
         return Ok(members);
     }
     
@@ -83,26 +80,26 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> RegisterTennisClub(
+    public async Task<ActionResult<Guid>> RegisterTennisClub(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         var registeredTennisClubId = await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
         return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
     
-    [HttpPatch("{clubId}")]
+    [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> UpdateTennisClub(
-        string clubId,
+    public async Task<ActionResult<Guid>> UpdateTennisClub(
+        Guid id,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
         if (tennisClubUpdateCommand.SubscriptionTierId != null)
         {
             var updatedTennisClubId =
-                await updateTennisClubService.ChangeSubscriptionTier(clubId,
+                await updateTennisClubService.ChangeSubscriptionTier(id,
                     tennisClubUpdateCommand.SubscriptionTierId);
             return Ok(updatedTennisClubId);
         }
@@ -110,43 +107,43 @@ public class TennisClubController(
         if (tennisClubUpdateCommand.Name != null)
         {
             var updatedTennisClubId =
-                await updateTennisClubService.ChangeName(clubId, tennisClubUpdateCommand.Name);
+                await updateTennisClubService.ChangeName(id, tennisClubUpdateCommand.Name);
             return Ok(updatedTennisClubId);
         }
         
         return BadRequest("You have to provide either a name or a subscription tier!");
     }
     
-    [HttpDelete("{clubId}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> DeleteTennisClub(string clubId)
+    public async Task<ActionResult<Guid>> DeleteTennisClub(Guid id)
     {
-        var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(clubId);
+        var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(id);
         return Ok(deletedTennisClubId);
     }
     
-    [HttpPost("{clubId}/lock")]
+    [HttpPost("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> LockTennisClub(string clubId)
+    public async Task<ActionResult<Guid>> LockTennisClub(Guid id)
     {
-        var lockedTennisClubId = await updateTennisClubService.LockTennisClub(clubId);
+        var lockedTennisClubId = await updateTennisClubService.LockTennisClub(id);
         return Ok(lockedTennisClubId);
     }
     
-    [HttpDelete("{clubId}/lock")]
+    [HttpDelete("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> UnlockTennisClub(string clubId)
+    public async Task<ActionResult<Guid>> UnlockTennisClub(Guid id)
     {
-        var unlockedTennisClubId = await updateTennisClubService.UnlockTennisClub(clubId);
+        var unlockedTennisClubId = await updateTennisClubService.UnlockTennisClub(id);
         return Ok(unlockedTennisClubId);
     }
 }
