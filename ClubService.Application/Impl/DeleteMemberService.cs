@@ -10,9 +10,9 @@ namespace ClubService.Application.Impl;
 
 public class DeleteMemberService(IEventRepository eventRepository) : IDeleteMemberService
 {
-    public async Task<string> DeleteMember(string id)
+    public async Task<Guid> DeleteMember(Guid id)
     {
-        var memberId = new MemberId(new Guid(id));
+        var memberId = new MemberId(id);
         var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
         
         if (existingMemberDomainEvents.Count == 0)

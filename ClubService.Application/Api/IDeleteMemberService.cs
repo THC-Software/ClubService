@@ -2,5 +2,5 @@
 
 public interface IDeleteMemberService
 {
-    Task<string> DeleteMember(string id);
+    Task<Guid> DeleteMember(Guid id);
 }

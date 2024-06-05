@@ -17,14 +17,13 @@ public class MemberController(
     IMemberReadModelRepository memberReadModelRepository)
     : ControllerBase
 {
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<MemberReadModel>> GetMemberById(string id)
+    public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
-        var memberId = new Guid(id);
-        var memberReadModel = await memberReadModelRepository.GetMemberById(memberId);
+        var memberReadModel = await memberReadModelRepository.GetMemberById(id);
         
         if (memberReadModel == null)
         {
@@ -39,18 +38,18 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
+    public async Task<ActionResult<Guid>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
     {
         var registeredMemberId = await registerMemberService.RegisterMember(memberRegisterCommand);
         return CreatedAtAction(nameof(RegisterMember), new { id = registeredMemberId }, registeredMemberId);
     }
     
-    [HttpPatch("{id}")]
+    [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> UpdateMember(string id, MemberUpdateCommand memberUpdateCommand)
+    public async Task<ActionResult<Guid>> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
     {
         if (memberUpdateCommand.FirstName != null && memberUpdateCommand.LastName != null)
         {
@@ -71,34 +70,34 @@ public class MemberController(
         return BadRequest("You have to provide either first and last name or an e-mail address!");
     }
     
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> DeleteMember(string id)
+    public async Task<ActionResult<Guid>> DeleteMember(Guid id)
     {
         var deletedMemberId = await deleteMemberService.DeleteMember(id);
         return Ok(deletedMemberId);
     }
     
-    [HttpPost("{id}/lock")]
+    [HttpPost("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> LockMember(string id)
+    public async Task<ActionResult<Guid>> LockMember(Guid id)
     {
         var lockedMemberId = await updateMemberService.LockMember(id);
         return Ok(lockedMemberId);
     }
     
-    [HttpDelete("{id}/lock")]
+    [HttpDelete("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<string>> UnlockMember(string id)
+    public async Task<ActionResult<Guid>> UnlockMember(Guid id)
     {
         var unlockedMemberId = await updateMemberService.UnlockMember(id);
         return Ok(unlockedMemberId);
