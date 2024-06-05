@@ -2,7 +2,9 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.Member;
+using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
+using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
@@ -29,26 +31,45 @@ public class UpdateMemberService(
             member.Apply(domainEvent);
         }
         
-        try
+        var tennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+        
+        var tennisClub = new TennisClub();
+        foreach (var domainEvent in tennisClubDomainEvents)
         {
-            var domainEvents = member.ProcessMemberLockCommand();
-            var expectedEventCount = existingMemberDomainEvents.Count;
-            
-            await eventStoreTransactionManager.TransactionScope(async () =>
-            {
-                foreach (var domainEvent in domainEvents)
-                {
-                    member.Apply(domainEvent);
-                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-                }
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new ConflictException(ex.Message, ex);
+            tennisClub.Apply(domainEvent);
         }
         
-        return id;
+        switch (tennisClub.Status)
+        {
+            case TennisClubStatus.ACTIVE:
+                try
+                {
+                    var domainEvents = member.ProcessMemberLockCommand();
+                    var expectedEventCount = existingMemberDomainEvents.Count;
+                    
+                    await eventStoreTransactionManager.TransactionScope(async () =>
+                    {
+                        foreach (var domainEvent in domainEvents)
+                        {
+                            member.Apply(domainEvent);
+                            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                        }
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new ConflictException(ex.Message, ex);
+                }
+                
+                return id;
+            case TennisClubStatus.LOCKED:
+                throw new ConflictException("Tennis club is locked!");
+            case TennisClubStatus.DELETED:
+                throw new ConflictException("Tennis club already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
     
     public async Task<Guid> UnlockMember(Guid id)
@@ -67,27 +88,46 @@ public class UpdateMemberService(
             member.Apply(domainEvent);
         }
         
-        try
+        var tennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+        
+        var tennisClub = new TennisClub();
+        foreach (var domainEvent in tennisClubDomainEvents)
         {
-            var domainEvents = member.ProcessMemberUnlockCommand();
-            var expectedEventCount = existingMemberDomainEvents.Count;
-            
-            foreach (var domainEvent in domainEvents)
-            {
-                member.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
+            tennisClub.Apply(domainEvent);
         }
         
-        return id;
+        switch (tennisClub.Status)
+        {
+            case TennisClubStatus.ACTIVE:
+                try
+                {
+                    var domainEvents = member.ProcessMemberUnlockCommand();
+                    var expectedEventCount = existingMemberDomainEvents.Count;
+                    
+                    foreach (var domainEvent in domainEvents)
+                    {
+                        member.Apply(domainEvent);
+                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new ConflictException(ex.Message, ex);
+                }
+                catch (DataException ex)
+                {
+                    throw new ConcurrencyException(ex.Message, ex);
+                }
+                
+                return id;
+            case TennisClubStatus.LOCKED:
+                throw new ConflictException("Tennis club is locked!");
+            case TennisClubStatus.DELETED:
+                throw new ConflictException("Tennis club already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
     
     public async Task<Guid> ChangeFullName(Guid id, string firstName, string lastName)
@@ -107,27 +147,46 @@ public class UpdateMemberService(
             member.Apply(domainEvent);
         }
         
-        try
+        var tennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+        
+        var tennisClub = new TennisClub();
+        foreach (var domainEvent in tennisClubDomainEvents)
         {
-            var domainEvents = member.ProcessMemberChangeFullNameCommand(new FullName(firstName, lastName));
-            var expectedEventCount = existingMemberDomainEvents.Count;
-            
-            foreach (var domainEvent in domainEvents)
-            {
-                member.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
+            tennisClub.Apply(domainEvent);
         }
         
-        return id;
+        switch (tennisClub.Status)
+        {
+            case TennisClubStatus.ACTIVE:
+                try
+                {
+                    var domainEvents = member.ProcessMemberChangeFullNameCommand(new FullName(firstName, lastName));
+                    var expectedEventCount = existingMemberDomainEvents.Count;
+                    
+                    foreach (var domainEvent in domainEvents)
+                    {
+                        member.Apply(domainEvent);
+                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new ConflictException(ex.Message, ex);
+                }
+                catch (DataException ex)
+                {
+                    throw new ConcurrencyException(ex.Message, ex);
+                }
+                
+                return id;
+            case TennisClubStatus.LOCKED:
+                throw new ConflictException("Tennis club is locked!");
+            case TennisClubStatus.DELETED:
+                throw new ConflictException("Tennis club already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
     
     public async Task<Guid> ChangeEmail(Guid id, string email)
@@ -147,26 +206,45 @@ public class UpdateMemberService(
             member.Apply(domainEvent);
         }
         
-        try
+        var tennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+        
+        var tennisClub = new TennisClub();
+        foreach (var domainEvent in tennisClubDomainEvents)
         {
-            var domainEvents = member.ProcessMemberChangeEmailCommand(email);
-            var expectedEventCount = existingMemberDomainEvents.Count;
-            
-            foreach (var domainEvent in domainEvents)
-            {
-                member.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new ConflictException(ex.Message, ex);
-        }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
+            tennisClub.Apply(domainEvent);
         }
         
-        return id;
+        switch (tennisClub.Status)
+        {
+            case TennisClubStatus.ACTIVE:
+                try
+                {
+                    var domainEvents = member.ProcessMemberChangeEmailCommand(email);
+                    var expectedEventCount = existingMemberDomainEvents.Count;
+                    
+                    foreach (var domainEvent in domainEvents)
+                    {
+                        member.Apply(domainEvent);
+                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new ConflictException(ex.Message, ex);
+                }
+                catch (DataException ex)
+                {
+                    throw new ConcurrencyException(ex.Message, ex);
+                }
+                
+                return id;
+            case TennisClubStatus.LOCKED:
+                throw new ConflictException("Tennis club is locked!");
+            case TennisClubStatus.DELETED:
+                throw new ConflictException("Tennis club already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }
