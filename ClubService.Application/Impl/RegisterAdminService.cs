@@ -40,7 +40,7 @@ public class RegisterAdminService(
                 
                 if (admins.Any(admin => admin.Username == adminRegisterCommand.Username))
                 {
-                    throw new AdminUsernameAlreadyExist(
+                    throw new AdminUsernameAlreadyExists(
                         adminRegisterCommand.Username,
                         tennisClub.Name,
                         tennisClubId.Id
