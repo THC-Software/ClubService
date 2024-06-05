@@ -5,14 +5,17 @@ using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
-public class RegisterAdminService(IEventRepository eventRepository) : IRegisterAdminService
+public class RegisterAdminService(
+    IEventRepository eventRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterAdminService
 {
-    public async Task<string> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
+    public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
     {
-        var tennisClubId = new TennisClubId(new Guid(adminRegisterCommand.TennisClubId));
+        var tennisClubId = new TennisClubId(adminRegisterCommand.TennisClubId);
         var admin = new Admin();
         
         var tennisClubDomainEvents =
@@ -25,16 +28,18 @@ public class RegisterAdminService(IEventRepository eventRepository) : IRegisterA
         }
         
         var domainEvents = admin.ProcessAdminRegisterCommand(adminRegisterCommand.Username,
-            new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName),
-            new TennisClubId(new Guid(adminRegisterCommand.TennisClubId)));
+            new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName), tennisClubId);
         var expectedEventCount = 0;
         
-        foreach (var domainEvent in domainEvents)
+        await eventStoreTransactionManager.TransactionScope(async () =>
         {
-            admin.Apply(domainEvent);
-            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-        }
+            foreach (var domainEvent in domainEvents)
+            {
+                admin.Apply(domainEvent);
+                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+            }
+        });
         
-        return admin.AdminId.Id.ToString();
+        return admin.AdminId.Id;
     }
 }

@@ -9,7 +9,7 @@ namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
 public class MemberRegisteredEventHandler(
     IMemberReadModelRepository memberReadModelRepository,
-    ITennisClubReadModelRepository tennisClubReadModelRepository, 
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
     IReadStoreTransactionManager readStoreTransactionManager) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
@@ -30,22 +30,14 @@ public class MemberRegisteredEventHandler(
             return;
         }
         
-        try
+        await readStoreTransactionManager.TransactionScope(async () =>
         {
-            await readStoreTransactionManager.BeginTransactionAsync();
-            
             tennisClubReadModel.IncreaseMemberCount();
             await tennisClubReadModelRepository.Update();
             
             var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
             await memberReadModelRepository.Add(memberReadModel);
-            
-            await readStoreTransactionManager.CommitTransactionAsync();
-        }
-        catch (Exception)
-        {
-            await readStoreTransactionManager.RollbackTransactionAsync();
-        }
+        });
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

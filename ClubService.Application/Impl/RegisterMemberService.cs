@@ -1,23 +1,23 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
-using ClubService.Domain.Event.SubscriptionTier;
-using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
 public class RegisterMemberService(
     IEventRepository eventRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository) : IRegisterMemberService
+    ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterMemberService
 {
-    public async Task<string> RegisterMember(MemberRegisterCommand memberRegisterCommand)
+    public async Task<Guid> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
-        var tennisClubId = new TennisClubId(new Guid(memberRegisterCommand.TennisClubId));
+        var tennisClubId = new TennisClubId(memberRegisterCommand.TennisClubId);
         var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(tennisClubId.Id);
         
         if (tennisClubReadModel == null)
@@ -48,17 +48,20 @@ public class RegisterMemberService(
                     memberRegisterCommand.FirstName,
                     memberRegisterCommand.LastName,
                     memberRegisterCommand.Email,
-                    memberRegisterCommand.TennisClubId
+                    tennisClubId
                 );
                 var expectedEventCount = 0;
                 
-                foreach (var domainEvent in domainEvents)
+                await eventStoreTransactionManager.TransactionScope(async () =>
                 {
-                    member.Apply(domainEvent);
-                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-                }
+                    foreach (var domainEvent in domainEvents)
+                    {
+                        member.Apply(domainEvent);
+                        expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                    }
+                });
                 
-                return member.MemberId.Id.ToString();
+                return member.MemberId.Id;
             case TennisClubStatus.LOCKED:
                 throw new ConflictException("Tennis club is locked!");
             case TennisClubStatus.DELETED:

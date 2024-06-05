@@ -36,21 +36,13 @@ public class MemberDeletedEventHandler(
             return;
         }
         
-        try
+        await readStoreTransactionManager.TransactionScope(async () =>
         {
-            await readStoreTransactionManager.BeginTransactionAsync();
-            
             tennisClubReadModel.DecreaseMemberCount();
             await tennisClubReadModelRepository.Update();
             
             await memberReadModelRepository.Delete(memberReadModel);
-            
-            await readStoreTransactionManager.CommitTransactionAsync();
-        }
-        catch (Exception)
-        {
-            await readStoreTransactionManager.RollbackTransactionAsync();
-        }
+        });
     }
     
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

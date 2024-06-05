@@ -5,14 +5,17 @@ using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
-public class DeleteTennisClubService(IEventRepository eventRepository) : IDeleteTennisClubService
+public class DeleteTennisClubService(
+    IEventRepository eventRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager) : IDeleteTennisClubService
 {
-    public async Task<string> DeleteTennisClub(string clubId)
+    public async Task<Guid> DeleteTennisClub(Guid id)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(id);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -34,21 +37,20 @@ public class DeleteTennisClubService(IEventRepository eventRepository) : IDelete
             var domainEvents = tennisClub.ProcessDeleteTennisClubCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
-            foreach (var domainEvent in domainEvents)
+            await eventStoreTransactionManager.TransactionScope(async () =>
             {
-                tennisClub.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
+                foreach (var domainEvent in domainEvents)
+                {
+                    tennisClub.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
-        }
         
-        return tennisClub.TennisClubId.Id.ToString();
+        return tennisClub.TennisClubId.Id;
     }
 }

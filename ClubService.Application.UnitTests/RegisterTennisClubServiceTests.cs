@@ -6,6 +6,7 @@ using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 using Moq;
 
 namespace ClubService.Application.UnitTests;
@@ -13,15 +14,26 @@ namespace ClubService.Application.UnitTests;
 [TestFixture]
 public class RegisterTennisClubServiceTests
 {
+    private Mock<IEventRepository> _eventRepositoryMock;
+    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private RegisterTennisClubService _registerTennisClubService;
+    
     [SetUp]
     public void Setup()
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
-        _registerTennisClubService = new RegisterTennisClubService(_eventRepositoryMock.Object);
+        _eventStoreTransactionManagerMock = new Mock<IEventStoreTransactionManager>();
+        
+        // set up the TransactionScope method to call the passed function
+        _eventStoreTransactionManagerMock
+            .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> transactionalOperation) => transactionalOperation());
+        
+        _registerTennisClubService = new RegisterTennisClubService(
+            _eventRepositoryMock.Object,
+            _eventStoreTransactionManagerMock.Object
+        );
     }
-    
-    private RegisterTennisClubService _registerTennisClubService;
-    private Mock<IEventRepository> _eventRepositoryMock;
     
     [Test]
     public async Task GivenValidInputs_WhenRegisterTennisClub_ThenRepoIsCalledWithExpectedEvent()
@@ -33,7 +45,7 @@ public class RegisterTennisClubServiceTests
         var eventDataTypeExpected = typeof(TennisClubRegisteredEvent);
         var subscriptionTierId = Guid.NewGuid();
         var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId.ToString());
+            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId);
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents =
         [
             new DomainEnvelope<ISubscriptionTierDomainEvent>(
@@ -71,7 +83,7 @@ public class RegisterTennisClubServiceTests
         // Given
         var subscriptionTierId = Guid.NewGuid();
         var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId.ToString());
+            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId);
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents = [];
         
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))

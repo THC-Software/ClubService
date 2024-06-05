@@ -1,6 +1,6 @@
-﻿namespace ClubService.Application.Api.Exceptions;
+﻿namespace ClubService.Application.Api;
 
 public interface IDeleteAdminService
 {
-    Task<string> DeleteAdmin(string id);
+    Task<Guid> DeleteAdmin(Guid id);
 }

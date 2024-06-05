@@ -5,14 +5,17 @@ using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.Impl;
 
-public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdateTennisClubService
+public class UpdateTennisClubService(
+    IEventRepository eventRepository,
+    IEventStoreTransactionManager eventStoreTransactionManager) : IUpdateTennisClubService
 {
-    public async Task<string> LockTennisClub(string clubId)
+    public async Task<Guid> LockTennisClub(Guid id)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(id);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -33,27 +36,26 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             var domainEvents = tennisClub.ProcessTennisClubLockCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
-            foreach (var domainEvent in domainEvents)
+            await eventStoreTransactionManager.TransactionScope(async () =>
             {
-                tennisClub.Apply(domainEvent);
-                expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-            }
+                foreach (var domainEvent in domainEvents)
+                {
+                    tennisClub.Apply(domainEvent);
+                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                }
+            });
         }
         catch (InvalidOperationException ex)
         {
             throw new ConflictException(ex.Message, ex);
         }
-        catch (DataException ex)
-        {
-            throw new ConcurrencyException(ex.Message, ex);
-        }
         
-        return clubId;
+        return id;
     }
     
-    public async Task<string> UnlockTennisClub(string clubId)
+    public async Task<Guid> UnlockTennisClub(Guid id)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(id);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -89,12 +91,13 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
             throw new ConcurrencyException(ex.Message, ex);
         }
         
-        return clubId;
+        return id;
     }
     
-    public async Task<string> ChangeSubscriptionTier(string clubId, string subscriptionTierId)
+    public async Task<Guid> ChangeSubscriptionTier(Guid clubId, Guid subscriptionTierGuid)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var subscriptionTierId = new SubscriptionTierId(subscriptionTierGuid);
+        var tennisClubId = new TennisClubId(clubId);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =
@@ -133,9 +136,9 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         return clubId;
     }
     
-    public async Task<string> ChangeName(string clubId, string name)
+    public async Task<Guid> ChangeName(Guid clubId, string name)
     {
-        var tennisClubId = new TennisClubId(new Guid(clubId));
+        var tennisClubId = new TennisClubId(clubId);
         var tennisClub = new TennisClub();
         
         var existingTennisClubDomainEvents =

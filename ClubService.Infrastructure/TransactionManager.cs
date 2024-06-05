@@ -1,4 +1,6 @@
-﻿using ClubService.Domain.Repository.Transaction;
+﻿using System.Data;
+using ClubService.Application.Api.Exceptions;
+using ClubService.Domain.Repository.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -9,12 +11,39 @@ public class TransactionManager<TDbContext>(TDbContext dbContext)
 {
     private IDbContextTransaction? _transaction;
     
-    public async Task BeginTransactionAsync()
+    public void Dispose()
+    {
+        if (_transaction == null)
+        {
+            return;
+        }
+        
+        _transaction.Dispose();
+        _transaction = null;
+    }
+    
+    public async Task TransactionScope(Func<Task> transactionalFunction)
+    {
+        try
+        {
+            await BeginTransactionAsync();
+            await transactionalFunction();
+            await CommitTransactionAsync();
+        }
+        catch (DataException ex)
+        {
+            await RollbackTransactionAsync();
+            throw new ConcurrencyException(ex.Message, ex);
+        }
+    }
+    
+    
+    private async Task BeginTransactionAsync()
     {
         _transaction = await dbContext.Database.BeginTransactionAsync();
     }
     
-    public async Task CommitTransactionAsync()
+    private async Task CommitTransactionAsync()
     {
         if (_transaction == null)
         {
@@ -25,7 +54,7 @@ public class TransactionManager<TDbContext>(TDbContext dbContext)
         await DisposeTransactionAsync();
     }
     
-    public async Task RollbackTransactionAsync()
+    private async Task RollbackTransactionAsync()
     {
         if (_transaction == null)
         {
@@ -34,17 +63,6 @@ public class TransactionManager<TDbContext>(TDbContext dbContext)
         
         await _transaction.RollbackAsync();
         await DisposeTransactionAsync();
-    }
-    
-    public void Dispose()
-    {
-        if (_transaction == null)
-        {
-            return;
-        }
-        
-        _transaction.Dispose();
-        _transaction = null;
     }
     
     private async Task DisposeTransactionAsync()

@@ -5,6 +5,7 @@ using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
+using ClubService.Domain.Repository.Transaction;
 using Moq;
 
 namespace ClubService.Application.UnitTests;
@@ -12,15 +13,26 @@ namespace ClubService.Application.UnitTests;
 [TestFixture]
 public class UpdateTennisClubServiceTests
 {
+    private Mock<IEventRepository> _eventRepositoryMock;
+    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private UpdateTennisClubService _updateTennisClubService;
+    
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
-        _updateTennisClubService = new UpdateTennisClubService(_eventRepositoryMock.Object);
+        _eventStoreTransactionManagerMock = new Mock<IEventStoreTransactionManager>();
+        
+        // set up the TransactionScope method to call the passed function
+        _eventStoreTransactionManagerMock
+            .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
+            .Returns((Func<Task> transactionalOperation) => transactionalOperation());
+        
+        _updateTennisClubService = new UpdateTennisClubService(
+            _eventRepositoryMock.Object,
+            _eventStoreTransactionManagerMock.Object
+        );
     }
-    
-    private UpdateTennisClubService _updateTennisClubService;
-    private Mock<IEventRepository> _eventRepositoryMock;
     
     [Test]
     public async Task GivenUnlockedTennisClub_WhenLockTennisClub_ThenRepoIsCalledWithExpectedEvent()
@@ -50,7 +62,7 @@ public class UpdateTennisClubServiceTests
             .ReturnsAsync(existingDomainEvents);
         
         // When
-        _ = await _updateTennisClubService.LockTennisClub(tennisClubId.Id.ToString());
+        _ = await _updateTennisClubService.LockTennisClub(tennisClubId.Id);
         
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -68,7 +80,7 @@ public class UpdateTennisClubServiceTests
     public void GivenNonExistentTennisClubId_WhenLockTennisClub_ThenExceptionIsThrown()
     {
         // Given
-        var clubId = Guid.NewGuid().ToString();
+        var clubId = Guid.NewGuid();
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
@@ -110,7 +122,7 @@ public class UpdateTennisClubServiceTests
             .ReturnsAsync(existingDomainEvents);
         
         // When
-        _ = await _updateTennisClubService.UnlockTennisClub(tennisClubId.Id.ToString());
+        _ = await _updateTennisClubService.UnlockTennisClub(tennisClubId.Id);
         
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -128,7 +140,7 @@ public class UpdateTennisClubServiceTests
     public void GivenNonExistentTennisClubId_WhenUnlockTennisClub_ThenExceptionIsThrown()
     {
         // Given
-        var clubId = Guid.NewGuid().ToString();
+        var clubId = Guid.NewGuid();
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
@@ -165,8 +177,8 @@ public class UpdateTennisClubServiceTests
             .ReturnsAsync(existingDomainEvents);
         
         // When
-        _ = await _updateTennisClubService.ChangeSubscriptionTier(tennisClubId.Id.ToString(),
-            newSubscriptionTierId.Id.ToString());
+        _ = await _updateTennisClubService.ChangeSubscriptionTier(tennisClubId.Id,
+            newSubscriptionTierId.Id);
         
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -184,8 +196,8 @@ public class UpdateTennisClubServiceTests
     public void GivenNonExistentTennisClubId_WhenChangeSubscriptionTier_ThenExceptionIsThrown()
     {
         // Given
-        var clubId = Guid.NewGuid().ToString();
-        var subscriptionTierId = Guid.NewGuid().ToString();
+        var clubId = Guid.NewGuid();
+        var subscriptionTierId = Guid.NewGuid();
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
@@ -223,7 +235,7 @@ public class UpdateTennisClubServiceTests
             .ReturnsAsync(existingDomainEvents);
         
         // When
-        _ = await _updateTennisClubService.ChangeName(tennisClubId.Id.ToString(),
+        _ = await _updateTennisClubService.ChangeName(tennisClubId.Id,
             newName);
         
         // Then
@@ -242,7 +254,7 @@ public class UpdateTennisClubServiceTests
     public void GivenNonExistentTennisClubId_WhenChangeName_ThenExceptionIsThrown()
     {
         // Given
-        var clubId = Guid.NewGuid().ToString();
+        var clubId = Guid.NewGuid();
         const string name = "Test";
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
