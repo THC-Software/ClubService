@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ClubService.Application.Commands;
 
-public class TennisClubRegisterCommand(string name, string subscriptionTierId)
+public class TennisClubRegisterCommand(string name, Guid subscriptionTierId)
 {
     [Required]
     public string Name { get; } = name;
     
     [Required]
-    public string SubscriptionTierId { get; } = subscriptionTierId;
+    public Guid SubscriptionTierId { get; } = subscriptionTierId;
 }
