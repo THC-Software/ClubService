@@ -100,7 +100,7 @@ public class TennisClubController(
         {
             var updatedTennisClubId =
                 await updateTennisClubService.ChangeSubscriptionTier(id,
-                    tennisClubUpdateCommand.SubscriptionTierId);
+                    (Guid)tennisClubUpdateCommand.SubscriptionTierId);
             return Ok(updatedTennisClubId);
         }
         

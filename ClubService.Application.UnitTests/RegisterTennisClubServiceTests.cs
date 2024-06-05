@@ -33,7 +33,7 @@ public class RegisterTennisClubServiceTests
         var eventDataTypeExpected = typeof(TennisClubRegisteredEvent);
         var subscriptionTierId = Guid.NewGuid();
         var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId.ToString());
+            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId);
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents =
         [
             new DomainEnvelope<ISubscriptionTierDomainEvent>(
@@ -71,7 +71,7 @@ public class RegisterTennisClubServiceTests
         // Given
         var subscriptionTierId = Guid.NewGuid();
         var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId.ToString());
+            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId);
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents = [];
         
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))

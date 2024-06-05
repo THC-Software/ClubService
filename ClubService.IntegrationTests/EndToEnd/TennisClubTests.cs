@@ -23,7 +23,7 @@ public class TennisClubTests : TestBase
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubRegisteredEvent);
         var subscriptionTierIdExpected = new Guid("38888969-d579-46ec-9cd6-0208569a077e");
-        var registerTennisClubCommand = new TennisClubRegisterCommand("Test", subscriptionTierIdExpected.ToString());
+        var registerTennisClubCommand = new TennisClubRegisterCommand("Test", subscriptionTierIdExpected);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerTennisClubCommand), Encoding.UTF8,
             "application/json");
         
@@ -133,7 +133,7 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubSubscriptionTierChangedEvent);
-        var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, Guid.NewGuid().ToString());
+        var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, Guid.NewGuid());
         var jsonContent = JsonConvert.SerializeObject(tennisClubUpdateCommand);
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
         
@@ -161,7 +161,7 @@ public class TennisClubTests : TestBase
         
         var tennisClubSubscriptionTierChangedEventActual =
             (TennisClubSubscriptionTierChangedEvent)storedEvent.EventData;
-        Assert.That(tennisClubSubscriptionTierChangedEventActual.SubscriptionTierId.Id.ToString(),
+        Assert.That(tennisClubSubscriptionTierChangedEventActual.SubscriptionTierId.Id,
             Is.EqualTo(tennisClubUpdateCommand.SubscriptionTierId));
     }
     

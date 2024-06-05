@@ -92,8 +92,9 @@ public class UpdateTennisClubService(IEventRepository eventRepository) : IUpdate
         return id;
     }
     
-    public async Task<Guid> ChangeSubscriptionTier(Guid clubId, string subscriptionTierId)
+    public async Task<Guid> ChangeSubscriptionTier(Guid clubId, Guid subscriptionTierGuid)
     {
+        var subscriptionTierId = new SubscriptionTierId(subscriptionTierGuid);
         var tennisClubId = new TennisClubId(clubId);
         var tennisClub = new TennisClub();
         

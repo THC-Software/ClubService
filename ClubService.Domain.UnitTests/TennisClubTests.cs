@@ -22,7 +22,7 @@ public class TennisClubTests
         
         // When
         var domainEnvelopes =
-            tennisClub.ProcessTennisClubRegisterCommand(nameExpected, subscriptionTierIdExpected.Id.ToString());
+            tennisClub.ProcessTennisClubRegisterCommand(nameExpected, subscriptionTierIdExpected);
         
         // Then
         Assert.That(domainEnvelopes, Is.Not.Null);
@@ -86,7 +86,7 @@ public class TennisClubTests
         var name = "Test Tennis Club";
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
         // When
@@ -112,7 +112,7 @@ public class TennisClubTests
         var name = "Test Tennis Club";
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         tennisClub.ProcessTennisClubLockCommand().ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
@@ -149,7 +149,7 @@ public class TennisClubTests
         var name = "Test Tennis Club";
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         tennisClub.ProcessTennisClubLockCommand()
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
@@ -177,7 +177,7 @@ public class TennisClubTests
         var name = "Test Tennis Club";
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
         // When ... Then
@@ -214,12 +214,12 @@ public class TennisClubTests
         var subscriptionTierIdInitial = new SubscriptionTierId(Guid.NewGuid());
         var subscriptionTierIdExpected = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierIdInitial.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierIdInitial)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
         // When
         var domainEnvelopes =
-            tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierIdExpected.Id.ToString());
+            tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierIdExpected);
         
         // Then
         Assert.That(domainEnvelopes, Is.Not.Null);
@@ -245,12 +245,12 @@ public class TennisClubTests
         var name = "Test Tennis Club";
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
         // When ... Then
         Assert.Throws<InvalidOperationException>(() =>
-            tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierId.Id.ToString()));
+            tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierId));
     }
     
     [Test]
@@ -288,7 +288,7 @@ public class TennisClubTests
         var nameExpected = "New Tennis Club Name";
         var subscriptionTierIdInitial = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(nameInitial, subscriptionTierIdInitial.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(nameInitial, subscriptionTierIdInitial)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
         // When
@@ -319,7 +319,7 @@ public class TennisClubTests
         var name = "Test Tennis Club";
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var tennisClub = new TennisClub();
-        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId.Id.ToString())
+        tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
         // When ... Then

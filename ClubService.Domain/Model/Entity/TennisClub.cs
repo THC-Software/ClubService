@@ -14,12 +14,12 @@ public class TennisClub
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubRegisterCommand(
         string name,
-        string subscriptionTierIdStr)
+        SubscriptionTierId subscriptionTierIdStr)
     {
         var tennisClubRegisteredEvent = new TennisClubRegisteredEvent(
             new TennisClubId(Guid.NewGuid()),
             name,
-            new SubscriptionTierId(new Guid(subscriptionTierIdStr)),
+            subscriptionTierIdStr,
             TennisClubStatus.ACTIVE
         );
         
@@ -78,14 +78,12 @@ public class TennisClub
     }
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeSubscriptionTierCommand(
-        string subscriptionTierIdStr)
+        SubscriptionTierId subscriptionTierId)
     {
-        if (subscriptionTierIdStr.Equals(SubscriptionTierId.Id.ToString()))
+        if (subscriptionTierId.Equals(SubscriptionTierId))
         {
             throw new InvalidOperationException("This subscription tier is already set!");
         }
-        
-        var subscriptionTierId = new SubscriptionTierId(new Guid(subscriptionTierIdStr));
         
         var subscriptionTierChangedEvent = new TennisClubSubscriptionTierChangedEvent(subscriptionTierId);
         

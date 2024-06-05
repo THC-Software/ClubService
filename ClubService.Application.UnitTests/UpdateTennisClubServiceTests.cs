@@ -166,7 +166,7 @@ public class UpdateTennisClubServiceTests
         
         // When
         _ = await _updateTennisClubService.ChangeSubscriptionTier(tennisClubId.Id,
-            newSubscriptionTierId.Id.ToString());
+            newSubscriptionTierId.Id);
         
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -185,7 +185,7 @@ public class UpdateTennisClubServiceTests
     {
         // Given
         var clubId = Guid.NewGuid();
-        var subscriptionTierId = Guid.NewGuid().ToString();
+        var subscriptionTierId = Guid.NewGuid();
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
