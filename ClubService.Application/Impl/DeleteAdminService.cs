@@ -1,4 +1,3 @@
-using System.Data;
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event.Admin;
@@ -13,9 +12,9 @@ public class DeleteAdminService(
     IEventRepository eventRepository,
     IEventStoreTransactionManager eventStoreTransactionManager) : IDeleteAdminService
 {
-    public async Task<string> DeleteAdmin(string id)
+    public async Task<Guid> DeleteAdmin(Guid id)
     {
-        var adminId = new AdminId(new Guid(id));
+        var adminId = new AdminId(id);
         var existingAdminDomainEvents = await eventRepository.GetEventsForEntity<IAdminDomainEvent>(adminId.Id);
         
         if (existingAdminDomainEvents.Count == 0)

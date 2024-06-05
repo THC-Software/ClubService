@@ -39,7 +39,7 @@ public class RegisterAdminService(
                 var domainEvents = admin.ProcessAdminRegisterCommand(
                     adminRegisterCommand.Username,
                     new FullName(adminRegisterCommand.FirstName, adminRegisterCommand.LastName),
-                    new TennisClubId(new Guid(adminRegisterCommand.TennisClubId))
+                    tennisClubId
                 );
                 var expectedEventCount = 0;
                 
