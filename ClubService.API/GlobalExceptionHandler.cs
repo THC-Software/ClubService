@@ -30,7 +30,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             case ConflictException:
             case MemberLimitExceededException:
             case AdminUsernameAlreadyExists:
-            case MemberEmailAlreadyExist:
+            case MemberEmailAlreadyExists:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.10";
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";

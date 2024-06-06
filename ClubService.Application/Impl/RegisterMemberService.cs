@@ -47,7 +47,7 @@ public class RegisterMemberService(
                 
                 if (members.Any(member => member.Email == memberRegisterCommand.Email))
                 {
-                    throw new MemberEmailAlreadyExist(
+                    throw new MemberEmailAlreadyExists(
                         memberRegisterCommand.Email,
                         tennisClubReadModel.Name,
                         tennisClubId.Id
