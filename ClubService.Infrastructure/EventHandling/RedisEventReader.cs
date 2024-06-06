@@ -1,6 +1,5 @@
 using System.Text.Json.Nodes;
 using ClubService.Application.Api;
-using ClubService.Domain.Event;
 using StackExchange.Redis;
 
 namespace ClubService.Infrastructure.EventHandling;
@@ -8,11 +7,11 @@ namespace ClubService.Infrastructure.EventHandling;
 public class RedisEventReader : IEventReader
 {
     private readonly CancellationToken _cancellationToken;
-    private readonly string _streamName;
-    private readonly string _groupName;
     private readonly IDatabase _db;
-    private readonly ConnectionMultiplexer _muxer;
     private readonly IEventHandler _eventHandler;
+    private readonly string _groupName;
+    private readonly ConnectionMultiplexer _muxer;
+    private readonly string _streamName;
     
     public RedisEventReader(
         CancellationToken cancellationToken,
@@ -33,10 +32,10 @@ public class RedisEventReader : IEventReader
     
     public async Task ConsumeMessagesAsync()
     {
-        if (!(await _db.KeyExistsAsync(_streamName)) ||
+        if (!await _db.KeyExistsAsync(_streamName) ||
             (await _db.StreamGroupInfoAsync(_streamName)).All(x => x.Name != _groupName))
         {
-            await _db.StreamCreateConsumerGroupAsync(_streamName, _groupName, "0-0", true);
+            await _db.StreamCreateConsumerGroupAsync(_streamName, _groupName, "0-0");
         }
         
         var id = string.Empty;
@@ -56,18 +55,26 @@ public class RedisEventReader : IEventReader
                     var streamEntry = result.First();
                     var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
                     var jsonContent = JsonNode.Parse(dict.Values.First());
-                    var eventInfo = jsonContent["payload"]["after"];
                     
-                    try
+                    if (jsonContent == null)
                     {
-                        DomainEnvelope<IDomainEvent> parsedEvent = EventParser.ParseEvent(eventInfo);
-                        await _eventHandler.Handle(parsedEvent);
+                        throw new InvalidOperationException("json content is null");
                     }
-                    catch (InvalidOperationException e)
+                    
+                    var payload = jsonContent["payload"];
+                    if (payload == null)
                     {
-                        //TODO: Use logger
-                        Console.WriteLine("Event Ignored: " + e.Message);
+                        throw new InvalidOperationException("payload is null");
                     }
+                    
+                    var eventInfo = payload["after"];
+                    if (eventInfo == null)
+                    {
+                        throw new InvalidOperationException("event info is null");
+                    }
+                    
+                    var parsedEvent = EventParser.ParseEvent(eventInfo);
+                    await _eventHandler.Handle(parsedEvent);
                 }
                 
                 await Task.Delay(1000, _cancellationToken);
@@ -77,6 +84,11 @@ public class RedisEventReader : IEventReader
                 Console.WriteLine("Redis Event Reader stopped!");
                 Dispose();
                 break;
+            }
+            catch (InvalidOperationException e)
+            {
+                //TODO: Use logger
+                Console.WriteLine("Event Ignored: " + e.Message);
             }
         }
     }

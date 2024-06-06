@@ -7,21 +7,36 @@ public class EventParser
 {
     public static DomainEnvelope<IDomainEvent> ParseEvent(JsonNode jsonEvent)
     {
-        //TODO: what if some parameters are null?
-        var eventId = Guid.Parse(jsonEvent["eventId"]?.GetValue<string>());
-        var entityId = Guid.Parse(jsonEvent["entityId"].GetValue<string>());
-        var eventType = (EventType)Enum.Parse(typeof(EventType), jsonEvent["eventType"].GetValue<string>());
-        var entityType = (EntityType)Enum.Parse(typeof(EntityType), jsonEvent["entityType"].GetValue<string>());
-        var timestamp = DateTime.Parse(jsonEvent["timestamp"].GetValue<string>()).ToUniversalTime();
-        var eventData = jsonEvent["eventData"].GetValue<string>();
+        var jsonEventId = jsonEvent["eventId"];
+        var jsonEventType = jsonEvent["eventType"];
+        var jsonEntityType = jsonEvent["entityType"];
+        var jsonTimestamp = jsonEvent["timestamp"];
+        var jsonEventData = jsonEvent["eventData"];
+        
+        if (jsonEventId == null ||
+            jsonEventType == null ||
+            jsonEntityType == null ||
+            jsonTimestamp == null ||
+            jsonEventData == null)
+        {
+            throw new InvalidOperationException("event has missing properties");
+        }
+        
+        var eventId = Guid.Parse(jsonEventId.GetValue<string>());
+        var entityId = Guid.Parse(jsonEventId.GetValue<string>());
+        var eventType = (EventType)Enum.Parse(typeof(EventType), jsonEventType.GetValue<string>());
+        var entityType = (EntityType)Enum.Parse(typeof(EntityType), jsonEntityType.GetValue<string>());
+        var timestamp = DateTime.Parse(jsonTimestamp.GetValue<string>()).ToUniversalTime();
+        var eventData = jsonEventData.GetValue<string>();
+        
         var deserializedEventData = EventDeserializer.DeserializeEventData<IDomainEvent>(eventType, eventData);
         
         return new DomainEnvelope<IDomainEvent>(
-            eventId: eventId,
-            entityId: entityId,
-            eventType: eventType,
-            entityType: entityType,
-            timestamp: timestamp,
-            eventData: deserializedEventData);
+            eventId,
+            entityId,
+            eventType,
+            entityType,
+            timestamp,
+            deserializedEventData);
     }
 }
