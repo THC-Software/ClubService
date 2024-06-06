@@ -45,7 +45,7 @@ public class RegisterMemberService(
                 
                 var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubId.Id);
                 
-                if (members.Any(member => member.Email == memberRegisterCommand.Email))
+                if (members.Exists(member => member.Email == memberRegisterCommand.Email))
                 {
                     throw new MemberEmailAlreadyExists(
                         memberRegisterCommand.Email,
