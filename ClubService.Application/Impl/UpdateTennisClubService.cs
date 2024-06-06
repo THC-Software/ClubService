@@ -7,6 +7,7 @@ using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
+using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace ClubService.Application.Impl;
 
@@ -96,7 +97,12 @@ public class UpdateTennisClubService(
     
     public async Task<Guid> UpdateTennisClub(Guid id, TennisClubUpdateCommand tennisClubUpdateCommand)
     {
-        // TODO: Check that not both properties of tennisClubUpdateCommand are null
+        if (string.IsNullOrWhiteSpace(tennisClubUpdateCommand.Name) &&
+            tennisClubUpdateCommand.SubscriptionTierId == null)
+        {
+            throw new ValidationException("You have to either provide a name or a subscription tier id!");
+        }
+        
         var tennisClubId = new TennisClubId(id);
         
         var existingTennisClubDomainEvents =

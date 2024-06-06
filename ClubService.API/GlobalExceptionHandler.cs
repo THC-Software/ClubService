@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using ClubService.Application.Api.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,11 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.10";
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";
+                break;
+            case ValidationException:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.1";
+                problemDetails.Status = StatusCodes.Status400BadRequest;
+                problemDetails.Title = "Bad Request";
                 break;
             default:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
