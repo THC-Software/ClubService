@@ -44,6 +44,10 @@ public class MemberTests : TestBase
             .Setup(repo => repo.GetSubscriptionTierById(It.IsAny<Guid>()))
             .ReturnsAsync(subscriptionTierReadModel);
         
+        MockMemberReadModelRepository
+            .Setup(repo => repo.GetMembersByTennisClubId(It.IsAny<Guid>()))
+            .ReturnsAsync([]);
+        
         var numberOfEventsExpected = 1;
         var eventTypeExpected = EventType.MEMBER_REGISTERED;
         var entityTypeExpected = EntityType.MEMBER;

@@ -12,7 +12,8 @@ public class WebAppFactory(
     string connectionString,
     Mock<ITennisClubReadModelRepository> mockTennisClubReadModelRepository,
     Mock<ISubscriptionTierReadModelRepository> mockSubscriptionTierReadModelRepository,
-    Mock<IAdminReadModelRepository> mockAdminReadModelRepository) : WebApplicationFactory<Program>
+    Mock<IAdminReadModelRepository> mockAdminReadModelRepository,
+    Mock<IMemberReadModelRepository> mockMemberReadModelRepository) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -38,5 +39,6 @@ public class WebAppFactory(
         services.AddScoped(_ => mockTennisClubReadModelRepository.Object);
         services.AddScoped(_ => mockSubscriptionTierReadModelRepository.Object);
         services.AddScoped(_ => mockAdminReadModelRepository.Object);
+        services.AddScoped(_ => mockMemberReadModelRepository.Object);
     }
 }

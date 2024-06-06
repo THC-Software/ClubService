@@ -11,6 +11,7 @@ namespace ClubService.Application.Impl;
 
 public class RegisterMemberService(
     IEventRepository eventRepository,
+    IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
     ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository,
     IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterMemberService
@@ -40,6 +41,17 @@ public class RegisterMemberService(
                 if (tennisClubReadModel.MemberCount + 1 > subscriptionTierReadModel.MaxMemberCount)
                 {
                     throw new MemberLimitExceededException(subscriptionTierReadModel.MaxMemberCount);
+                }
+                
+                var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubId.Id);
+                
+                if (members.Exists(member => member.Email == memberRegisterCommand.Email))
+                {
+                    throw new MemberEmailAlreadyExists(
+                        memberRegisterCommand.Email,
+                        tennisClubReadModel.Name,
+                        tennisClubId.Id
+                    );
                 }
                 
                 var member = new Member();

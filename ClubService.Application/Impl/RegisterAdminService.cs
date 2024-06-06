@@ -38,7 +38,7 @@ public class RegisterAdminService(
             case TennisClubStatus.ACTIVE:
                 var admins = await adminReadModelRepository.GetAdminsByTennisClubId(tennisClubId.Id);
                 
-                if (admins.Any(admin => admin.Username == adminRegisterCommand.Username))
+                if (admins.Exists(admin => admin.Username == adminRegisterCommand.Username))
                 {
                     throw new AdminUsernameAlreadyExists(
                         adminRegisterCommand.Username,
