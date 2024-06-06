@@ -77,49 +77,6 @@ public class TennisClub
         return [domainEnvelope];
     }
     
-    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeSubscriptionTierCommand(
-        SubscriptionTierId subscriptionTierId)
-    {
-        if (subscriptionTierId.Equals(SubscriptionTierId))
-        {
-            throw new InvalidOperationException("This subscription tier is already set!");
-        }
-        
-        var subscriptionTierChangedEvent = new TennisClubSubscriptionTierChangedEvent(subscriptionTierId);
-        
-        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
-            Guid.NewGuid(),
-            TennisClubId.Id,
-            EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED,
-            EntityType.TENNIS_CLUB,
-            DateTime.UtcNow,
-            subscriptionTierChangedEvent
-        );
-        
-        return [domainEnvelope];
-    }
-    
-    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubChangeNameCommand(string name)
-    {
-        if (name.Equals(Name))
-        {
-            throw new InvalidOperationException("This name is already set!");
-        }
-        
-        var nameChangedEvent = new TennisClubNameChangedEvent(name);
-        
-        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
-            Guid.NewGuid(),
-            TennisClubId.Id,
-            EventType.TENNIS_CLUB_NAME_CHANGED,
-            EntityType.TENNIS_CLUB,
-            DateTime.UtcNow,
-            nameChangedEvent
-        );
-        
-        return [domainEnvelope];
-    }
-    
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUpdateCommand(
         string? name,
         SubscriptionTierId? subscriptionTierId)
