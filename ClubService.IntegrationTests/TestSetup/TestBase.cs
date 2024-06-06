@@ -13,6 +13,7 @@ public class TestBase
     private PostgreSqlContainer _postgresContainer;
     protected IEventRepository EventRepository;
     protected HttpClient HttpClient;
+    protected Mock<IMemberReadModelRepository> MockMemberReadModelRepository;
     protected Mock<IAdminReadModelRepository> MockAdminReadModelRepository;
     protected Mock<ISubscriptionTierReadModelRepository> MockSubscriptionTierReadModelRepository;
     protected Mock<ITennisClubReadModelRepository> MockTennisClubReadModelRepository;
@@ -36,12 +37,14 @@ public class TestBase
         MockTennisClubReadModelRepository = new Mock<ITennisClubReadModelRepository>();
         MockSubscriptionTierReadModelRepository = new Mock<ISubscriptionTierReadModelRepository>();
         MockAdminReadModelRepository = new Mock<IAdminReadModelRepository>();
+        MockMemberReadModelRepository = new Mock<IMemberReadModelRepository>();
         
         _factory = new WebAppFactory(
             _postgresContainer.GetConnectionString(),
             MockTennisClubReadModelRepository,
             MockSubscriptionTierReadModelRepository,
-            MockAdminReadModelRepository
+            MockAdminReadModelRepository,
+            MockMemberReadModelRepository
         );
         HttpClient = _factory.CreateClient();
         
