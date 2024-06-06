@@ -178,6 +178,7 @@ public class UpdateTennisClubService(
     
     public async Task<Guid> UpdateTennisClub(Guid id, TennisClubUpdateCommand tennisClubUpdateCommand)
     {
+        // TODO: Check that not both properties of tennisClubUpdateCommand are null
         var tennisClubId = new TennisClubId(id);
         
         var existingTennisClubDomainEvents =

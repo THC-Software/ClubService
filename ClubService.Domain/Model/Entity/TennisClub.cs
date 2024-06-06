@@ -124,7 +124,41 @@ public class TennisClub
         string? name,
         SubscriptionTierId? subscriptionTierId)
     {
-        throw new NotImplementedException();
+        var domainEnvelopes = new List<DomainEnvelope<ITennisClubDomainEvent>>();
+        
+        if (!string.IsNullOrWhiteSpace(name) && !name.Equals(Name))
+        {
+            var nameChangedEvent = new TennisClubNameChangedEvent(name);
+            
+            var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+                Guid.NewGuid(),
+                TennisClubId.Id,
+                EventType.TENNIS_CLUB_NAME_CHANGED,
+                EntityType.TENNIS_CLUB,
+                DateTime.UtcNow,
+                nameChangedEvent
+            );
+            
+            domainEnvelopes.Add(domainEnvelope);
+        }
+        
+        if (subscriptionTierId != null && !subscriptionTierId.Equals(SubscriptionTierId))
+        {
+            var subscriptionTierChangedEvent = new TennisClubSubscriptionTierChangedEvent(subscriptionTierId);
+            
+            var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+                Guid.NewGuid(),
+                TennisClubId.Id,
+                EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED,
+                EntityType.TENNIS_CLUB,
+                DateTime.UtcNow,
+                subscriptionTierChangedEvent
+            );
+            
+            domainEnvelopes.Add(domainEnvelope);
+        }
+        
+        return domainEnvelopes;
     }
     
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubDeleteCommand()
