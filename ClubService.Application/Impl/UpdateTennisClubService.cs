@@ -1,5 +1,6 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.Commands;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
@@ -92,6 +93,7 @@ public class UpdateTennisClubService(
         return id;
     }
     
+    // TODO: Remove after update is refactored
     public async Task<Guid> ChangeSubscriptionTier(Guid clubId, Guid subscriptionTierGuid)
     {
         var subscriptionTierId = new SubscriptionTierId(subscriptionTierGuid);
@@ -133,6 +135,7 @@ public class UpdateTennisClubService(
         return clubId;
     }
     
+    // TODO: Remove after update is refactored
     public async Task<Guid> ChangeName(Guid clubId, string name)
     {
         var tennisClubId = new TennisClubId(clubId);
@@ -171,5 +174,10 @@ public class UpdateTennisClubService(
         }
         
         return clubId;
+    }
+    
+    public Task<Guid> UpdateTennisClub(Guid id, TennisClubUpdateCommand tennisClubUpdateCommand)
+    {
+        throw new NotImplementedException();
     }
 }

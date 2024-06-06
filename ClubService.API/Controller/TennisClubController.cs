@@ -87,12 +87,13 @@ public class TennisClubController(
         return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
     
+    // TODO: Remove after Update is refactored
     [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Guid>> UpdateTennisClub(
+    public async Task<ActionResult<Guid>> PartialUpdateTennisClub(
         Guid id,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
@@ -112,6 +113,19 @@ public class TennisClubController(
         }
         
         return BadRequest("You have to provide either a name or a subscription tier!");
+    }
+    
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Guid>> UpdateTennisClub(
+        Guid id,
+        [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
+    {
+        var updatedTennisClubId = await updateTennisClubService.UpdateTennisClub(id, tennisClubUpdateCommand);
+        return Ok(updatedTennisClubId);
     }
     
     [HttpDelete("{id:guid}")]
