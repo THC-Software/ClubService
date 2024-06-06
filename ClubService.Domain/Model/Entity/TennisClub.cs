@@ -120,7 +120,14 @@ public class TennisClub
         return [domainEnvelope];
     }
     
-    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessDeleteTennisClubCommand()
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUpdateCommand(
+        string? name,
+        SubscriptionTierId? subscriptionTierId)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubDeleteCommand()
     {
         if (Status.Equals(TennisClubStatus.DELETED))
         {
