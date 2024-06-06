@@ -1,7 +1,9 @@
+using ClubService.Domain.ReadModel;
+
 namespace ClubService.Domain.Repository;
 
 public interface IProcessedEventRepository
 {
-    Task Add(Guid id);
-    Task<List<Guid>> GetAllProcessedEvents();
+    Task Add(ProcessedEvent processedEvent);
+    Task<List<ProcessedEvent>> GetAllProcessedEvents();
 }
