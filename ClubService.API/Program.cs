@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using ClubService.API;
 using ClubService.Application.Api;
-using ClubService.Application.Api.Exceptions;
 using ClubService.Application.EventHandlers;
 using ClubService.Application.EventHandlers.AdminEventHandlers;
 using ClubService.Application.EventHandlers.MemberEventHandlers;
@@ -34,6 +33,7 @@ builder.Services.AddScoped<ISubscriptionTierReadModelRepository, SubscriptionTie
 builder.Services.AddScoped<ITennisClubReadModelRepository, TennisClubReadModelRepository>();
 builder.Services.AddScoped<IAdminReadModelRepository, AdminReadModelRepository>();
 builder.Services.AddScoped<IMemberReadModelRepository, MemberReadModelRepository>();
+builder.Services.AddScoped<IProcessedEventRepository, ProcessedEventRepository>();
 
 // Services
 builder.Services.AddScoped<IRegisterMemberService, RegisterMemberService>();
