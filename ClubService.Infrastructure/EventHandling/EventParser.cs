@@ -8,12 +8,14 @@ public class EventParser
     public static DomainEnvelope<IDomainEvent> ParseEvent(JsonNode jsonEvent)
     {
         var jsonEventId = jsonEvent["eventId"];
+        var jsonEntityId = jsonEvent["entityId"];
         var jsonEventType = jsonEvent["eventType"];
         var jsonEntityType = jsonEvent["entityType"];
         var jsonTimestamp = jsonEvent["timestamp"];
         var jsonEventData = jsonEvent["eventData"];
         
         if (jsonEventId == null ||
+            jsonEntityId == null ||
             jsonEventType == null ||
             jsonEntityType == null ||
             jsonTimestamp == null ||
@@ -23,7 +25,7 @@ public class EventParser
         }
         
         var eventId = Guid.Parse(jsonEventId.GetValue<string>());
-        var entityId = Guid.Parse(jsonEventId.GetValue<string>());
+        var entityId = Guid.Parse(jsonEntityId.GetValue<string>());
         var eventType = (EventType)Enum.Parse(typeof(EventType), jsonEventType.GetValue<string>());
         var entityType = (EntityType)Enum.Parse(typeof(EntityType), jsonEntityType.GetValue<string>());
         var timestamp = DateTime.Parse(jsonTimestamp.GetValue<string>()).ToUniversalTime();
