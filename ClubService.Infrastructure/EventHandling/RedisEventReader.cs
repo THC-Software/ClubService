@@ -10,25 +10,21 @@ public class RedisEventReader : IEventReader
 {
     private readonly CancellationToken _cancellationToken;
     private readonly IDatabase _db;
-    private readonly IEventHandler _eventHandler;
     private readonly string _groupName;
     private readonly ConnectionMultiplexer _muxer;
+    private readonly IServiceProvider _services;
     private readonly string _streamName;
     
     public RedisEventReader(
         CancellationToken cancellationToken,
-        IServiceProvider serviceProvider,
+        IServiceProvider services,
         string host,
         string streamName,
         string groupName)
     {
         _streamName = streamName;
         _groupName = groupName;
-        using (var scope = serviceProvider.CreateScope())
-        {
-            _eventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
-        }
-        
+        _services = services;
         _cancellationToken = cancellationToken;
         var configurationOptions = ConfigurationOptions.Parse(host);
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
@@ -80,7 +76,10 @@ public class RedisEventReader : IEventReader
                     }
                     
                     var parsedEvent = EventParser.ParseEvent(eventInfo);
-                    await _eventHandler.Handle(parsedEvent);
+                    
+                    using var scope = _services.CreateScope();
+                    var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
+                    await chainEventHandler.Handle(parsedEvent);
                 }
                 
                 await Task.Delay(1000, _cancellationToken);

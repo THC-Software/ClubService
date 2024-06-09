@@ -52,6 +52,22 @@ builder.Services.AddScoped<IEventStoreTransactionManager, TransactionManager<Eve
 
 // Event Handler
 builder.Services.AddScoped<ChainEventHandler>();
+builder.Services.AddScoped<IEventHandler, SubscriptionTierCreatedEventHandler>();
+builder.Services.AddScoped<IEventHandler, TennisClubRegisteredEventHandler>();
+builder.Services.AddScoped<IEventHandler, TennisClubLockedEventHandler>();
+builder.Services.AddScoped<IEventHandler, TennisClubNameChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler, TennisClubSubscriptionTierChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler, TennisClubDeletedEventHandler>();
+builder.Services.AddScoped<IEventHandler, TennisClubUnlockedEventHandler>();
+builder.Services.AddScoped<IEventHandler, AdminRegisteredEventHandler>();
+builder.Services.AddScoped<IEventHandler, AdminDeletedEventHandler>();
+builder.Services.AddScoped<IEventHandler, AdminFullNameChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler, MemberRegisteredEventHandler>();
+builder.Services.AddScoped<IEventHandler, MemberLockedEventHandler>();
+builder.Services.AddScoped<IEventHandler, MemberUnlockedEventHandler>();
+builder.Services.AddScoped<IEventHandler, MemberDeletedEventHandler>();
+builder.Services.AddScoped<IEventHandler, MemberFullNameChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler, MemberEmailChangedEventHandler>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -77,10 +93,8 @@ else
 {
     builder.Services.AddSingleton<IEventReader>(sp =>
     {
-        var serviceProvider = sp.GetRequiredService<IServiceProvider>();
         var cancellationToken = new CancellationTokenSource().Token;
-        
-        return new RedisEventReader(cancellationToken, serviceProvider, redisHost, redisStreamName, redisGroupName);
+        return new RedisEventReader(cancellationToken, sp, redisHost, redisStreamName, redisGroupName);
     });
     
     builder.Services.AddHostedService<EventReaderScheduler>();
@@ -115,61 +129,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     await readStoreDbContext.Database.EnsureCreatedAsync();
 }
 
-// TransactionManager
-var readStoreTransactionManager = services.GetRequiredService<IReadStoreTransactionManager>();
-
-// Read Model Repositories
-var subscriptionTierReadModelRepository = services.GetRequiredService<ISubscriptionTierReadModelRepository>();
-var tennisClubReadModelRepository = services.GetRequiredService<ITennisClubReadModelRepository>();
-var adminReadModelRepository = services.GetRequiredService<IAdminReadModelRepository>();
-var memberReadModelRepository = services.GetRequiredService<IMemberReadModelRepository>();
 
 var chainEventHandler = services.GetRequiredService<ChainEventHandler>();
+var eventHandlers = services.GetServices<IEventHandler>();
 
-// Event Handlers
-var subscriptionTierCreatedEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);
-// tennis club
-var tennisClubRegisteredEventHandler = new TennisClubRegisteredEventHandler(tennisClubReadModelRepository);
-var tennisClubLockedEventHandler = new TennisClubLockedEventHandler(tennisClubReadModelRepository);
-var tennisClubNameChangedEventHandler = new TennisClubNameChangedEventHandler(tennisClubReadModelRepository);
-var tennisClubSubscriptionTierChangedEventHandler =
-    new TennisClubSubscriptionTierChangedEventHandler(tennisClubReadModelRepository);
-var tennisClubDeletedEventHandler = new TennisClubDeletedEventHandler(tennisClubReadModelRepository);
-var tennisClubUnlockedEventHandler = new TennisClubUnlockedEventHandler(tennisClubReadModelRepository);
-// admin
-var adminRegisteredEventHandler = new AdminRegisteredEventHandler(adminReadModelRepository);
-var adminDeletedEventHandler = new AdminDeletedEventHandler(adminReadModelRepository);
-var adminFullNameChangedEventHandler = new AdminFullNameChangedEventHandler(adminReadModelRepository);
-// member
-var memberRegisteredEventHandler = new MemberRegisteredEventHandler(memberReadModelRepository,
-    tennisClubReadModelRepository, readStoreTransactionManager);
-var memberLockedEventHandler = new MemberLockedEventHandler(memberReadModelRepository);
-var memberUnlockedEventHandler = new MemberUnlockedEventHandler(memberReadModelRepository);
-var memberDeletedEventHandler = new MemberDeletedEventHandler(memberReadModelRepository, tennisClubReadModelRepository,
-    readStoreTransactionManager);
-var memberFullNameChangedEventHandler = new MemberFullNameChangedEventHandler(memberReadModelRepository);
-var memberEmailChangedEventHandler = new MemberEmailChangedEventHandler(memberReadModelRepository);
-
-// Registration of Event Handlers
-chainEventHandler.RegisterEventHandler(subscriptionTierCreatedEventHandler);
-// tennis club
-chainEventHandler.RegisterEventHandler(tennisClubRegisteredEventHandler);
-chainEventHandler.RegisterEventHandler(tennisClubLockedEventHandler);
-chainEventHandler.RegisterEventHandler(tennisClubNameChangedEventHandler);
-chainEventHandler.RegisterEventHandler(tennisClubSubscriptionTierChangedEventHandler);
-chainEventHandler.RegisterEventHandler(tennisClubDeletedEventHandler);
-chainEventHandler.RegisterEventHandler(tennisClubUnlockedEventHandler);
-// admin
-chainEventHandler.RegisterEventHandler(adminRegisteredEventHandler);
-chainEventHandler.RegisterEventHandler(adminDeletedEventHandler);
-chainEventHandler.RegisterEventHandler(adminFullNameChangedEventHandler);
-// member
-chainEventHandler.RegisterEventHandler(memberRegisteredEventHandler);
-chainEventHandler.RegisterEventHandler(memberLockedEventHandler);
-chainEventHandler.RegisterEventHandler(memberUnlockedEventHandler);
-chainEventHandler.RegisterEventHandler(memberDeletedEventHandler);
-chainEventHandler.RegisterEventHandler(memberFullNameChangedEventHandler);
-chainEventHandler.RegisterEventHandler(memberEmailChangedEventHandler);
+foreach (var eventHandler in eventHandlers)
+{
+    chainEventHandler.RegisterEventHandler(eventHandler);
+}
 
 app.MapControllers();
 app.UseExceptionHandler();
