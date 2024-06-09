@@ -50,6 +50,9 @@ builder.Services.AddScoped<IUpdateAdminService, UpdateAdminService>();
 builder.Services.AddScoped<IReadStoreTransactionManager, TransactionManager<ReadStoreDbContext>>();
 builder.Services.AddScoped<IEventStoreTransactionManager, TransactionManager<EventStoreDbContext>>();
 
+// Event Handler
+builder.Services.AddScoped<ChainEventHandler>();
+
 // API Versioning
 builder.Services.AddApiVersioning(options =>
 {
@@ -62,8 +65,6 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
-var chainEventHandler = new ChainEventHandler();
-
 // TODO: Logging/errorhandling?
 var redisHost = builder.Configuration["RedisConfig:Host"];
 var redisStreamName = builder.Configuration["RedisConfig:StreamName"];
@@ -75,8 +76,12 @@ if (redisHost == null || redisStreamName == null || redisGroupName == null)
 else
 {
     builder.Services.AddSingleton<IEventReader>(sp =>
-        new RedisEventReader(new CancellationTokenSource().Token, chainEventHandler, redisHost, redisStreamName,
-            redisGroupName));
+    {
+        var serviceProvider = sp.GetRequiredService<IServiceProvider>();
+        var cancellationToken = new CancellationTokenSource().Token;
+        
+        return new RedisEventReader(cancellationToken, serviceProvider, redisHost, redisStreamName, redisGroupName);
+    });
     
     builder.Services.AddHostedService<EventReaderScheduler>();
 }
@@ -118,6 +123,8 @@ var subscriptionTierReadModelRepository = services.GetRequiredService<ISubscript
 var tennisClubReadModelRepository = services.GetRequiredService<ITennisClubReadModelRepository>();
 var adminReadModelRepository = services.GetRequiredService<IAdminReadModelRepository>();
 var memberReadModelRepository = services.GetRequiredService<IMemberReadModelRepository>();
+
+var chainEventHandler = services.GetRequiredService<ChainEventHandler>();
 
 // Event Handlers
 var subscriptionTierCreatedEventHandler = new SubscriptionTierCreatedEventHandler(subscriptionTierReadModelRepository);

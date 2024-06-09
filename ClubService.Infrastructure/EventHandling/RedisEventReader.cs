@@ -1,5 +1,7 @@
 using System.Text.Json.Nodes;
 using ClubService.Application.Api;
+using ClubService.Application.EventHandlers;
+using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
 namespace ClubService.Infrastructure.EventHandling;
@@ -15,14 +17,18 @@ public class RedisEventReader : IEventReader
     
     public RedisEventReader(
         CancellationToken cancellationToken,
-        IEventHandler eventHandler,
+        IServiceProvider serviceProvider,
         string host,
         string streamName,
         string groupName)
     {
         _streamName = streamName;
         _groupName = groupName;
-        _eventHandler = eventHandler;
+        using (var scope = serviceProvider.CreateScope())
+        {
+            _eventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
+        }
+        
         _cancellationToken = cancellationToken;
         var configurationOptions = ConfigurationOptions.Parse(host);
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
