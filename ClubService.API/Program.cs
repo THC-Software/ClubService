@@ -113,6 +113,10 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
     await readStoreDbContext.Database.EnsureDeletedAsync();
     await readStoreDbContext.Database.EnsureCreatedAsync();
+    
+    var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
+    await loginStoreDbContext.Database.EnsureDeletedAsync();
+    await loginStoreDbContext.Database.EnsureCreatedAsync();
 }
 
 // TransactionManager
