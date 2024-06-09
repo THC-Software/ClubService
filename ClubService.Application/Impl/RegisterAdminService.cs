@@ -13,6 +13,7 @@ namespace ClubService.Application.Impl;
 public class RegisterAdminService(
     IEventRepository eventRepository,
     IAdminReadModelRepository adminReadModelRepository,
+    ILoginRepository loginRepository,
     IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterAdminService
 {
     public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
@@ -63,6 +64,8 @@ public class RegisterAdminService(
                         expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
                     }
                 });
+
+                SaveLoginCredentials(admin.AdminId, adminRegisterCommand.Password);
                 
                 return admin.AdminId.Id;
             case TennisClubStatus.LOCKED:
@@ -72,5 +75,11 @@ public class RegisterAdminService(
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void SaveLoginCredentials(AdminId adminId, string password)
+    {
+        var userPassword = new UserPassword(adminId.Id, password);
+        loginRepository.Add(userPassword);
     }
 }
