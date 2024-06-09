@@ -205,7 +205,7 @@ public class TennisClubTests
     
     [Test]
     public void
-        GivenDifferentSubscriptionTierId_WhenProcessTennisClubChangeSubscriptionTierCommand_ThenDomainEnvelopeWithTennisClubSubscriptionTierChangedEventIsReturned()
+        GivenDifferentSubscriptionTierId_WhenProcessTennisClubUpdateCommand_ThenDomainEnvelopeWithTennisClubSubscriptionTierChangedEventIsReturned()
     {
         // Given
         var eventTypeExpected = EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED;
@@ -219,7 +219,7 @@ public class TennisClubTests
         
         // When
         var domainEnvelopes =
-            tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierIdExpected);
+            tennisClub.ProcessTennisClubUpdateCommand(null, subscriptionTierIdExpected);
         
         // Then
         Assert.That(domainEnvelopes, Is.Not.Null);
@@ -239,7 +239,7 @@ public class TennisClubTests
     }
     
     [Test]
-    public void GivenSameSubscriptionTierId_WhenProcessTennisClubChangeSubscriptionTierCommand_ThenExceptionIsThrown()
+    public void GivenSameSubscriptionTierId_WhenProcessTennisClubUpdateCommand_ThenEmptyListIsReturned()
     {
         // Given
         var name = "Test Tennis Club";
@@ -248,9 +248,11 @@ public class TennisClubTests
         tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
-        // When ... Then
-        Assert.Throws<InvalidOperationException>(() =>
-            tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierId));
+        // When
+        var domainEnvelopes = tennisClub.ProcessTennisClubUpdateCommand(null, subscriptionTierId);
+        
+        // Then
+        Assert.That(domainEnvelopes, Is.Empty);
     }
     
     [Test]
@@ -278,7 +280,7 @@ public class TennisClubTests
     
     [Test]
     public void
-        GivenDifferentName_WhenProcessTennisClubChangeNameCommand_ThenDomainEnvelopeWithTennisClubNameChangedEventIsReturned()
+        GivenDifferentName_WhenProcessTennisClubUpdateCommand_ThenDomainEnvelopeWithTennisClubNameChangedEventIsReturned()
     {
         // Given
         var eventTypeExpected = EventType.TENNIS_CLUB_NAME_CHANGED;
@@ -293,7 +295,7 @@ public class TennisClubTests
         
         // When
         var domainEnvelopes =
-            tennisClub.ProcessTennisClubChangeNameCommand(nameExpected);
+            tennisClub.ProcessTennisClubUpdateCommand(nameExpected, null);
         
         // Then
         Assert.That(domainEnvelopes, Is.Not.Null);
@@ -313,7 +315,7 @@ public class TennisClubTests
     }
     
     [Test]
-    public void GivenSameName_WhenProcessTennisClubChangeNameCommand_ThenExceptionIsThrown()
+    public void GivenSameName_WhenProcessTennisClubUpdateCommand_ThenEmptyListIsReturned()
     {
         // Given
         var name = "Test Tennis Club";
@@ -322,8 +324,11 @@ public class TennisClubTests
         tennisClub.ProcessTennisClubRegisterCommand(name, subscriptionTierId)
             .ForEach(domainEvent => tennisClub.Apply(domainEvent));
         
-        // When ... Then
-        Assert.Throws<InvalidOperationException>(() => tennisClub.ProcessTennisClubChangeNameCommand(name));
+        // When
+        var domainEnvelopes = tennisClub.ProcessTennisClubUpdateCommand(name, null);
+        
+        // Then
+        Assert.That(domainEnvelopes, Is.Empty);
     }
     
     [Test]

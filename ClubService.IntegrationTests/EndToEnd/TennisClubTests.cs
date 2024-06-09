@@ -3,6 +3,7 @@ using ClubService.Application.Commands;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
+using ClubService.Domain.Model.ValueObject;
 using ClubService.IntegrationTests.TestSetup;
 using Newtonsoft.Json;
 
@@ -133,12 +134,13 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubSubscriptionTierChangedEvent);
-        var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, Guid.NewGuid());
+        var subscriptionTierId = new SubscriptionTierId(new Guid("38888969-d579-46ec-9cd6-0208569a077e"));
+        var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, subscriptionTierId.Id);
         var jsonContent = JsonConvert.SerializeObject(tennisClubUpdateCommand);
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
         
         // When
-        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
+        var response = await HttpClient.PutAsync($"{BaseUrl}/{clubIdExpected}", content);
         
         // Then
         response.EnsureSuccessStatusCode();
@@ -180,7 +182,7 @@ public class TennisClubTests : TestBase
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
         
         // When
-        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
+        var response = await HttpClient.PutAsync($"{BaseUrl}/{clubIdExpected}", content);
         
         // Then
         response.EnsureSuccessStatusCode();
