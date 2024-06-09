@@ -42,6 +42,8 @@ builder.Services.AddScoped<ITennisClubReadModelRepository, TennisClubReadModelRe
 builder.Services.AddScoped<IAdminReadModelRepository, AdminReadModelRepository>();
 builder.Services.AddScoped<IMemberReadModelRepository, MemberReadModelRepository>();
 
+builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+
 // Services
 builder.Services.AddScoped<IRegisterMemberService, RegisterMemberService>();
 builder.Services.AddScoped<IUpdateMemberService, UpdateMemberService>();
