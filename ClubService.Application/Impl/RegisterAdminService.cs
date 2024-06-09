@@ -1,6 +1,7 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
+using ClubService.Domain.Api;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
@@ -14,6 +15,7 @@ public class RegisterAdminService(
     IEventRepository eventRepository,
     IAdminReadModelRepository adminReadModelRepository,
     ILoginRepository loginRepository,
+    IPasswordHasherService passwordHasherService,
     IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterAdminService
 {
     public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
@@ -79,7 +81,7 @@ public class RegisterAdminService(
 
     private void SaveLoginCredentials(AdminId adminId, string password)
     {
-        var userPassword = new UserPassword(adminId.Id, password);
+        var userPassword = UserPassword.Create(adminId.Id, password, passwordHasherService);
         loginRepository.Add(userPassword);
     }
 }
