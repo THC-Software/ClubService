@@ -12,9 +12,11 @@ public class UserPassword
         
     }
 
-    public UserPassword(UserId userId, string hashedPassword)
+    public UserPassword(Guid userId, string password)
     {
-        UserId = userId;
-        HashedPassword = hashedPassword;
+ 
+        UserId = new UserId(userId);
+        // TODO: Hash password
+        HashedPassword = password;
     }
 }
