@@ -1,18 +1,20 @@
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClubService.Infrastructure.Repositories;
 
 public class ProcessedEventRepository(ReadStoreDbContext readStoreDbContext) : IProcessedEventRepository
 {
-    public Task Add(ProcessedEvent processedEvent)
+    public async Task Add(ProcessedEvent processedEvent)
     {
-        throw new NotImplementedException();
+        await readStoreDbContext.ProcessedEvents.AddAsync(processedEvent);
+        await readStoreDbContext.SaveChangesAsync();
     }
     
-    public Task<List<ProcessedEvent>> GetAllProcessedEvents()
+    public async Task<List<ProcessedEvent>> GetAllProcessedEvents()
     {
-        throw new NotImplementedException();
+        return await readStoreDbContext.ProcessedEvents.ToListAsync();
     }
 }
