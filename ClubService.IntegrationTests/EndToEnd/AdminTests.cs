@@ -26,10 +26,11 @@ public class AdminTests : TestBase
         var entityTypeExpected = EntityType.ADMIN;
         var eventDataTypeExpected = typeof(AdminRegisteredEvent);
         var usernameExpected = "john_doe";
+        var passwordExpected = "hunter2";
         var nameExpected = new FullName("John", "Doe");
         var statusExpected = AdminStatus.ACTIVE;
         var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
-        var registerAdminCommand = new AdminRegisterCommand(usernameExpected, nameExpected.FirstName,
+        var registerAdminCommand = new AdminRegisterCommand(usernameExpected, passwordExpected, nameExpected.FirstName,
             nameExpected.LastName, tennisClubIdExpected.Id);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerAdminCommand), Encoding.UTF8,
             "application/json");
