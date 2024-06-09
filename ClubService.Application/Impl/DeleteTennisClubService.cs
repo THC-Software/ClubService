@@ -33,7 +33,7 @@ public class DeleteTennisClubService(
         //TODO: Delete all members and admins?
         try
         {
-            var domainEvents = tennisClub.ProcessDeleteTennisClubCommand();
+            var domainEvents = tennisClub.ProcessTennisClubDeleteCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
             await eventStoreTransactionManager.TransactionScope(async () =>

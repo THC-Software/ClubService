@@ -1,6 +1,8 @@
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.Commands;
 using ClubService.Application.Impl;
 using ClubService.Domain.Event;
+using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
@@ -13,10 +15,6 @@ namespace ClubService.Application.UnitTests;
 [TestFixture]
 public class UpdateTennisClubServiceTests
 {
-    private Mock<IEventRepository> _eventRepositoryMock;
-    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
-    private UpdateTennisClubService _updateTennisClubService;
-    
     [OneTimeSetUp]
     public void OneTimeSetUp()
     {
@@ -33,6 +31,10 @@ public class UpdateTennisClubServiceTests
             _eventStoreTransactionManagerMock.Object
         );
     }
+    
+    private Mock<IEventRepository> _eventRepositoryMock;
+    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private UpdateTennisClubService _updateTennisClubService;
     
     [Test]
     public async Task GivenUnlockedTennisClub_WhenLockTennisClub_ThenRepoIsCalledWithExpectedEvent()
@@ -160,6 +162,7 @@ public class UpdateTennisClubServiceTests
         const string name = "Test Tennis Club";
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         var newSubscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
+        var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, newSubscriptionTierId.Id);
         
         var tennisClubRegisteredEvent =
             new TennisClubRegisteredEvent(tennisClubId, name,
@@ -167,18 +170,29 @@ public class UpdateTennisClubServiceTests
         var domainEnvelopeTennisClubRegistered =
             new DomainEnvelope<ITennisClubDomainEvent>(Guid.NewGuid(), tennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow, tennisClubRegisteredEvent);
-        
-        var existingDomainEvents = new List<DomainEnvelope<ITennisClubDomainEvent>>
+        var existingTennisClubDomainEvents = new List<DomainEnvelope<ITennisClubDomainEvent>>
         {
             domainEnvelopeTennisClubRegistered
         };
         
+        var subscriptionTierCreatedEvent = new SubscriptionTierCreatedEvent(newSubscriptionTierId, "Test", 42);
+        var domainEnvelopeSubscriptionTierCreated =
+            new DomainEnvelope<ISubscriptionTierDomainEvent>(Guid.NewGuid(), newSubscriptionTierId.Id,
+                EventType.SUBSCRIPTION_TIER_CREATED, EntityType.SUBSCRIPTION_TIER, DateTime.UtcNow,
+                subscriptionTierCreatedEvent);
+        var existingSubscriptionTierDomainEvents = new List<DomainEnvelope<ISubscriptionTierDomainEvent>>
+        {
+            domainEnvelopeSubscriptionTierCreated
+        };
+        
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
-            .ReturnsAsync(existingDomainEvents);
+            .ReturnsAsync(existingTennisClubDomainEvents);
+        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(It.IsAny<Guid>()))
+            .ReturnsAsync(existingSubscriptionTierDomainEvents);
         
         // When
-        _ = await _updateTennisClubService.ChangeSubscriptionTier(tennisClubId.Id,
-            newSubscriptionTierId.Id);
+        _ = await _updateTennisClubService.UpdateTennisClub(tennisClubId.Id,
+            tennisClubUpdateCommand);
         
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -197,17 +211,17 @@ public class UpdateTennisClubServiceTests
     {
         // Given
         var clubId = Guid.NewGuid();
-        var subscriptionTierId = Guid.NewGuid();
+        var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, Guid.NewGuid());
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() =>
-            _updateTennisClubService.ChangeSubscriptionTier(clubId, subscriptionTierId));
+            _updateTennisClubService.UpdateTennisClub(clubId, tennisClubUpdateCommand));
     }
     
     [Test]
-    public async Task GivenDifferentName_WhenName_ThenRepoIsCalledWithExpectedEvent()
+    public async Task GivenDifferentName_WhenUpdateTennisClub_ThenRepoIsCalledWithExpectedEvent()
     {
         // Given
         const int eventCountExpected = 1;
@@ -216,7 +230,7 @@ public class UpdateTennisClubServiceTests
         var eventDataTypeExpected = typeof(TennisClubNameChangedEvent);
         var tennisClubId = new TennisClubId(Guid.NewGuid());
         const string name = "Test Tennis Club";
-        const string newName = "New Tennis Club Name";
+        var tennisClubUpdateCommand = new TennisClubUpdateCommand("New Name", null);
         var subscriptionTierId = new SubscriptionTierId(Guid.NewGuid());
         
         var tennisClubRegisteredEvent =
@@ -235,8 +249,8 @@ public class UpdateTennisClubServiceTests
             .ReturnsAsync(existingDomainEvents);
         
         // When
-        _ = await _updateTennisClubService.ChangeName(tennisClubId.Id,
-            newName);
+        _ = await _updateTennisClubService.UpdateTennisClub(tennisClubId.Id,
+            tennisClubUpdateCommand);
         
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -251,16 +265,16 @@ public class UpdateTennisClubServiceTests
     }
     
     [Test]
-    public void GivenNonExistentTennisClubId_WhenChangeName_ThenExceptionIsThrown()
+    public void GivenNonExistentTennisClubId_WhenUpdateTennisClub_ThenExceptionIsThrown()
     {
         // Given
         var clubId = Guid.NewGuid();
-        const string name = "Test";
+        var tennisClubUpdateCommand = new TennisClubUpdateCommand("Test", null);
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
         
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() =>
-            _updateTennisClubService.ChangeName(clubId, name));
+            _updateTennisClubService.UpdateTennisClub(clubId, tennisClubUpdateCommand));
     }
 }
