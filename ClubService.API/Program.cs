@@ -27,6 +27,11 @@ builder.Services.AddDbContext<ReadStoreDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("read-store-connection"));
 });
+builder.Services.AddDbContext<LoginStoreDbContext>(options =>
+{
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("login-store-connection"));
+});
 
 // Repositories
 builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
