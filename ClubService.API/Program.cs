@@ -8,12 +8,14 @@ using ClubService.Application.EventHandlers.MemberEventHandlers;
 using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
 using ClubService.Application.EventHandlers.TennisClubEventHandlers;
 using ClubService.Application.Impl;
+using ClubService.Domain.Api;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
 using ClubService.Infrastructure;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
 using ClubService.Infrastructure.Repositories;
+using ClubService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +52,8 @@ builder.Services.AddScoped<IDeleteTennisClubService, DeleteTennisClubService>();
 builder.Services.AddScoped<IRegisterAdminService, RegisterAdminService>();
 builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
 builder.Services.AddScoped<IUpdateAdminService, UpdateAdminService>();
+
+builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
 
 // Transaction
 builder.Services.AddScoped<IReadStoreTransactionManager, TransactionManager<ReadStoreDbContext>>();
