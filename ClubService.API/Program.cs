@@ -56,6 +56,7 @@ builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
 builder.Services.AddScoped<IUpdateAdminService, UpdateAdminService>();
 
 builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
 
 // Transaction
 builder.Services.AddScoped<IReadStoreTransactionManager, TransactionManager<ReadStoreDbContext>>();
