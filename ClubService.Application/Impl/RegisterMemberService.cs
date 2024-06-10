@@ -1,6 +1,7 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
+using ClubService.Domain.Api;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
@@ -14,7 +15,9 @@ public class RegisterMemberService(
     IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
     ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterMemberService
+    IEventStoreTransactionManager eventStoreTransactionManager,
+    ILoginRepository loginRepository,
+    IPasswordHasherService passwordHasherService) : IRegisterMemberService
 {
     public async Task<Guid> RegisterMember(MemberRegisterCommand memberRegisterCommand)
     {
@@ -73,6 +76,8 @@ public class RegisterMemberService(
                     }
                 });
                 
+                SaveLoginCredentials(member.MemberId, memberRegisterCommand.Password);
+                
                 return member.MemberId.Id;
             case TennisClubStatus.LOCKED:
                 throw new ConflictException("Tennis club is locked!");
@@ -81,5 +86,10 @@ public class RegisterMemberService(
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+    private void SaveLoginCredentials(MemberId memberId, string password)
+    {
+        var userPassword = UserPassword.Create(memberId.Id, password, passwordHasherService);
+        loginRepository.Add(userPassword);
     }
 }
