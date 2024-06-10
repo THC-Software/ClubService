@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ClubService.Application.Commands;
 
-public class MemberRegisterCommand(string firstName, string lastName, string email, Guid tennisClubId)
+public class MemberRegisterCommand(string firstName, string lastName, string email, string password, Guid tennisClubId)
 {
     [Required]
     public string FirstName { get; } = firstName;
@@ -12,7 +12,10 @@ public class MemberRegisterCommand(string firstName, string lastName, string ema
     
     [Required]
     public string Email { get; } = email;
-    
+
+    [Required]
+    public string Password { get; } = password;
+
     [Required]
     public Guid TennisClubId { get; } = tennisClubId;
 }
