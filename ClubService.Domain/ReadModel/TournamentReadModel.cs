@@ -4,17 +4,17 @@ namespace ClubService.Domain.ReadModel;
 
 public class TournamentReadModel
 {
-    private TournamentReadModel(Guid tournamentId, Guid clubId, string name, DateOnly startDate, DateOnly endDate)
+    private TournamentReadModel(Guid tournamentId, Guid tennisClubId, string name, DateOnly startDate, DateOnly endDate)
     {
         TournamentId = tournamentId;
-        ClubId = clubId;
+        TennisClubId = tennisClubId;
         Name = name;
         StartDate = startDate;
         EndDate = endDate;
     }
 
     public Guid TournamentId { get; }
-    public Guid ClubId { get; }
+    public Guid TennisClubId { get; }
     public string Name { get; }
     public DateOnly StartDate { get; }
     public DateOnly EndDate { get; }

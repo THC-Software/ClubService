@@ -14,7 +14,7 @@ public class TournamentReadModelConfiguration : IEntityTypeConfiguration<Tournam
         builder.Property(t => t.TournamentId)
             .IsRequired();
 
-        builder.Property(t => t.ClubId)
+        builder.Property(t => t.TennisClubId)
             .IsRequired();
 
         builder.Property(t => t.Name)
