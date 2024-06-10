@@ -38,4 +38,11 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
             .Where(memberReadModel => memberReadModel.TennisClubId == new TennisClubId(tennisClubId))
             .ToListAsync();
     }
+
+    public async Task<MemberReadModel?> GetMemberByTennisClubIdAndUsername(Guid tennisClubId, string username)
+    {
+        return await readStoreDbContext.Members
+            .Where(member => member.TennisClubId == new TennisClubId(tennisClubId) && member.Email == username)
+            .SingleOrDefaultAsync();
+    }
 }
