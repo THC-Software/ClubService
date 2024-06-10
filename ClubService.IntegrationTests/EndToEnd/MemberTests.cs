@@ -53,10 +53,11 @@ public class MemberTests : TestBase
         var entityTypeExpected = EntityType.MEMBER;
         var eventDataTypeExpected = typeof(MemberRegisteredEvent);
         var nameExpected = new FullName("John", "Doe");
+        var passwordExpected = "CorrectBatteryHorseStaple";
         var statusExpected = MemberStatus.ACTIVE;
         var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
         var registerMemberCommand = new MemberRegisterCommand(nameExpected.FirstName, nameExpected.LastName,
-            "john.doe@dev.com", tennisClubIdExpected.Id);
+            "john.doe@dev.com", passwordExpected, tennisClubIdExpected.Id);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerMemberCommand), Encoding.UTF8,
             "application/json");
         
