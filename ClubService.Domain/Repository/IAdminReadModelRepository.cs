@@ -9,4 +9,5 @@ public interface IAdminReadModelRepository
     Task Update();
     Task<AdminReadModel?> GetAdminById(Guid id);
     Task<List<AdminReadModel>> GetAdminsByTennisClubId(Guid tennisClubId);
+    Task<AdminReadModel?> GetAdminByTennisClubIdAndUsername(Guid tennisClubId, string username);
 }

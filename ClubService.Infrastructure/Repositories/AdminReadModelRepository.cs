@@ -38,4 +38,10 @@ public class AdminReadModelRepository(ReadStoreDbContext readStoreDbContext) : I
             .Where(admin => admin.TennisClubId == new TennisClubId(tennisClubId))
             .ToListAsync();
     }
+
+    public async Task<AdminReadModel?> GetAdminByTennisClubIdAndUsername(Guid tennisClubId, string username)
+    {
+        return await readStoreDbContext.Admins
+            .Where(admin => admin.TennisClubId == new TennisClubId(tennisClubId) && admin.Username == username).SingleOrDefaultAsync();
+    }
 }
