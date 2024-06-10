@@ -32,10 +32,17 @@ public class MemberReadModelRepository(ReadStoreDbContext readStoreDbContext) : 
             .SingleOrDefaultAsync();
     }
     
-    public Task<List<MemberReadModel>> GetMembersByTennisClubId(Guid tennisClubId)
+    public async Task<List<MemberReadModel>> GetMembersByTennisClubId(Guid tennisClubId)
     {
-        return readStoreDbContext.Members
+        return await readStoreDbContext.Members
             .Where(memberReadModel => memberReadModel.TennisClubId == new TennisClubId(tennisClubId))
             .ToListAsync();
+    }
+
+    public async Task<MemberReadModel?> GetMemberByTennisClubIdAndUsername(Guid tennisClubId, string username)
+    {
+        return await readStoreDbContext.Members
+            .Where(member => member.TennisClubId == new TennisClubId(tennisClubId) && member.Email == username)
+            .SingleOrDefaultAsync();
     }
 }

@@ -7,12 +7,14 @@ using ClubService.Application.EventHandlers.MemberEventHandlers;
 using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
 using ClubService.Application.EventHandlers.TennisClubEventHandlers;
 using ClubService.Application.Impl;
+using ClubService.Domain.Api;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
 using ClubService.Infrastructure;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
 using ClubService.Infrastructure.Repositories;
+using ClubService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,11 @@ builder.Services.AddDbContext<ReadStoreDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("read-store-connection"));
 });
+builder.Services.AddDbContext<LoginStoreDbContext>(options =>
+{
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("login-store-connection"));
+});
 
 // Repositories
 builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
@@ -34,6 +41,8 @@ builder.Services.AddScoped<ITennisClubReadModelRepository, TennisClubReadModelRe
 builder.Services.AddScoped<IAdminReadModelRepository, AdminReadModelRepository>();
 builder.Services.AddScoped<IMemberReadModelRepository, MemberReadModelRepository>();
 builder.Services.AddScoped<IProcessedEventRepository, ProcessedEventRepository>();
+
+builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 
 // Services
 builder.Services.AddScoped<IRegisterMemberService, RegisterMemberService>();
@@ -45,6 +54,9 @@ builder.Services.AddScoped<IDeleteTennisClubService, DeleteTennisClubService>();
 builder.Services.AddScoped<IRegisterAdminService, RegisterAdminService>();
 builder.Services.AddScoped<IDeleteAdminService, DeleteAdminService>();
 builder.Services.AddScoped<IUpdateAdminService, UpdateAdminService>();
+
+builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
 
 // Transaction
 builder.Services.AddScoped<IReadStoreTransactionManager, TransactionManager<ReadStoreDbContext>>();
@@ -127,6 +139,10 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
     await readStoreDbContext.Database.EnsureDeletedAsync();
     await readStoreDbContext.Database.EnsureCreatedAsync();
+    
+    var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
+    await loginStoreDbContext.Database.EnsureDeletedAsync();
+    await loginStoreDbContext.Database.EnsureCreatedAsync();
 }
 
 
