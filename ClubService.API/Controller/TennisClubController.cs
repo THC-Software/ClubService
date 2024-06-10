@@ -87,7 +87,7 @@ public class TennisClubController(
         return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
     
-    [HttpPatch("{id:guid}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -96,22 +96,8 @@ public class TennisClubController(
         Guid id,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
-        if (tennisClubUpdateCommand.SubscriptionTierId != null)
-        {
-            var updatedTennisClubId =
-                await updateTennisClubService.ChangeSubscriptionTier(id,
-                    (Guid)tennisClubUpdateCommand.SubscriptionTierId);
-            return Ok(updatedTennisClubId);
-        }
-        
-        if (tennisClubUpdateCommand.Name != null)
-        {
-            var updatedTennisClubId =
-                await updateTennisClubService.ChangeName(id, tennisClubUpdateCommand.Name);
-            return Ok(updatedTennisClubId);
-        }
-        
-        return BadRequest("You have to provide either a name or a subscription tier!");
+        var updatedTennisClubId = await updateTennisClubService.UpdateTennisClub(id, tennisClubUpdateCommand);
+        return Ok(updatedTennisClubId);
     }
     
     [HttpDelete("{id:guid}")]

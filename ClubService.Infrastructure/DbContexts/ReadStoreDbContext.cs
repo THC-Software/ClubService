@@ -10,6 +10,7 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
     public DbSet<TennisClubReadModel> TennisClubs { get; init; }
     public DbSet<AdminReadModel> Admins { get; init; }
     public DbSet<MemberReadModel> Members { get; init; }
+    public DbSet<ProcessedEvent> ProcessedEvents { get; init; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -24,5 +25,6 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
         modelBuilder.ApplyConfiguration(new TennisClubReadModelConfiguration());
         modelBuilder.ApplyConfiguration(new AdminReadModelConfig());
         modelBuilder.ApplyConfiguration(new MemberReadModelConfiguration());
+        modelBuilder.ApplyConfiguration(new ProcessedEventConfiguration());
     }
 }

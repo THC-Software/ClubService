@@ -1,10 +1,13 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.Commands;
+using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
+using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace ClubService.Application.Impl;
 
@@ -92,11 +95,15 @@ public class UpdateTennisClubService(
         return id;
     }
     
-    public async Task<Guid> ChangeSubscriptionTier(Guid clubId, Guid subscriptionTierGuid)
+    public async Task<Guid> UpdateTennisClub(Guid id, TennisClubUpdateCommand tennisClubUpdateCommand)
     {
-        var subscriptionTierId = new SubscriptionTierId(subscriptionTierGuid);
-        var tennisClubId = new TennisClubId(clubId);
-        var tennisClub = new TennisClub();
+        if (string.IsNullOrWhiteSpace(tennisClubUpdateCommand.Name) &&
+            tennisClubUpdateCommand.SubscriptionTierId == null)
+        {
+            throw new ValidationException("You have to either provide a name or a subscription tier id!");
+        }
+        
+        var tennisClubId = new TennisClubId(id);
         
         var existingTennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
@@ -106,6 +113,21 @@ public class UpdateTennisClubService(
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
         
+        SubscriptionTierId? subscriptionTierId = null;
+        if (tennisClubUpdateCommand.SubscriptionTierId != null)
+        {
+            subscriptionTierId = new SubscriptionTierId((Guid)tennisClubUpdateCommand.SubscriptionTierId);
+            
+            var existingSubscriptionTierDomainEvents =
+                await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id);
+            
+            if (existingSubscriptionTierDomainEvents.Count == 0)
+            {
+                throw new TennisClubNotFoundException(tennisClubId.Id);
+            }
+        }
+        
+        var tennisClub = new TennisClub();
         foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
@@ -113,7 +135,8 @@ public class UpdateTennisClubService(
         
         try
         {
-            var domainEvents = tennisClub.ProcessTennisClubChangeSubscriptionTierCommand(subscriptionTierId);
+            var domainEvents =
+                tennisClub.ProcessTennisClubUpdateCommand(tennisClubUpdateCommand.Name, subscriptionTierId);
             var expectedEventCount = existingTennisClubDomainEvents.Count;
             
             await eventStoreTransactionManager.TransactionScope(async () =>
@@ -130,46 +153,6 @@ public class UpdateTennisClubService(
             throw new ConflictException(ex.Message, ex);
         }
         
-        return clubId;
-    }
-    
-    public async Task<Guid> ChangeName(Guid clubId, string name)
-    {
-        var tennisClubId = new TennisClubId(clubId);
-        var tennisClub = new TennisClub();
-        
-        var existingTennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-        
-        if (existingTennisClubDomainEvents.Count == 0)
-        {
-            throw new TennisClubNotFoundException(tennisClubId.Id);
-        }
-        
-        foreach (var domainEvent in existingTennisClubDomainEvents)
-        {
-            tennisClub.Apply(domainEvent);
-        }
-        
-        try
-        {
-            var domainEvents = tennisClub.ProcessTennisClubChangeNameCommand(name);
-            var expectedEventCount = existingTennisClubDomainEvents.Count;
-            
-            await eventStoreTransactionManager.TransactionScope(async () =>
-            {
-                foreach (var domainEvent in domainEvents)
-                {
-                    tennisClub.Apply(domainEvent);
-                    expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
-                }
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new ConflictException(ex.Message, ex);
-        }
-        
-        return clubId;
+        return id;
     }
 }
