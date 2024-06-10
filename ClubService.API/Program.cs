@@ -6,6 +6,7 @@ using ClubService.Application.EventHandlers.AdminEventHandlers;
 using ClubService.Application.EventHandlers.MemberEventHandlers;
 using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
 using ClubService.Application.EventHandlers.TennisClubEventHandlers;
+using ClubService.Application.EventHandlers.TournamentEventHandlers;
 using ClubService.Application.Impl;
 using ClubService.Domain.Api;
 using ClubService.Domain.Repository;
@@ -80,6 +81,7 @@ builder.Services.AddScoped<IEventHandler, MemberUnlockedEventHandler>();
 builder.Services.AddScoped<IEventHandler, MemberDeletedEventHandler>();
 builder.Services.AddScoped<IEventHandler, MemberFullNameChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler, MemberEmailChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler, TournamentConfirmedEventHandler>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -108,7 +110,7 @@ else
         var cancellationToken = new CancellationTokenSource().Token;
         return new RedisEventReader(cancellationToken, sp, redisHost, redisStreamName, redisGroupName);
     });
-    
+
     builder.Services.AddHostedService<EventReaderScheduler>();
 }
 
@@ -131,21 +133,21 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 {
     app.UseSwagger();
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
-    
+
     var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
     await eventStoreDbContext.Database.EnsureDeletedAsync();
     await eventStoreDbContext.Database.EnsureCreatedAsync();
-    
+
     var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
     await readStoreDbContext.Database.EnsureDeletedAsync();
     await readStoreDbContext.Database.EnsureCreatedAsync();
-    
+
     var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
     await loginStoreDbContext.Database.EnsureDeletedAsync();
     await loginStoreDbContext.Database.EnsureCreatedAsync();
 }
 
-
+// Register event handler in ChainEventHandler
 var chainEventHandler = services.GetRequiredService<ChainEventHandler>();
 var eventHandlers = services.GetServices<IEventHandler>();
 

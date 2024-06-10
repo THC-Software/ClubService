@@ -5,5 +5,6 @@ public enum EntityType
     TENNIS_CLUB,
     MEMBER,
     ADMIN,
-    SUBSCRIPTION_TIER
+    SUBSCRIPTION_TIER,
+    TOURNAMENT
 }
