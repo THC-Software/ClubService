@@ -21,8 +21,8 @@ public class TournamentReadModel
 
     public static TournamentReadModel FromDomainEvent(TournamentConfirmedEvent tournamentConfirmedEvent)
     {
-        var startDate = tournamentConfirmedEvent.Days.First();
-        var endDate = tournamentConfirmedEvent.Days.Last();
+        var startDate = tournamentConfirmedEvent.Days.OrderBy(d => d.Day).First();
+        var endDate = tournamentConfirmedEvent.Days.OrderBy(d => d.Day).Last();
 
         return new TournamentReadModel(
             tournamentConfirmedEvent.Id,
