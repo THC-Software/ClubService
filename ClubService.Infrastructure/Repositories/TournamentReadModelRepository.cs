@@ -11,4 +11,14 @@ public class TournamentReadModelRepository(ReadStoreDbContext readStoreDbContext
         await readStoreDbContext.Tournaments.AddAsync(tournamentReadModel);
         await readStoreDbContext.SaveChangesAsync();
     }
+
+    public Task<TournamentReadModel> GetTournamentById(Guid domainEnvelopeEntityId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Delete(object tournamentReadModel)
+    {
+        throw new NotImplementedException();
+    }
 }
