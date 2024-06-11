@@ -8,6 +8,8 @@ public interface ILoggerService<T>
     void LogRegisterAdmin(string username, string firstName, string lastName, Guid tennisClubId);
     void LogAdminUsernameAlreadyExists(string username, string tennisClubName, Guid tennisClubId);
     void LogAdminRegistered(Guid id);
+    void LogAdminChangeFullName(Guid id, string firstName, string lastName);
+    void LogAdminFullNameChanged(Guid id);
     void LogDeleteMember(Guid id);
     void LogMemberNotFound(Guid id);
     void LogMemberDeleted(Guid id);

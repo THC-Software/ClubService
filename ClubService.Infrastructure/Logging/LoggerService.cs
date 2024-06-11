@@ -39,6 +39,17 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Registered admin with id '{id}'.", id);
     }
 
+    public void LogAdminChangeFullName(Guid id, string firstName, string lastName)
+    {
+        logger.LogInformation("ChangeFullName called with id '{id}', firstName '{firstName} and lastName '{lastName}'.",
+            id, firstName, lastName);
+    }
+
+    public void LogAdminFullNameChanged(Guid id)
+    {
+        logger.LogInformation("Changed full name for admin with id '{id}'.", id);
+    }
+
     public void LogDeleteMember(Guid id)
     {
         logger.LogInformation("DeleteMember called with id '{id}'.", id);
