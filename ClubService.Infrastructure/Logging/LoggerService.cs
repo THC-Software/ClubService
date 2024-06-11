@@ -5,23 +5,23 @@ namespace ClubService.Infrastructure.Logging;
 
 public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
 {
-    public void LogInformation(string message)
+    public void LogDeleteAdmin(Guid id)
     {
-        logger.LogInformation(message);
+        logger.LogInformation("DeleteAdmin called with id '{id}'.", id);
     }
 
-    public void LogWarning(string message)
+    public void LogAdminNotFound(Guid id)
     {
-        logger.LogWarning(message);
+        logger.LogError("Admin with id '{id}' not found.", id);
     }
 
-    public void LogError(string message, Exception exception)
+    public void LogAdminDeleted(Guid id)
     {
-        logger.LogError(exception, message);
+        logger.LogInformation("Deleted admin with id '{id}'.", id);
     }
 
-    public void LogDebug(string message)
+    public void LogInvalidOperationException(InvalidOperationException ex)
     {
-        logger.LogDebug(message);
+        logger.LogError("Error: {error}", ex.Message);
     }
 }

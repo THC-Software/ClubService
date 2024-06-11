@@ -2,5 +2,5 @@
 
 public class AdminNotFoundException(Guid id) : Exception
 {
-    public override string Message { get; } = $"Admin with id {id} not found.";
+    public override string Message { get; } = $"Admin with id '{id}' not found.";
 }
