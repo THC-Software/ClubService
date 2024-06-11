@@ -20,6 +20,25 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Deleted admin with id '{id}'.", id);
     }
 
+    public void LogRegisterAdmin(string username, string firstName, string lastName, Guid tennisClubId)
+    {
+        logger.LogInformation(
+            "RegisterAdmin called with username '{username}', firstName '{firstName}', lastName '{lastName}' " +
+            "and tennisClubId '{tennisClubId}''.", username, firstName, lastName, tennisClubId);
+    }
+
+    public void LogAdminUsernameAlreadyExists(string username, string tennisClubName, Guid tennisClubId)
+    {
+        logger.LogError(
+            "Admin username '{username}' already exists in tennis club '{tennisClubName}' ({tennisClubId}).", username,
+            tennisClubName, tennisClubId);
+    }
+
+    public void LogAdminRegistered(Guid id)
+    {
+        logger.LogInformation("Registered admin with id '{id}'.", id);
+    }
+
     public void LogDeleteMember(Guid id)
     {
         logger.LogInformation("DeleteMember called with id '{id}'.", id);

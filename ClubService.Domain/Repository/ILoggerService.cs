@@ -5,6 +5,9 @@ public interface ILoggerService<T>
     void LogDeleteAdmin(Guid id);
     void LogAdminNotFound(Guid id);
     void LogAdminDeleted(Guid id);
+    void LogRegisterAdmin(string username, string firstName, string lastName, Guid tennisClubId);
+    void LogAdminUsernameAlreadyExists(string username, string tennisClubName, Guid tennisClubId);
+    void LogAdminRegistered(Guid id);
     void LogDeleteMember(Guid id);
     void LogMemberNotFound(Guid id);
     void LogMemberDeleted(Guid id);
