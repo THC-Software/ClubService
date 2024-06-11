@@ -54,6 +54,31 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Deleted member with id '{id}'.", id);
     }
 
+    public void LogRegisterMember(string firstName, string lastName, string email, Guid tennisClubId)
+    {
+        logger.LogInformation(
+            "RegisterMember called with email '{email}', firstName '{firstName}', lastName '{lastName}' " +
+            "and tennisClubId '{tennisClubId}''.", email, firstName, lastName, tennisClubId);
+    }
+
+    public void LogMemberLimitExceeded(Guid tennisClubId, int maxMemberCount)
+    {
+        logger.LogError("Member limit of {maxMemberCount} exceeded for tennis club with id '{id}'.", maxMemberCount,
+            tennisClubId);
+    }
+
+    public void LogMemberEmailAlreadyExists(string email, string tennisClubName, Guid tennisClubId)
+    {
+        logger.LogError(
+            "Member email '{email}' already exists in tennis club '{tennisClubName}' ({tennisClubId}).", email,
+            tennisClubName, tennisClubId);
+    }
+
+    public void LogMemberRegistered(Guid id)
+    {
+        logger.LogInformation("Registered member with id '{id}'.", id);
+    }
+
     public void LogDeleteTennisClub(Guid id)
     {
         logger.LogInformation("DeleteTennisClub called with id '{id}'.", id);

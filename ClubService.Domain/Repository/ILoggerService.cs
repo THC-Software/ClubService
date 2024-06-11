@@ -11,6 +11,10 @@ public interface ILoggerService<T>
     void LogDeleteMember(Guid id);
     void LogMemberNotFound(Guid id);
     void LogMemberDeleted(Guid id);
+    void LogRegisterMember(string firstName, string lastName, string email, Guid tennisClubId);
+    void LogMemberLimitExceeded(Guid tennisClubId, int maxMemberCount);
+    void LogMemberEmailAlreadyExists(string email, string tennisClubName, Guid tennisClubId);
+    void LogMemberRegistered(Guid id);
     void LogDeleteTennisClub(Guid id);
     void LogTennisClubNotFound(Guid id);
     void LogTennisClubDeleted(Guid id);
