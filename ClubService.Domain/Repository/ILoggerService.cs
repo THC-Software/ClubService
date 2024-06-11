@@ -11,5 +11,8 @@ public interface ILoggerService<T>
     void LogDeleteTennisClub(Guid id);
     void LogTennisClubNotFound(Guid id);
     void LogTennisClubDeleted(Guid id);
+    void LogRegisterTennisClub(string name, Guid subscriptionTierId);
+    void LogTennisClubRegistered(Guid id);
+    void LogSubscriptionTierNotFound(Guid id);
     void LogInvalidOperationException(InvalidOperationException ex);
 }

@@ -50,6 +50,22 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Deleted tennis club with id '{id}'.", id);
     }
 
+    public void LogRegisterTennisClub(string name, Guid subscriptionTierId)
+    {
+        logger.LogInformation("RegisterTennisClub called with name '{name}' and subscription tier id '{id}'.", name,
+            subscriptionTierId);
+    }
+
+    public void LogTennisClubRegistered(Guid id)
+    {
+        logger.LogInformation("Registered tennis club with id '{id}'.", id);
+    }
+
+    public void LogSubscriptionTierNotFound(Guid id)
+    {
+        logger.LogError("Subscription tier with id '{id}' not found.", id);
+    }
+
     public void LogInvalidOperationException(InvalidOperationException ex)
     {
         logger.LogError("Error: {error}", ex.Message);

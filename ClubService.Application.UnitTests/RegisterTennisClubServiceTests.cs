@@ -14,27 +14,30 @@ namespace ClubService.Application.UnitTests;
 [TestFixture]
 public class RegisterTennisClubServiceTests
 {
-    private Mock<IEventRepository> _eventRepositoryMock;
-    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
-    private RegisterTennisClubService _registerTennisClubService;
-    
     [SetUp]
     public void Setup()
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
         _eventStoreTransactionManagerMock = new Mock<IEventStoreTransactionManager>();
-        
+        _loggerMock = new Mock<ILoggerService<RegisterTennisClubService>>();
+
         // set up the TransactionScope method to call the passed function
         _eventStoreTransactionManagerMock
             .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
             .Returns((Func<Task> transactionalOperation) => transactionalOperation());
-        
+
         _registerTennisClubService = new RegisterTennisClubService(
             _eventRepositoryMock.Object,
-            _eventStoreTransactionManagerMock.Object
+            _eventStoreTransactionManagerMock.Object,
+            _loggerMock.Object
         );
     }
-    
+
+    private Mock<IEventRepository> _eventRepositoryMock;
+    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private Mock<ILoggerService<RegisterTennisClubService>> _loggerMock;
+    private RegisterTennisClubService _registerTennisClubService;
+
     [Test]
     public async Task GivenValidInputs_WhenRegisterTennisClub_ThenRepoIsCalledWithExpectedEvent()
     {
@@ -60,13 +63,13 @@ public class RegisterTennisClubServiceTests
                     200)
             )
         ];
-        
+
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))
             .ReturnsAsync(subscriptionTierDomainEvents);
-        
+
         // When
         _ = await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
-        
+
         // Then
         _eventRepositoryMock.Verify(repo =>
                 repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
@@ -76,7 +79,7 @@ public class RegisterTennisClubServiceTests
                     eventCountExpected), Times.Once
         );
     }
-    
+
     [Test]
     public void GivenNonExistentSubscriptionTierId_WhenRegisterTennisClub_ThenExceptionIsThrown()
     {
@@ -85,10 +88,10 @@ public class RegisterTennisClubServiceTests
         var tennisClubRegisterCommand =
             new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId);
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents = [];
-        
+
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))
             .ReturnsAsync(subscriptionTierDomainEvents);
-        
+
         // When ... Then
         Assert.ThrowsAsync<SubscriptionTierNotFoundException>(async () =>
             await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand));
