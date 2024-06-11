@@ -20,6 +20,21 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Deleted admin with id '{id}'.", id);
     }
 
+    public void LogDeleteMember(Guid id)
+    {
+        logger.LogInformation("DeleteMember called with id '{id}'.", id);
+    }
+
+    public void LogMemberNotFound(Guid id)
+    {
+        logger.LogError("Member with id '{id}' not found.", id);
+    }
+
+    public void LogMemberDeleted(Guid id)
+    {
+        logger.LogInformation("Deleted member with id '{id}'.", id);
+    }
+
     public void LogInvalidOperationException(InvalidOperationException ex)
     {
         logger.LogError("Error: {error}", ex.Message);

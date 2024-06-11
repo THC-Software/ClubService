@@ -2,9 +2,11 @@ namespace ClubService.Domain.Repository;
 
 public interface ILoggerService<T>
 {
-    public void LogDeleteAdmin(Guid id);
-    public void LogAdminNotFound(Guid id);
-    public void LogAdminDeleted(Guid id);
-
-    public void LogInvalidOperationException(InvalidOperationException ex);
+    void LogDeleteAdmin(Guid id);
+    void LogAdminNotFound(Guid id);
+    void LogAdminDeleted(Guid id);
+    void LogDeleteMember(Guid id);
+    void LogMemberNotFound(Guid id);
+    void LogMemberDeleted(Guid id);
+    void LogInvalidOperationException(InvalidOperationException ex);
 }
