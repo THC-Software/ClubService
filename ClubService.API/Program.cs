@@ -14,6 +14,7 @@ using ClubService.Domain.Repository.Transaction;
 using ClubService.Infrastructure;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
+using ClubService.Infrastructure.Logging;
 using ClubService.Infrastructure.Repositories;
 using ClubService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,14 @@ builder.Services.AddDbContext<LoginStoreDbContext>(options =>
     options
         .UseNpgsql(builder.Configuration.GetConnectionString("login-store-connection"));
 });
+
+// Logging
+builder.Services.AddLogging(config =>
+{
+    config.AddConsole();
+    config.AddDebug();
+});
+builder.Services.AddTransient(typeof(ILoggerService<>), typeof(LoggerService<>));
 
 // Repositories
 builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
