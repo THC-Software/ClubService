@@ -10,32 +10,36 @@ namespace ClubService.Application.Impl;
 
 public class DeleteTennisClubService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager) : IDeleteTennisClubService
+    IEventStoreTransactionManager eventStoreTransactionManager,
+    ILoggerService<DeleteTennisClubService> loggerService) : IDeleteTennisClubService
 {
     public async Task<Guid> DeleteTennisClub(Guid id)
     {
+        loggerService.LogDeleteTennisClub(id);
+
         var tennisClubId = new TennisClubId(id);
         var tennisClub = new TennisClub();
-        
+
         var existingTennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-        
+
         if (existingTennisClubDomainEvents.Count == 0)
         {
+            loggerService.LogTennisClubNotFound(id);
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
-        
+
         foreach (var domainEvent in existingTennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
-        
+
         //TODO: Delete all members and admins?
         try
         {
             var domainEvents = tennisClub.ProcessTennisClubDeleteCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
-            
+
             await eventStoreTransactionManager.TransactionScope(async () =>
             {
                 foreach (var domainEvent in domainEvents)
@@ -47,9 +51,11 @@ public class DeleteTennisClubService(
         }
         catch (InvalidOperationException ex)
         {
+            loggerService.LogInvalidOperationException(ex);
             throw new ConflictException(ex.Message, ex);
         }
-        
+
+        loggerService.LogTennisClubDeleted(id);
         return tennisClub.TennisClubId.Id;
     }
 }

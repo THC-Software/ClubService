@@ -8,5 +8,8 @@ public interface ILoggerService<T>
     void LogDeleteMember(Guid id);
     void LogMemberNotFound(Guid id);
     void LogMemberDeleted(Guid id);
+    void LogDeleteTennisClub(Guid id);
+    void LogTennisClubNotFound(Guid id);
+    void LogTennisClubDeleted(Guid id);
     void LogInvalidOperationException(InvalidOperationException ex);
 }

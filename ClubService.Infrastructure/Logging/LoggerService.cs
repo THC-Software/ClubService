@@ -35,6 +35,21 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Deleted member with id '{id}'.", id);
     }
 
+    public void LogDeleteTennisClub(Guid id)
+    {
+        logger.LogInformation("DeleteTennisClub called with id '{id}'.", id);
+    }
+
+    public void LogTennisClubNotFound(Guid id)
+    {
+        logger.LogError("Tennis Club with id '{id}' not found.", id);
+    }
+
+    public void LogTennisClubDeleted(Guid id)
+    {
+        logger.LogInformation("Deleted tennis club with id '{id}'.", id);
+    }
+
     public void LogInvalidOperationException(InvalidOperationException ex)
     {
         logger.LogError("Error: {error}", ex.Message);
