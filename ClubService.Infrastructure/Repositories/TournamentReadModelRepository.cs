@@ -1,6 +1,7 @@
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace ClubService.Infrastructure.Repositories;
 
@@ -12,13 +13,16 @@ public class TournamentReadModelRepository(ReadStoreDbContext readStoreDbContext
         await readStoreDbContext.SaveChangesAsync();
     }
 
-    public Task<TournamentReadModel> GetTournamentById(Guid domainEnvelopeEntityId)
+    public async Task<TournamentReadModel?> GetTournamentById(Guid id)
     {
-        throw new NotImplementedException();
+        return await readStoreDbContext.Tournaments
+            .Where(tournament => tournament.TournamentId == id)
+            .SingleOrDefaultAsync();
     }
 
-    public Task Delete(object tournamentReadModel)
+    public async Task Delete(TournamentReadModel tournamentReadModel)
     {
-        throw new NotImplementedException();
+        readStoreDbContext.Tournaments.Remove(tournamentReadModel);
+        await readStoreDbContext.SaveChangesAsync();
     }
 }
