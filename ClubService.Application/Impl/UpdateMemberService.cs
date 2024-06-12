@@ -1,5 +1,6 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.Commands;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
@@ -242,5 +243,10 @@ public class UpdateMemberService(
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+    
+    public Task<Guid> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace ClubService.Application.Api;
+﻿using ClubService.Application.Commands;
+
+namespace ClubService.Application.Api;
 
 public interface IUpdateMemberService
 {
@@ -6,4 +8,5 @@ public interface IUpdateMemberService
     Task<Guid> UnlockMember(Guid id);
     Task<Guid> ChangeFullName(Guid id, string firstName, string lastName);
     Task<Guid> ChangeEmail(Guid id, string email);
+    Task<Guid> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand);
 }
