@@ -1,11 +1,25 @@
+using System.Net.Mail;
 using ClubService.Domain.Repository;
+using ClubService.Infrastructure.Configurations;
+using Microsoft.Extensions.Options;
 
 namespace ClubService.Infrastructure.Mail;
 
-public class MailService : IMailService
+public class MailService(IOptions<SmtpConfiguration> smtpConfig) : IMailService
 {
-    public void Send(string email, string subject, string body)
+    private readonly string _host = smtpConfig.Value.Host;
+    private readonly int _port = smtpConfig.Value.Port;
+
+    public async Task Send(string email, string subject, string body)
     {
-        throw new NotImplementedException();
+        var mailMessage = new MailMessage("admin@thcdornbirn.at", email)
+        {
+            Subject = subject,
+            Body = body
+        };
+
+        using var smtpClient = new SmtpClient(_host, _port);
+        smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+        await smtpClient.SendMailAsync(mailMessage);
     }
 }

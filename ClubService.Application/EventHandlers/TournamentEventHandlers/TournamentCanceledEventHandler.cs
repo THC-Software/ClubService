@@ -51,7 +51,7 @@ public class TournamentCanceledEventHandler(
 
         foreach (var member in members)
         {
-            mailService.Send(member.Email, mailSubject, mailBody);
+            await mailService.Send(member.Email, mailSubject, mailBody);
         }
 
         loggerService.LogTournamentCanceled(tournamentReadModel.TournamentId);

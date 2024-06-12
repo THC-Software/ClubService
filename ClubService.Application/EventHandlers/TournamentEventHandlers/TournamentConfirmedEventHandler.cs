@@ -40,7 +40,7 @@ public class TournamentConfirmedEventHandler(
         var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubReadModel.TennisClubId.Id);
         foreach (var member in members)
         {
-            mailService.Send(member.Email, tournamentConfirmedEvent.Name, tournamentConfirmedEvent.Description);
+            await mailService.Send(member.Email, tournamentConfirmedEvent.Name, tournamentConfirmedEvent.Description);
         }
 
         loggerService.LogTournamentConfirmed(tournamentReadModel.TournamentId);

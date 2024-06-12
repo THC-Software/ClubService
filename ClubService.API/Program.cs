@@ -12,6 +12,7 @@ using ClubService.Domain.Api;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
 using ClubService.Infrastructure;
+using ClubService.Infrastructure.Configurations;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
 using ClubService.Infrastructure.Logging;
@@ -97,6 +98,7 @@ builder.Services.AddScoped<IEventHandler, TournamentCanceledEventHandler>();
 builder.Services.AddScoped<ChainEventHandler>();
 
 // Mail
+builder.Services.Configure<SmtpConfiguration>(builder.Configuration.GetSection("SmtpConfiguration"));
 builder.Services.AddScoped<IMailService, MailService>();
 
 // API Versioning
