@@ -137,9 +137,50 @@ public class Member
         }
     }
     
-    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand(string? fistName, string? lastName, string? email)
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand(
+        string? firstName,
+        string? lastName,
+        string? email)
     {
-        throw new NotImplementedException();
+        var domainEnvelopes = new List<DomainEnvelope<IMemberDomainEvent>>();
+        
+        if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName))
+        {
+            var fullName = new FullName(firstName, lastName);
+            if (!fullName.Equals(Name))
+            {
+                var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
+                
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_FULL_NAME_CHANGED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberFullNameChangedEvent
+                );
+                
+                domainEnvelopes.Add(domainEnvelope);
+            }
+        }
+        
+        if (!string.IsNullOrWhiteSpace(email) && !email.Equals(Email))
+        {
+            var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
+            
+            var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                Guid.NewGuid(),
+                MemberId.Id,
+                EventType.MEMBER_EMAIL_CHANGED,
+                EntityType.MEMBER,
+                DateTime.UtcNow,
+                memberEmailChangedEvent
+            );
+            
+            domainEnvelopes.Add(domainEnvelope);
+        }
+        
+        return domainEnvelopes;
     }
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
