@@ -23,9 +23,9 @@ public interface ILoggerService<T>
     void LogMemberLocked(Guid id);
     void LogUnlockMember(Guid id);
     void LogMemberUnlocked(Guid id);
-    void LogMemberChangeFullName(Guid id, string firstName, string lastName);
+    void LogUpdateMember(Guid id, string? firstName, string? lastName, string? email);
+    void LogMemberUpdated(Guid id);
     void LogMemberFullNameChanged(Guid id);
-    void LogMemberChangeEmail(Guid id, string email);
     void LogMemberEmailChanged(Guid id);
     void LogDeleteTennisClub(Guid id);
     void LogTennisClubNotFound(Guid id);

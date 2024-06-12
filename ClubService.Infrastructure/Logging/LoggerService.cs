@@ -111,21 +111,22 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Unlocked member with id '{id}'.", id);
     }
 
-    public void LogMemberChangeFullName(Guid id, string firstName, string lastName)
+    public void LogUpdateMember(Guid id, string? firstName, string? lastName, string? email)
     {
         logger.LogInformation(
-            "ChangeFullName called with id '{id}', firstName '{firstName}' and lastName '{lastName}'.", id, firstName,
-            lastName);
+            "LogUpdateMember called with id '{id}', firstName '{firstName}', lastName '{lastName}' and email '{email}'.",
+            id, firstName,
+            lastName, email);
+    }
+
+    public void LogMemberUpdated(Guid id)
+    {
+        logger.LogInformation("Updated member with id '{id}'.", id);
     }
 
     public void LogMemberFullNameChanged(Guid id)
     {
         logger.LogInformation("Changed full name for member with id '{id}'.", id);
-    }
-
-    public void LogMemberChangeEmail(Guid id, string email)
-    {
-        logger.LogInformation("ChangeEmail called with id '{id}' and email '{email}'.", id, email);
     }
 
     public void LogMemberEmailChanged(Guid id)
