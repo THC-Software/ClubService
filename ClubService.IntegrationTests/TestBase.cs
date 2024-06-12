@@ -2,7 +2,6 @@ using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Testcontainers.PostgreSql;
 
 namespace ClubService.IntegrationTests;
 
@@ -10,7 +9,6 @@ public class TestBase
 {
     private EventStoreDbContext _eventStoreDbContext;
     private WebAppFactory _factory;
-    private PostgreSqlContainer _postgresContainer;
     protected IEventRepository EventRepository;
     protected HttpClient HttpClient;
     protected Mock<IAdminReadModelRepository> MockAdminReadModelRepository;
@@ -21,16 +19,6 @@ public class TestBase
     [SetUp]
     public async Task Setup()
     {
-        _postgresContainer = new PostgreSqlBuilder()
-            .WithImage("debezium/postgres:16-alpine")
-            .WithUsername("user")
-            .WithPassword("password")
-            .WithDatabase("club-service-test")
-            .WithPortBinding(5432, true)
-            .Build();
-
-        await _postgresContainer.StartAsync();
-
         // mock repositories for write side integration tests
         MockTennisClubReadModelRepository = new Mock<ITennisClubReadModelRepository>();
         MockSubscriptionTierReadModelRepository = new Mock<ISubscriptionTierReadModelRepository>();
@@ -38,7 +26,7 @@ public class TestBase
         MockMemberReadModelRepository = new Mock<IMemberReadModelRepository>();
 
         _factory = new WebAppFactory(
-            _postgresContainer.GetConnectionString(),
+            IntegrationTestSetup.PostgresContainer.GetConnectionString(),
             MockTennisClubReadModelRepository,
             MockSubscriptionTierReadModelRepository,
             MockAdminReadModelRepository,
@@ -61,9 +49,9 @@ public class TestBase
     [TearDown]
     public async Task TearDown()
     {
+        await _eventStoreDbContext.Database.EnsureDeletedAsync();
         HttpClient.Dispose();
         await _factory.DisposeAsync();
         await _eventStoreDbContext.DisposeAsync();
-        await _postgresContainer.StopAsync();
     }
 }
