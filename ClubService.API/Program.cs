@@ -92,6 +92,7 @@ builder.Services.AddScoped<IEventHandler, MemberDeletedEventHandler>();
 builder.Services.AddScoped<IEventHandler, MemberFullNameChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler, MemberEmailChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler, TournamentConfirmedEventHandler>();
+builder.Services.AddScoped<IEventHandler, TournamentCanceledEventHandler>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
