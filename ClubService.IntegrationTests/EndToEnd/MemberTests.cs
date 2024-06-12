@@ -239,8 +239,7 @@ public class MemberTests : TestBase
     }
     
     [Test]
-    public async Task
-        GivenUpdateMemberCommand_WhenMemberFullNameChanged_ThenMemberFullNameChangedEventExistsInRepository()
+    public async Task GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberFullNameChangedEventExistsInRepository()
     {
         // Given
         var numberOfEventsExpected = 2;
@@ -295,7 +294,7 @@ public class MemberTests : TestBase
     }
     
     [Test]
-    public async Task GivenUpdateMemberCommand_WhenMemberEmailChanged_ThenMemberEmailChangedEventExistsInRepository()
+    public async Task GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberEmailChangedEventExistsInRepository()
     {
         // Given
         var numberOfEventsExpected = 2;
