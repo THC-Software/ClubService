@@ -14,6 +14,7 @@ using ClubService.Domain.Repository.Transaction;
 using ClubService.Infrastructure;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
+using ClubService.Infrastructure.Logging;
 using ClubService.Infrastructure.Repositories;
 using ClubService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,15 @@ builder.Services.AddDbContext<LoginStoreDbContext>(options =>
     options
         .UseNpgsql(builder.Configuration.GetConnectionString("login-store-connection"));
 });
+
+// Logging
+builder.Services.AddLogging(config =>
+{
+    config.AddConsole();
+    config.AddDebug();
+    config.AddConfiguration(builder.Configuration.GetSection("Logging"));
+});
+builder.Services.AddTransient(typeof(ILoggerService<>), typeof(LoggerService<>));
 
 // Repositories
 builder.Services.AddScoped<IEventRepository, PostgresEventRepository>();
@@ -65,7 +75,6 @@ builder.Services.AddScoped<IReadStoreTransactionManager, TransactionManager<Read
 builder.Services.AddScoped<IEventStoreTransactionManager, TransactionManager<EventStoreDbContext>>();
 
 // Event Handler
-builder.Services.AddScoped<ChainEventHandler>();
 builder.Services.AddScoped<IEventHandler, SubscriptionTierCreatedEventHandler>();
 builder.Services.AddScoped<IEventHandler, TennisClubRegisteredEventHandler>();
 builder.Services.AddScoped<IEventHandler, TennisClubLockedEventHandler>();
@@ -84,6 +93,7 @@ builder.Services.AddScoped<IEventHandler, MemberFullNameChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler, MemberEmailChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler, TournamentConfirmedEventHandler>();
 builder.Services.AddScoped<IEventHandler, TournamentCanceledEventHandler>();
+builder.Services.AddScoped<ChainEventHandler>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
@@ -147,15 +157,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
     await loginStoreDbContext.Database.EnsureDeletedAsync();
     await loginStoreDbContext.Database.EnsureCreatedAsync();
-}
-
-// Register event handler in ChainEventHandler
-var chainEventHandler = services.GetRequiredService<ChainEventHandler>();
-var eventHandlers = services.GetServices<IEventHandler>();
-
-foreach (var eventHandler in eventHandlers)
-{
-    chainEventHandler.RegisterEventHandler(eventHandler);
 }
 
 app.MapControllers();

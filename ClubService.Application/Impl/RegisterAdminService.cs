@@ -16,40 +16,49 @@ public class RegisterAdminService(
     IAdminReadModelRepository adminReadModelRepository,
     ILoginRepository loginRepository,
     IPasswordHasherService passwordHasherService,
-    IEventStoreTransactionManager eventStoreTransactionManager) : IRegisterAdminService
+    IEventStoreTransactionManager eventStoreTransactionManager,
+    ILoggerService<RegisterAdminService> loggerService) : IRegisterAdminService
 {
     public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
     {
+        loggerService.LogRegisterAdmin(adminRegisterCommand.Username, adminRegisterCommand.FirstName,
+            adminRegisterCommand.LastName, adminRegisterCommand.TennisClubId);
+
         var tennisClubId = new TennisClubId(adminRegisterCommand.TennisClubId);
-        
+
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
-        
+
         if (tennisClubDomainEvents.Count == 0)
         {
+            loggerService.LogTennisClubNotFound(tennisClubId.Id);
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
-        
+
         var tennisClub = new TennisClub();
         foreach (var domainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
-        
+
         switch (tennisClub.Status)
         {
             case TennisClubStatus.ACTIVE:
                 var admins = await adminReadModelRepository.GetAdminsByTennisClubId(tennisClubId.Id);
-                
+
                 if (admins.Exists(admin => admin.Username == adminRegisterCommand.Username))
                 {
+                    loggerService.LogAdminUsernameAlreadyExists(
+                        adminRegisterCommand.Username,
+                        tennisClub.Name,
+                        tennisClubId.Id);
                     throw new AdminUsernameAlreadyExists(
                         adminRegisterCommand.Username,
                         tennisClub.Name,
                         tennisClubId.Id
                     );
                 }
-                
+
                 var admin = new Admin();
                 var domainEvents = admin.ProcessAdminRegisterCommand(
                     adminRegisterCommand.Username,
@@ -57,7 +66,7 @@ public class RegisterAdminService(
                     tennisClubId
                 );
                 var expectedEventCount = 0;
-                
+
                 await eventStoreTransactionManager.TransactionScope(async () =>
                 {
                     foreach (var domainEvent in domainEvents)
@@ -68,7 +77,8 @@ public class RegisterAdminService(
                 });
 
                 SaveLoginCredentials(admin.AdminId, adminRegisterCommand.Password);
-                
+
+                loggerService.LogAdminRegistered(admin.AdminId.Id);
                 return admin.AdminId.Id;
             case TennisClubStatus.LOCKED:
                 throw new ConflictException("Tennis club is locked!");

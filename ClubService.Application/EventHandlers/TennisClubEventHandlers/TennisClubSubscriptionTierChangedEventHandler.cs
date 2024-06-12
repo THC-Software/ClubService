@@ -5,30 +5,35 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.TennisClubEventHandlers;
 
-public class TennisClubSubscriptionTierChangedEventHandler(ITennisClubReadModelRepository tennisClubReadModelRepository)
+public class TennisClubSubscriptionTierChangedEventHandler(
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ILoggerService<TennisClubSubscriptionTierChangedEventHandler> loggerService)
     : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
-        
+
+        loggerService.LogHandleEvent(domainEnvelope);
+
         var tennisClubSubscriptionTierChangedEvent = (TennisClubSubscriptionTierChangedEvent)domainEnvelope.EventData;
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
-        
-        if (tennisClub == null)
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+
+        if (tennisClubReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
-        
-        tennisClub.ChangeSubscriptionTier(tennisClubSubscriptionTierChangedEvent.SubscriptionTierId);
+
+        tennisClubReadModel.ChangeSubscriptionTier(tennisClubSubscriptionTierChangedEvent.SubscriptionTierId);
         await tennisClubReadModelRepository.Update();
+        loggerService.LogTennisClubSubscriptionTierChanged(tennisClubReadModel.TennisClubId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED);

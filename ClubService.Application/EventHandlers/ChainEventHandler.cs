@@ -5,31 +5,27 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers;
 
-public class ChainEventHandler(IProcessedEventRepository processedEventRepository) : IEventHandler
+public class ChainEventHandler(
+    IEnumerable<IEventHandler> eventHandlers,
+    IProcessedEventRepository processedEventRepository,
+    ILoggerService<ChainEventHandler> loggerService) : IEventHandler
 {
-    private List<IEventHandler> EventHandlers { get; } = new();
-    
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
+        loggerService.LogHandleEvent(domainEnvelope);
         var processedEvents = await processedEventRepository.GetAllProcessedEvents();
-        
+
         if (processedEvents.Exists(pe => pe.EventId == domainEnvelope.EventId))
         {
             return;
         }
-        
-        foreach (var eventHandler in EventHandlers)
+
+        foreach (var eventHandler in eventHandlers)
         {
-            Console.WriteLine("Handling event in " + eventHandler.GetType().Name);
             await eventHandler.Handle(domainEnvelope);
         }
-        
+
         var processedEvent = new ProcessedEvent(domainEnvelope.EventId);
         await processedEventRepository.Add(processedEvent);
-    }
-    
-    public void RegisterEventHandler(IEventHandler eventHandler)
-    {
-        EventHandlers.Add(eventHandler);
     }
 }

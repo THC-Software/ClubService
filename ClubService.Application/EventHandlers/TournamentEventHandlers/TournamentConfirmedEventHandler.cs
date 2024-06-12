@@ -8,15 +8,19 @@ namespace ClubService.Application.EventHandlers.TournamentEventHandlers;
 
 public class TournamentConfirmedEventHandler(
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    ITournamentReadModelRepository tournamentReadModelRepository)
+    ITournamentReadModelRepository tournamentReadModelRepository,
+    ILoggerService<TournamentConfirmedEventHandler> loggerService)
     : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
+
+        loggerService.LogHandleEvent(domainEnvelope);
 
         var tournamentConfirmedEvent = (TournamentConfirmedEvent)domainEnvelope.EventData;
         var tennisClubReadModel =
@@ -24,14 +28,14 @@ public class TournamentConfirmedEventHandler(
 
         if (tennisClubReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Tennis Club with id '{tournamentConfirmedEvent.ClubId}' not found!");
+            loggerService.LogTennisClubNotFound(tournamentConfirmedEvent.ClubId);
             return;
         }
 
         // TODO: Send mail
         var tournamentReadModel = TournamentReadModel.FromDomainEvent(tournamentConfirmedEvent);
         await tournamentReadModelRepository.Add(tournamentReadModel);
+        loggerService.LogTournamentConfirmed(tournamentReadModel.TournamentId);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

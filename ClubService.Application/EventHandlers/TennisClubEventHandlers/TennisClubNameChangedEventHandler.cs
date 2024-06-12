@@ -5,30 +5,35 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.TennisClubEventHandlers;
 
-public class TennisClubNameChangedEventHandler(ITennisClubReadModelRepository tennisClubReadModelRepository)
+public class TennisClubNameChangedEventHandler(
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ILoggerService<TennisClubNameChangedEventHandler> loggerService)
     : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
-        
+
+        loggerService.LogHandleEvent(domainEnvelope);
+
         var tennisClubNameChangedEvent = (TennisClubNameChangedEvent)domainEnvelope.EventData;
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
-        
-        if (tennisClub == null)
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+
+        if (tennisClubReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
-        
-        tennisClub.ChangeName(tennisClubNameChangedEvent.Name);
+
+        tennisClubReadModel.ChangeName(tennisClubNameChangedEvent.Name);
         await tennisClubReadModelRepository.Update();
+        loggerService.LogTennisClubNameChanged(tennisClubReadModel.TennisClubId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_NAME_CHANGED);

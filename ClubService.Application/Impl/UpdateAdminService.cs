@@ -12,32 +12,38 @@ namespace ClubService.Application.Impl;
 
 public class UpdateAdminService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager) : IUpdateAdminService
+    IEventStoreTransactionManager eventStoreTransactionManager,
+    ILoggerService<UpdateAdminService> loggerService) : IUpdateAdminService
 {
     public async Task<Guid> ChangeFullName(Guid id, string firstName, string lastName)
     {
+        loggerService.LogAdminChangeFullName(id, firstName, lastName);
+
         var existingAdminDomainEvents = await eventRepository.GetEventsForEntity<IAdminDomainEvent>(id);
-        
+
         if (existingAdminDomainEvents.Count == 0)
         {
+            loggerService.LogAdminNotFound(id);
             throw new AdminNotFoundException(id);
         }
-        
+
         var admin = new Admin();
         foreach (var domainEvent in existingAdminDomainEvents)
         {
             admin.Apply(domainEvent);
         }
-        
+
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(admin.TennisClubId.Id);
-        
+
+        // TODO: Check if tennisClubDomainEvents.Count > 0
+
         var tennisClub = new TennisClub();
         foreach (var domainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
         }
-        
+
         switch (tennisClub.Status)
         {
             case TennisClubStatus.ACTIVE:
@@ -45,7 +51,7 @@ public class UpdateAdminService(
                 {
                     var domainEvents = admin.ProcessAdminChangeFullNameCommand(new FullName(firstName, lastName));
                     var expectedEventCount = existingAdminDomainEvents.Count;
-                    
+
                     await eventStoreTransactionManager.TransactionScope(async () =>
                     {
                         foreach (var domainEvent in domainEvents)
@@ -57,9 +63,11 @@ public class UpdateAdminService(
                 }
                 catch (InvalidOperationException ex)
                 {
+                    loggerService.LogInvalidOperationException(ex);
                     throw new ConflictException(ex.Message, ex);
                 }
-                
+
+                loggerService.LogAdminFullNameChanged(id);
                 return id;
             case TennisClubStatus.LOCKED:
                 throw new ConflictException("Tennis club is locked!");
