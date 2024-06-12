@@ -137,6 +137,11 @@ public class Member
         }
     }
     
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand()
+    {
+        throw new NotImplementedException();
+    }
+    
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
     {
         switch (Status)
