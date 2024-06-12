@@ -359,22 +359,22 @@ public class MemberTests : TestBase
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
         
-        var firstStoredEvent = storedEvents[numberOfEventsExpected - 1];
+        var firstStoredEvent = storedEvents[numberOfEventsExpected - 2];
         Assert.Multiple(() =>
         {
-            Assert.That(firstStoredEvent.EventType, Is.EqualTo(secondEventTypeExpected));
-            Assert.That(firstStoredEvent.EntityType, Is.EqualTo(secondEntityTypeExpected));
+            Assert.That(firstStoredEvent.EventType, Is.EqualTo(firstEventTypeExpected));
+            Assert.That(firstStoredEvent.EntityType, Is.EqualTo(firstEntityTypeExpected));
             Assert.That(firstStoredEvent.EntityId, Is.EqualTo(memberIdExpected));
-            Assert.That(firstStoredEvent.EventData.GetType(), Is.EqualTo(secondEventDataTypeExpected));
+            Assert.That(firstStoredEvent.EventData.GetType(), Is.EqualTo(firstEventDataTypeExpected));
         });
         
-        var secondStoredEvent = storedEvents[numberOfEventsExpected - 2];
+        var secondStoredEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
-            Assert.That(secondStoredEvent.EventType, Is.EqualTo(firstEventTypeExpected));
-            Assert.That(secondStoredEvent.EntityType, Is.EqualTo(firstEntityTypeExpected));
+            Assert.That(secondStoredEvent.EventType, Is.EqualTo(secondEventTypeExpected));
+            Assert.That(secondStoredEvent.EntityType, Is.EqualTo(secondEntityTypeExpected));
             Assert.That(secondStoredEvent.EntityId, Is.EqualTo(memberIdExpected));
-            Assert.That(secondStoredEvent.EventData.GetType(), Is.EqualTo(firstEventDataTypeExpected));
+            Assert.That(secondStoredEvent.EventData.GetType(), Is.EqualTo(secondEventDataTypeExpected));
         });
     }
     
