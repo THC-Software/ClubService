@@ -15,7 +15,7 @@ public class AdminDeletedEventHandler(
             return;
         }
 
-        loggerService.LogAdminDeletedEventHandler(domainEnvelope);
+        loggerService.LogHandleEvent(domainEnvelope);
 
         var adminReadModel = await adminReadModelRepository.GetAdminById(domainEnvelope.EntityId);
         if (adminReadModel == null)

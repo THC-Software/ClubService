@@ -51,23 +51,6 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Changed full name for admin with id '{id}'.", id);
     }
 
-    public void LogAdminDeletedEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope)
-    {
-        logger.LogInformation("AdminDeletedEventHandler called with domainEnvelope: {domainEnvelope}", domainEnvelope);
-    }
-
-    public void LogAdminFullNameChangedEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope)
-    {
-        logger.LogInformation("AdminFullNameChangedEventHandler called with domainEnvelope: {domainEnvelope}",
-            domainEnvelope);
-    }
-
-    public void LogAdminRegisteredEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope)
-    {
-        logger.LogInformation("AdminRegisteredEventHandler called with domainEnvelope: {domainEnvelope}",
-            domainEnvelope);
-    }
-
     public void LogDeleteMember(Guid id)
     {
         logger.LogInformation("DeleteMember called with id '{id}'.", id);
@@ -248,6 +231,11 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
 
     public void LogValidationFailure(string validationMessage)
     {
-        throw new NotImplementedException();
+        logger.LogError(validationMessage);
+    }
+
+    public void LogHandleEvent(DomainEnvelope<IDomainEvent> domainEnvelope)
+    {
+        logger.LogInformation("Handling event: {domainEnvelope}", domainEnvelope);
     }
 }

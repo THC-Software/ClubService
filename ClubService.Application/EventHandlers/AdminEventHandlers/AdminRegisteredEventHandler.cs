@@ -17,7 +17,7 @@ public class AdminRegisteredEventHandler(
             return;
         }
 
-        loggerService.LogAdminRegisteredEventHandler(domainEnvelope);
+        loggerService.LogHandleEvent(domainEnvelope);
 
         var adminRegisteredEvent = (AdminRegisteredEvent)domainEnvelope.EventData;
         var adminReadModel = AdminReadModel.FromDomainEvent(adminRegisteredEvent);

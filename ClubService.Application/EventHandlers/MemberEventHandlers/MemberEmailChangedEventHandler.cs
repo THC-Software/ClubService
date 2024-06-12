@@ -5,7 +5,9 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
-public class MemberEmailChangedEventHandler(IMemberReadModelRepository memberReadModelRepository) : IEventHandler
+public class MemberEmailChangedEventHandler(
+    IMemberReadModelRepository memberReadModelRepository,
+    ILoggerService<MemberEmailChangedEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
@@ -13,21 +15,23 @@ public class MemberEmailChangedEventHandler(IMemberReadModelRepository memberRea
         {
             return;
         }
-        
+
+        loggerService.LogHandleEvent(domainEnvelope);
+
         var memberEmailChangedEvent = (MemberEmailChangedEvent)domainEnvelope.EventData;
         var memberReadModel = await memberReadModelRepository.GetMemberById(domainEnvelope.EntityId);
-        
+
         if (memberReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+            loggerService.LogMemberNotFound(domainEnvelope.EntityId);
             return;
         }
-        
+
         memberReadModel.ChangeEmail(memberEmailChangedEvent.Email);
         await memberReadModelRepository.Update();
+        loggerService.LogMemberEmailChanged(memberReadModel.MemberId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.MEMBER_EMAIL_CHANGED);

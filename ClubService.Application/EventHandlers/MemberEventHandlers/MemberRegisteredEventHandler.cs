@@ -10,7 +10,8 @@ namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 public class MemberRegisteredEventHandler(
     IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    IReadStoreTransactionManager readStoreTransactionManager) : IEventHandler
+    IReadStoreTransactionManager readStoreTransactionManager,
+    ILoggerService<MemberRegisteredEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
@@ -19,14 +20,15 @@ public class MemberRegisteredEventHandler(
             return;
         }
 
+        loggerService.LogHandleEvent(domainEnvelope);
+
         var memberRegisteredEvent = (MemberRegisteredEvent)domainEnvelope.EventData;
         var tennisClubReadModel =
             await tennisClubReadModelRepository.GetTennisClubById(memberRegisteredEvent.TennisClubId.Id);
 
         if (tennisClubReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Tennis Club with id '{memberRegisteredEvent.TennisClubId.Id}' not found!");
+            loggerService.LogTennisClubNotFound(memberRegisteredEvent.TennisClubId.Id);
             return;
         }
 
@@ -38,6 +40,8 @@ public class MemberRegisteredEventHandler(
             var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
             await memberReadModelRepository.Add(memberReadModel);
         });
+
+        loggerService.LogMemberRegistered(memberRegisteredEvent.MemberId.Id);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

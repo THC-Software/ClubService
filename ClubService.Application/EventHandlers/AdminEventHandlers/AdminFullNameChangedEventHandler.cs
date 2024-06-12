@@ -16,7 +16,7 @@ public class AdminFullNameChangedEventHandler(
             return;
         }
 
-        loggerService.LogAdminFullNameChangedEventHandler(domainEnvelope);
+        loggerService.LogHandleEvent(domainEnvelope);
 
         var adminNameChangedEvent = (AdminFullNameChangedEvent)domainEnvelope.EventData;
         var adminReadModel = await adminReadModelRepository.GetAdminById(domainEnvelope.EntityId);

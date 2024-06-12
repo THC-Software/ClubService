@@ -8,7 +8,8 @@ namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 public class MemberDeletedEventHandler(
     IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    IReadStoreTransactionManager readStoreTransactionManager) : IEventHandler
+    IReadStoreTransactionManager readStoreTransactionManager,
+    ILoggerService<MemberDeletedEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
@@ -16,35 +17,37 @@ public class MemberDeletedEventHandler(
         {
             return;
         }
-        
+
+        loggerService.LogHandleEvent(domainEnvelope);
+
         var memberReadModel = await memberReadModelRepository.GetMemberById(domainEnvelope.EntityId);
-        
+
         if (memberReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Member with id {domainEnvelope.EntityId} not found!");
+            loggerService.LogMemberNotFound(domainEnvelope.EntityId);
             return;
         }
-        
+
         var tennisClubReadModel =
             await tennisClubReadModelRepository.GetTennisClubById(memberReadModel.TennisClubId.Id);
-        
+
         if (tennisClubReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            loggerService.LogTennisClubNotFound(memberReadModel.TennisClubId.Id);
             return;
         }
-        
+
         await readStoreTransactionManager.TransactionScope(async () =>
         {
             tennisClubReadModel.DecreaseMemberCount();
             await tennisClubReadModelRepository.Update();
-            
+
             await memberReadModelRepository.Delete(memberReadModel);
         });
+
+        loggerService.LogMemberDeleted(memberReadModel.MemberId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.MEMBER_DELETED);
