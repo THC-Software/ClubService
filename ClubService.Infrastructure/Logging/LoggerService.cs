@@ -62,6 +62,12 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
             domainEnvelope);
     }
 
+    public void LogAdminRegisteredEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope)
+    {
+        logger.LogInformation("AdminRegisteredEventHandler called with domainEnvelope: {domainEnvelope}",
+            domainEnvelope);
+    }
+
     public void LogDeleteMember(Guid id)
     {
         logger.LogInformation("DeleteMember called with id '{id}'.", id);

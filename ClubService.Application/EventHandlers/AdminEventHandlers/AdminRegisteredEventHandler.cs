@@ -6,7 +6,9 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.AdminEventHandlers;
 
-public class AdminRegisteredEventHandler(IAdminReadModelRepository adminReadModelRepository) : IEventHandler
+public class AdminRegisteredEventHandler(
+    IAdminReadModelRepository adminReadModelRepository,
+    ILoggerService<AdminRegisteredEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
@@ -14,12 +16,16 @@ public class AdminRegisteredEventHandler(IAdminReadModelRepository adminReadMode
         {
             return;
         }
-        
+
+        loggerService.LogAdminRegisteredEventHandler(domainEnvelope);
+
         var adminRegisteredEvent = (AdminRegisteredEvent)domainEnvelope.EventData;
         var adminReadModel = AdminReadModel.FromDomainEvent(adminRegisteredEvent);
+
         await adminReadModelRepository.Add(adminReadModel);
+        loggerService.LogAdminRegistered(adminReadModel.AdminId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.ADMIN_REGISTERED);
