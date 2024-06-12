@@ -45,6 +45,7 @@ public interface ILoggerService<T>
     void LogUserNotFound(string username);
     void LogLoginFailed(Guid id);
     void LogUserLoggedIn(Guid id, string username, string userRole, string status);
+    void LogTournamentConfirmed(Guid id);
     void LogInvalidOperationException(InvalidOperationException ex);
     void LogValidationFailure(string validationMessage);
     void LogHandleEvent(DomainEnvelope<IDomainEvent> domainEnvelope);

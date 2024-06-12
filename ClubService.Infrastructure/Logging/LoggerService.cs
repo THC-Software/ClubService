@@ -229,6 +229,11 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
             username, userRole, status);
     }
 
+    public void LogTournamentConfirmed(Guid id)
+    {
+        logger.LogInformation("Tournament confirmed with id '{id}'.", id);
+    }
+
     public void LogInvalidOperationException(InvalidOperationException ex)
     {
         logger.LogError("Error: {error}", ex.Message);
