@@ -191,6 +191,11 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Updated tennis club with id '{id}'.", id);
     }
 
+    public void LogSubscriptionTierCreated(Guid id)
+    {
+        logger.LogInformation("Created subscription tier with id '{id}'.", id);
+    }
+
     public void LogSubscriptionTierNotFound(Guid id)
     {
         logger.LogError("Subscription tier with id '{id}' not found.", id);
