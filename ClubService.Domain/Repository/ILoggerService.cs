@@ -1,3 +1,5 @@
+using ClubService.Domain.Event;
+
 namespace ClubService.Domain.Repository;
 
 public interface ILoggerService<T>
@@ -10,6 +12,7 @@ public interface ILoggerService<T>
     void LogAdminRegistered(Guid id);
     void LogAdminChangeFullName(Guid id, string firstName, string lastName);
     void LogAdminFullNameChanged(Guid id);
+    void LogAdminDeletedEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope);
     void LogDeleteMember(Guid id);
     void LogMemberNotFound(Guid id);
     void LogMemberDeleted(Guid id);
@@ -35,7 +38,6 @@ public interface ILoggerService<T>
     void LogUnlockTennisClub(Guid id);
     void LogTennisClubUnlocked(Guid id);
     void LogUpdateTennisClub(Guid id, string? name, Guid? subscriptionTierId);
-
     void LogTennisClubUpdated(Guid id);
     void LogSubscriptionTierNotFound(Guid id);
     void LogLogin(string username, Guid tennisClubId);

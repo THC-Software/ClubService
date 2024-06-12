@@ -1,3 +1,4 @@
+using ClubService.Domain.Event;
 using ClubService.Domain.Repository;
 using Microsoft.Extensions.Logging;
 
@@ -48,6 +49,11 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     public void LogAdminFullNameChanged(Guid id)
     {
         logger.LogInformation("Changed full name for admin with id '{id}'.", id);
+    }
+
+    public void LogAdminDeletedEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope)
+    {
+        logger.LogInformation("AdminDeletedEventHandler called with domainEnvelope: {domainEnvelope}", domainEnvelope);
     }
 
     public void LogDeleteMember(Guid id)
