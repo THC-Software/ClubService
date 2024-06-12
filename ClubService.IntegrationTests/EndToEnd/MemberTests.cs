@@ -239,8 +239,7 @@ public class MemberTests : TestBase
     }
     
     [Test]
-    public async Task
-        GivenUpdateMemberCommand_WhenMemberFullNameChanged_ThenMemberFullNameChangedEventExistsInRepository()
+    public async Task GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberFullNameChangedEventExistsInRepository()
     {
         // Given
         var numberOfEventsExpected = 2;
@@ -295,7 +294,7 @@ public class MemberTests : TestBase
     }
     
     [Test]
-    public async Task GivenUpdateMemberCommand_WhenMemberEmailChanged_ThenMemberEmailChangedEventExistsInRepository()
+    public async Task GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberEmailChangedEventExistsInRepository()
     {
         // Given
         var numberOfEventsExpected = 2;
@@ -325,6 +324,58 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
             Assert.That(storedEvent.EntityId, Is.EqualTo(memberIdExpected));
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
+        });
+    }
+    
+    [Test]
+    public async Task
+        GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberFullNameChangedEventAndMemberEmailChangedEventExistsInRepository()
+    {
+        // Given
+        var numberOfEventsExpected = 3;
+        var memberIdExpected = new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc");
+        
+        var firstEventTypeExpected = EventType.MEMBER_FULL_NAME_CHANGED;
+        var firstEntityTypeExpected = EntityType.MEMBER;
+        var firstEventDataTypeExpected = typeof(MemberFullNameChangedEvent);
+        
+        var secondEventTypeExpected = EventType.MEMBER_EMAIL_CHANGED;
+        var secondEntityTypeExpected = EntityType.MEMBER;
+        var secondEventDataTypeExpected = typeof(MemberEmailChangedEvent);
+        
+        var name = new FullName("Jane", "Doe");
+        var updateMemberCommand =
+            new MemberUpdateCommand(name.FirstName, name.LastName, "armin.otter@fhv.gorillaKaefig");
+        var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
+            "application/json");
+        
+        // When
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
+        
+        // Then
+        response.EnsureSuccessStatusCode();
+        var responseContent = await response.Content.ReadAsStringAsync();
+        Assert.That(responseContent, Is.Not.Null);
+        
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
+        
+        var firstStoredEvent = storedEvents[numberOfEventsExpected - 2];
+        Assert.Multiple(() =>
+        {
+            Assert.That(firstStoredEvent.EventType, Is.EqualTo(firstEventTypeExpected));
+            Assert.That(firstStoredEvent.EntityType, Is.EqualTo(firstEntityTypeExpected));
+            Assert.That(firstStoredEvent.EntityId, Is.EqualTo(memberIdExpected));
+            Assert.That(firstStoredEvent.EventData.GetType(), Is.EqualTo(firstEventDataTypeExpected));
+        });
+        
+        var secondStoredEvent = storedEvents[numberOfEventsExpected - 1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(secondStoredEvent.EventType, Is.EqualTo(secondEventTypeExpected));
+            Assert.That(secondStoredEvent.EntityType, Is.EqualTo(secondEntityTypeExpected));
+            Assert.That(secondStoredEvent.EntityId, Is.EqualTo(memberIdExpected));
+            Assert.That(secondStoredEvent.EventData.GetType(), Is.EqualTo(secondEventDataTypeExpected));
         });
     }
     

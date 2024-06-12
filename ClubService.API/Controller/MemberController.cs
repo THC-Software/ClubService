@@ -51,23 +51,8 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Guid>> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
     {
-        if (memberUpdateCommand.FirstName != null && memberUpdateCommand.LastName != null)
-        {
-            var updatedMemberId = await updateMemberService.ChangeFullName(
-                id,
-                memberUpdateCommand.FirstName,
-                memberUpdateCommand.LastName
-            );
-            return Ok(updatedMemberId);
-        }
-        
-        if (memberUpdateCommand.Email != null)
-        {
-            var updatedMemberId = await updateMemberService.ChangeEmail(id, memberUpdateCommand.Email);
-            return Ok(updatedMemberId);
-        }
-        
-        return BadRequest("You have to provide either first and last name or an e-mail address!");
+        var updatedMemberId = await updateMemberService.UpdateMember(id, memberUpdateCommand);
+        return Ok(updatedMemberId);
     }
     
     [HttpDelete("{id:guid}")]
