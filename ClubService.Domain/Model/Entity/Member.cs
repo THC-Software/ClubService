@@ -137,7 +137,7 @@ public class Member
         }
     }
     
-    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand()
+    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand(string? fistName, string? lastName, string? email)
     {
         throw new NotImplementedException();
     }
