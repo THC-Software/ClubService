@@ -234,6 +234,16 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Tournament confirmed with id '{id}'.", id);
     }
 
+    public void LogTournamentNotFound(Guid id)
+    {
+        logger.LogError("Tournament with id '{id}' not found.", id);
+    }
+
+    public void LogTournamentCanceled(Guid id)
+    {
+        logger.LogInformation("Tournament canceled with id '{id}'.", id);
+    }
+
     public void LogInvalidOperationException(InvalidOperationException ex)
     {
         logger.LogError("Error: {error}", ex.Message);
