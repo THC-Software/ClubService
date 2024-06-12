@@ -6,7 +6,9 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.TennisClubEventHandlers;
 
-public class TennisClubRegisteredEventHandler(ITennisClubReadModelRepository tennisClubReadModelRepository)
+public class TennisClubRegisteredEventHandler(
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ILoggerService<TennisClubRegisteredEventHandler> loggerService)
     : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
@@ -15,11 +17,15 @@ public class TennisClubRegisteredEventHandler(ITennisClubReadModelRepository ten
         {
             return;
         }
-        
+
+        loggerService.LogHandleEvent(domainEnvelope);
+
         var tennisClub = TennisClubReadModel.FromDomainEvent((TennisClubRegisteredEvent)domainEnvelope.EventData);
+
         await tennisClubReadModelRepository.Add(tennisClub);
+        loggerService.LogTennisClubRegistered(tennisClub.TennisClubId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_REGISTERED);

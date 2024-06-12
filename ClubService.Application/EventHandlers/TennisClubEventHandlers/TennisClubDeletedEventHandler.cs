@@ -4,7 +4,9 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.TennisClubEventHandlers;
 
-public class TennisClubDeletedEventHandler(ITennisClubReadModelRepository tennisClubReadModelRepository) : IEventHandler
+public class TennisClubDeletedEventHandler(
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ILoggerService<TennisClubDeletedEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
@@ -12,19 +14,21 @@ public class TennisClubDeletedEventHandler(ITennisClubReadModelRepository tennis
         {
             return;
         }
-        
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
-        
-        if (tennisClub == null)
+
+        loggerService.LogHandleEvent(domainEnvelope);
+
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+
+        if (tennisClubReadModel == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
-        
-        await tennisClubReadModelRepository.Delete(tennisClub);
+
+        await tennisClubReadModelRepository.Delete(tennisClubReadModel);
+        loggerService.LogTennisClubDeleted(tennisClubReadModel.TennisClubId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_DELETED);

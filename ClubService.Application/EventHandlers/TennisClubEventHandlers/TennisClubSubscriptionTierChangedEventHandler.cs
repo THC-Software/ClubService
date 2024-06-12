@@ -5,7 +5,9 @@ using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.TennisClubEventHandlers;
 
-public class TennisClubSubscriptionTierChangedEventHandler(ITennisClubReadModelRepository tennisClubReadModelRepository)
+public class TennisClubSubscriptionTierChangedEventHandler(
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    ILoggerService<TennisClubSubscriptionTierChangedEventHandler> loggerService)
     : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
@@ -14,21 +16,23 @@ public class TennisClubSubscriptionTierChangedEventHandler(ITennisClubReadModelR
         {
             return;
         }
-        
+
+        loggerService.LogHandleEvent(domainEnvelope);
+
         var tennisClubSubscriptionTierChangedEvent = (TennisClubSubscriptionTierChangedEvent)domainEnvelope.EventData;
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
-        
+
         if (tennisClub == null)
         {
-            // TODO: Add logging
-            Console.WriteLine($"Tennis club with id {domainEnvelope.EntityId} not found!");
+            loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
-        
+
         tennisClub.ChangeSubscriptionTier(tennisClubSubscriptionTierChangedEvent.SubscriptionTierId);
         await tennisClubReadModelRepository.Update();
+        loggerService.LogTennisClubUpdated(tennisClub.TennisClubId.Id);
     }
-    
+
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         return domainEnvelope.EventType.Equals(EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED);
