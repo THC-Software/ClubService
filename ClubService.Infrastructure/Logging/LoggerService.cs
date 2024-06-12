@@ -90,6 +90,48 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Registered member with id '{id}'.", id);
     }
 
+    public void LogLockMember(Guid id)
+    {
+        logger.LogInformation("LockMember called with id '{id}'.", id);
+    }
+
+    public void LogMemberLocked(Guid id)
+    {
+        logger.LogInformation("Locked member with id '{id}'.", id);
+    }
+
+    public void LogUnlockMember(Guid id)
+    {
+        logger.LogInformation("UnlockMember called with id '{id}'.", id);
+    }
+
+    public void LogMemberUnlocked(Guid id)
+    {
+        logger.LogInformation("Unlocked member with id '{id}'.", id);
+    }
+
+    public void LogMemberChangeFullName(Guid id, string firstName, string lastName)
+    {
+        logger.LogInformation(
+            "ChangeFullName called with id '{id}', firstName '{firstName}' and lastName '{lastName}'.", id, firstName,
+            lastName);
+    }
+
+    public void LogMemberFullNameChanged(Guid id)
+    {
+        logger.LogInformation("Changed full name for member with id '{id}'.", id);
+    }
+
+    public void LogMemberChangeEmail(Guid id, string email)
+    {
+        logger.LogInformation("ChangeEmail called with id '{id}' and email '{email}'.", id, email);
+    }
+
+    public void LogMemberEmailChanged(Guid id)
+    {
+        logger.LogInformation("Changed email for member with id '{id}'.", id);
+    }
+
     public void LogDeleteTennisClub(Guid id)
     {
         logger.LogInformation("DeleteTennisClub called with id '{id}'.", id);

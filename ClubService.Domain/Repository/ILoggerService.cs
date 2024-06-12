@@ -17,6 +17,14 @@ public interface ILoggerService<T>
     void LogMemberLimitExceeded(Guid tennisClubId, int maxMemberCount);
     void LogMemberEmailAlreadyExists(string email, string tennisClubName, Guid tennisClubId);
     void LogMemberRegistered(Guid id);
+    void LogLockMember(Guid id);
+    void LogMemberLocked(Guid id);
+    void LogUnlockMember(Guid id);
+    void LogMemberUnlocked(Guid id);
+    void LogMemberChangeFullName(Guid id, string firstName, string lastName);
+    void LogMemberFullNameChanged(Guid id);
+    void LogMemberChangeEmail(Guid id, string email);
+    void LogMemberEmailChanged(Guid id);
     void LogDeleteTennisClub(Guid id);
     void LogTennisClubNotFound(Guid id);
     void LogTennisClubDeleted(Guid id);
