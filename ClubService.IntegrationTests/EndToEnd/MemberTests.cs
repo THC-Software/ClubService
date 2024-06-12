@@ -8,7 +8,6 @@ using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.ReadModel;
-using ClubService.IntegrationTests.TestSetup;
 using Moq;
 using Newtonsoft.Json;
 
@@ -18,7 +17,7 @@ namespace ClubService.IntegrationTests.EndToEnd;
 public class MemberTests : TestBase
 {
     private const string BaseUrl = "/api/v1.0/members";
-    
+
     [Test]
     public async Task GivenRegisterMemberCommand_WhenRegisterMember_ThenMemberRegisteredEventExistsInRepository()
     {
@@ -33,7 +32,7 @@ public class MemberTests : TestBase
         MockTennisClubReadModelRepository
             .Setup(repo => repo.GetTennisClubById(It.IsAny<Guid>()))
             .ReturnsAsync(tennisClubReadModel);
-        
+
         var subscriptionTierCreatedEvent = new SubscriptionTierCreatedEvent(
             new SubscriptionTierId(Guid.NewGuid()),
             "Standard",
@@ -43,11 +42,11 @@ public class MemberTests : TestBase
         MockSubscriptionTierReadModelRepository
             .Setup(repo => repo.GetSubscriptionTierById(It.IsAny<Guid>()))
             .ReturnsAsync(subscriptionTierReadModel);
-        
+
         MockMemberReadModelRepository
             .Setup(repo => repo.GetMembersByTennisClubId(It.IsAny<Guid>()))
             .ReturnsAsync([]);
-        
+
         var numberOfEventsExpected = 1;
         var eventTypeExpected = EventType.MEMBER_REGISTERED;
         var entityTypeExpected = EntityType.MEMBER;
@@ -60,19 +59,19 @@ public class MemberTests : TestBase
             "john.doe@dev.com", passwordExpected, tennisClubIdExpected.Id);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerMemberCommand), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PostAsync(BaseUrl, httpContent);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var id = JsonConvert.DeserializeObject<Guid>(responseContent);
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(id);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
@@ -80,7 +79,7 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EntityType, Is.EqualTo(entityTypeExpected));
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
-        
+
         var memberRegisteredEvent = (MemberRegisteredEvent)storedEvent.EventData;
         Assert.Multiple(() =>
         {
@@ -90,7 +89,7 @@ public class MemberTests : TestBase
             Assert.That(memberRegisteredEvent.TennisClubId, Is.EqualTo(tennisClubIdExpected));
         });
     }
-    
+
     [Test]
     public async Task GivenMemberId_WhenLockMember_ThenMemberLockedEventExistsInRepositoryAndIdIsReturned()
     {
@@ -100,20 +99,20 @@ public class MemberTests : TestBase
         var eventTypeExpected = EventType.MEMBER_LOCKED;
         var entityTypeExpected = EntityType.MEMBER;
         var eventDataTypeExpected = typeof(MemberLockedEvent);
-        
+
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/{memberIdExpected.ToString()}/lock", null);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(memberIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
@@ -123,7 +122,7 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task GivenMemberId_WhenUnlockMember_ThenMemberUnlockedEventExistsInRepositoryAndIdIsReturned()
     {
@@ -133,20 +132,20 @@ public class MemberTests : TestBase
         var eventTypeExpected = EventType.MEMBER_UNLOCKED;
         var entityTypeExpected = EntityType.MEMBER;
         var eventDataTypeExpected = typeof(MemberUnlockedEvent);
-        
+
         // When
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{memberIdExpected.ToString()}/lock");
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(memberIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
@@ -156,7 +155,7 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task GivenMemberId_WhenDeleteMember_ThenMemberDeletedEventExistsInRepositoryAndIdIsReturned()
     {
@@ -166,20 +165,20 @@ public class MemberTests : TestBase
         var eventTypeExpected = EventType.MEMBER_DELETED;
         var entityTypeExpected = EntityType.MEMBER;
         var eventDataTypeExpected = typeof(MemberDeletedEvent);
-        
+
         // When
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{memberIdExpected.ToString()}");
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(memberIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
@@ -189,55 +188,55 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task GivenDeletedMemberId_WhenDeleteMemberAgain_ThenErrorResponseIsReturned()
     {
         // Given
         var deletedMemberId = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
-        
+
         // When
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{deletedMemberId.ToString()}");
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Does.Contain("Member is already deleted!"));
     }
-    
+
     [Test]
     public async Task GivenDeletedMemberId_WhenLockMember_ThenErrorResponseIsReturned()
     {
         // Given
         var deletedMemberId = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
-        
+
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/{deletedMemberId.ToString()}/lock", null);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Does.Contain("Member is already deleted!"));
     }
-    
+
     [Test]
     public async Task GivenDeletedMemberId_WhenUnlockMember_ThenErrorResponseIsReturned()
     {
         // Given
         var deletedMemberId = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
-        
+
         // When
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{deletedMemberId.ToString()}/lock");
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         Assert.That(responseContent, Does.Contain("Member is already deleted!"));
     }
-    
+
     [Test]
     public async Task GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberFullNameChangedEventExistsInRepository()
     {
@@ -251,18 +250,18 @@ public class MemberTests : TestBase
         var updateMemberCommand = new MemberUpdateCommand(nameExpected.FirstName, nameExpected.LastName, null);
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
@@ -272,7 +271,7 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task GivenUpdateMemberCommand_WhenOnlyFirstNameInUpdateMemberCommand_ThenErrorResponseIsReturned()
     {
@@ -281,10 +280,10 @@ public class MemberTests : TestBase
         var updateMemberCommand = new MemberUpdateCommand("Jane", null, null);
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberId.ToString()}", httpContent);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -292,7 +291,7 @@ public class MemberTests : TestBase
         Assert.That(responseContent,
             Does.Contain("You have to provide either first and last name or an e-mail address!"));
     }
-    
+
     [Test]
     public async Task GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberEmailChangedEventExistsInRepository()
     {
@@ -305,18 +304,18 @@ public class MemberTests : TestBase
         var updateMemberCommand = new MemberUpdateCommand(null, null, "armin.otter@fhv.gorillaKaefig");
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
@@ -326,7 +325,7 @@ public class MemberTests : TestBase
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task
         GivenUpdateMemberCommand_WhenUpdateMember_ThenMemberFullNameChangedEventAndMemberEmailChangedEventExistsInRepository()
@@ -334,32 +333,32 @@ public class MemberTests : TestBase
         // Given
         var numberOfEventsExpected = 3;
         var memberIdExpected = new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc");
-        
+
         var firstEventTypeExpected = EventType.MEMBER_FULL_NAME_CHANGED;
         var firstEntityTypeExpected = EntityType.MEMBER;
         var firstEventDataTypeExpected = typeof(MemberFullNameChangedEvent);
-        
+
         var secondEventTypeExpected = EventType.MEMBER_EMAIL_CHANGED;
         var secondEntityTypeExpected = EntityType.MEMBER;
         var secondEventDataTypeExpected = typeof(MemberEmailChangedEvent);
-        
+
         var name = new FullName("Jane", "Doe");
         var updateMemberCommand =
             new MemberUpdateCommand(name.FirstName, name.LastName, "armin.otter@fhv.gorillaKaefig");
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var firstStoredEvent = storedEvents[numberOfEventsExpected - 2];
         Assert.Multiple(() =>
         {
@@ -368,7 +367,7 @@ public class MemberTests : TestBase
             Assert.That(firstStoredEvent.EntityId, Is.EqualTo(memberIdExpected));
             Assert.That(firstStoredEvent.EventData.GetType(), Is.EqualTo(firstEventDataTypeExpected));
         });
-        
+
         var secondStoredEvent = storedEvents[numberOfEventsExpected - 1];
         Assert.Multiple(() =>
         {
@@ -378,7 +377,7 @@ public class MemberTests : TestBase
             Assert.That(secondStoredEvent.EventData.GetType(), Is.EqualTo(secondEventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task GivenUpdateMemberCommand_WhenEmptyUpdateMemberCommand_ThenErrorResponseIsReturned()
     {
@@ -387,10 +386,10 @@ public class MemberTests : TestBase
         var updateMemberCommand = new MemberUpdateCommand(null, null, null);
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberId.ToString()}", httpContent);
-        
+
         // Then
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         var responseContent = await response.Content.ReadAsStringAsync();
