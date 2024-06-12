@@ -9,6 +9,8 @@ namespace ClubService.Application.EventHandlers.TournamentEventHandlers;
 public class TournamentConfirmedEventHandler(
     ITennisClubReadModelRepository tennisClubReadModelRepository,
     ITournamentReadModelRepository tournamentReadModelRepository,
+    IMemberReadModelRepository memberReadModelRepository,
+    IMailService mailService,
     ILoggerService<TournamentConfirmedEventHandler> loggerService)
     : IEventHandler
 {
@@ -32,9 +34,15 @@ public class TournamentConfirmedEventHandler(
             return;
         }
 
-        // TODO: Send mail
         var tournamentReadModel = TournamentReadModel.FromDomainEvent(tournamentConfirmedEvent);
         await tournamentReadModelRepository.Add(tournamentReadModel);
+
+        var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubReadModel.TennisClubId.Id);
+        foreach (var member in members)
+        {
+            mailService.Send(member.Email, tournamentConfirmedEvent.Name, tournamentConfirmedEvent.Description);
+        }
+
         loggerService.LogTournamentConfirmed(tournamentReadModel.TournamentId);
     }
 
