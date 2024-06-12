@@ -16,6 +16,7 @@ public class TournamentConfirmedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

@@ -269,4 +269,9 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     {
         logger.LogInformation("Handling event: {domainEnvelope}", domainEnvelope);
     }
+
+    public void LogRejectEvent(DomainEnvelope<IDomainEvent> domainEnvelope)
+    {
+        logger.LogDebug("Rejected event: {domainEnvelope}", domainEnvelope);
+    }
 }

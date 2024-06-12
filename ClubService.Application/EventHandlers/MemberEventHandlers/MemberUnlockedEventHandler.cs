@@ -12,6 +12,7 @@ public class MemberUnlockedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

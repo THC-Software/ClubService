@@ -14,6 +14,7 @@ public class TennisClubNameChangedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

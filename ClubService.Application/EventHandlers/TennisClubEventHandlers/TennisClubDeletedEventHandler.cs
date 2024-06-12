@@ -12,6 +12,7 @@ public class TennisClubDeletedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

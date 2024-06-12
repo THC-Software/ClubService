@@ -17,6 +17,7 @@ public class MemberRegisteredEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

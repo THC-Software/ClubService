@@ -13,6 +13,7 @@ public class AdminFullNameChangedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

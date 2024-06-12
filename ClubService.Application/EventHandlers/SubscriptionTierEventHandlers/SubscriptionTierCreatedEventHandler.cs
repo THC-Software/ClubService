@@ -14,6 +14,7 @@ public class SubscriptionTierCreatedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

@@ -41,6 +41,7 @@ builder.Services.AddLogging(config =>
 {
     config.AddConsole();
     config.AddDebug();
+    config.AddConfiguration(builder.Configuration.GetSection("Logging"));
 });
 builder.Services.AddTransient(typeof(ILoggerService<>), typeof(LoggerService<>));
 

@@ -15,6 +15,7 @@ public class TennisClubRegisteredEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

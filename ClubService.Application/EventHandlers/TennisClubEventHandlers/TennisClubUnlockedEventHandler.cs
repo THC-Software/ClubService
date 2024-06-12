@@ -13,6 +13,7 @@ public class TennisClubUnlockedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 

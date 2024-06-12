@@ -14,6 +14,7 @@ public class TennisClubSubscriptionTierChangedEventHandler(
     {
         if (!Supports(domainEnvelope))
         {
+            loggerService.LogRejectEvent(domainEnvelope);
             return;
         }
 
