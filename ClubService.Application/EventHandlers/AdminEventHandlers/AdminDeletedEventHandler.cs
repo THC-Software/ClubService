@@ -24,8 +24,8 @@ public class AdminDeletedEventHandler(
             return;
         }
 
-        loggerService.LogAdminDeleted(domainEnvelope.EntityId);
         await adminReadModelRepository.Delete(adminReadModel);
+        loggerService.LogAdminDeleted(adminReadModel.AdminId.Id);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

@@ -13,6 +13,7 @@ public interface ILoggerService<T>
     void LogAdminChangeFullName(Guid id, string firstName, string lastName);
     void LogAdminFullNameChanged(Guid id);
     void LogAdminDeletedEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope);
+    void LogAdminFullNameChangedEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope);
     void LogDeleteMember(Guid id);
     void LogMemberNotFound(Guid id);
     void LogMemberDeleted(Guid id);

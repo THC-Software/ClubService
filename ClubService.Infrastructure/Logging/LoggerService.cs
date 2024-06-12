@@ -56,6 +56,12 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("AdminDeletedEventHandler called with domainEnvelope: {domainEnvelope}", domainEnvelope);
     }
 
+    public void LogAdminFullNameChangedEventHandler(DomainEnvelope<IDomainEvent> domainEnvelope)
+    {
+        logger.LogInformation("AdminFullNameChangedEventHandler called with domainEnvelope: {domainEnvelope}",
+            domainEnvelope);
+    }
+
     public void LogDeleteMember(Guid id)
     {
         logger.LogInformation("DeleteMember called with id '{id}'.", id);
