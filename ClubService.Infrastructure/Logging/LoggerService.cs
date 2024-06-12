@@ -121,6 +121,34 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogError("Subscription tier with id '{id}' not found.", id);
     }
 
+    public void LogLogin(string username, Guid tennisClubId)
+    {
+        logger.LogInformation("Login called with username '{username} and tennis club id '{tennisClubId}'.", username,
+            tennisClubId);
+    }
+
+    public void LogUserNotFound(Guid id)
+    {
+        logger.LogError("User with id '{id}' not found.", id);
+    }
+
+    public void LogUserNotFound(string username)
+    {
+        logger.LogError("User with username '{username}' not found.", username);
+    }
+
+    public void LogLoginFailed(Guid id)
+    {
+        logger.LogError("Login failed for user with id '{id}'.", id);
+    }
+
+    public void LogUserLoggedIn(Guid id, string username, string userRole, string status)
+    {
+        logger.LogInformation(
+            "User logged in with id '{id}', username '{username}', user role '{userRole}' and status '{status}'", id,
+            username, userRole, status);
+    }
+
     public void LogInvalidOperationException(InvalidOperationException ex)
     {
         logger.LogError("Error: {error}", ex.Message);

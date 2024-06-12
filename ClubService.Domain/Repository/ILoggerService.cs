@@ -23,5 +23,10 @@ public interface ILoggerService<T>
     void LogRegisterTennisClub(string name, Guid subscriptionTierId);
     void LogTennisClubRegistered(Guid id);
     void LogSubscriptionTierNotFound(Guid id);
+    void LogLogin(string username, Guid tennisClubId);
+    void LogUserNotFound(Guid id);
+    void LogUserNotFound(string username);
+    void LogLoginFailed(Guid id);
+    void LogUserLoggedIn(Guid id, string username, string userRole, string status);
     void LogInvalidOperationException(InvalidOperationException ex);
 }
