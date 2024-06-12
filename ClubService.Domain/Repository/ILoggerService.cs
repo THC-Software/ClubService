@@ -30,6 +30,13 @@ public interface ILoggerService<T>
     void LogTennisClubDeleted(Guid id);
     void LogRegisterTennisClub(string name, Guid subscriptionTierId);
     void LogTennisClubRegistered(Guid id);
+    void LogLockTennisClub(Guid id);
+    void LogTennisClubLocked(Guid id);
+    void LogUnlockTennisClub(Guid id);
+    void LogTennisClubUnlocked(Guid id);
+    void LogUpdateTennisClub(Guid id, string? name, Guid? subscriptionTierId);
+
+    void LogTennisClubUpdated(Guid id);
     void LogSubscriptionTierNotFound(Guid id);
     void LogLogin(string username, Guid tennisClubId);
     void LogUserNotFound(Guid id);
@@ -37,4 +44,5 @@ public interface ILoggerService<T>
     void LogLoginFailed(Guid id);
     void LogUserLoggedIn(Guid id, string username, string userRole, string status);
     void LogInvalidOperationException(InvalidOperationException ex);
+    void LogValidationFailure(string validationMessage);
 }

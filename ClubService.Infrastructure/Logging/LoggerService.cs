@@ -158,6 +158,38 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
         logger.LogInformation("Registered tennis club with id '{id}'.", id);
     }
 
+    public void LogLockTennisClub(Guid id)
+    {
+        logger.LogInformation("LockTennisClub called with id '{id}'.", id);
+    }
+
+    public void LogTennisClubLocked(Guid id)
+    {
+        logger.LogInformation("Locked tennis club with id '{id}'.", id);
+    }
+
+    public void LogUnlockTennisClub(Guid id)
+    {
+        logger.LogInformation("UnlockTennisClub called with id '{id}'.", id);
+    }
+
+    public void LogTennisClubUnlocked(Guid id)
+    {
+        logger.LogInformation("Unlocked tennis club with id '{id}'.", id);
+    }
+
+    public void LogUpdateTennisClub(Guid id, string? name, Guid? subscriptionTierId)
+    {
+        logger.LogInformation(
+            "UpdateTennisClub called with id '{id}', name '{name}' and subscription tier id '{subscriptionTierId}'.",
+            id, name, subscriptionTierId);
+    }
+
+    public void LogTennisClubUpdated(Guid id)
+    {
+        logger.LogInformation("Updated tennis club with id '{id}'.", id);
+    }
+
     public void LogSubscriptionTierNotFound(Guid id)
     {
         logger.LogError("Subscription tier with id '{id}' not found.", id);
@@ -194,5 +226,10 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     public void LogInvalidOperationException(InvalidOperationException ex)
     {
         logger.LogError("Error: {error}", ex.Message);
+    }
+
+    public void LogValidationFailure(string validationMessage)
+    {
+        throw new NotImplementedException();
     }
 }
