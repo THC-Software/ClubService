@@ -20,17 +20,17 @@ public class TennisClubNameChangedEventHandler(
         loggerService.LogHandleEvent(domainEnvelope);
 
         var tennisClubNameChangedEvent = (TennisClubNameChangedEvent)domainEnvelope.EventData;
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
 
-        if (tennisClub == null)
+        if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
 
-        tennisClub.ChangeName(tennisClubNameChangedEvent.Name);
+        tennisClubReadModel.ChangeName(tennisClubNameChangedEvent.Name);
         await tennisClubReadModelRepository.Update();
-        loggerService.LogTennisClubUpdated(tennisClub.TennisClubId.Id);
+        loggerService.LogTennisClubNameChanged(tennisClubReadModel.TennisClubId.Id);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

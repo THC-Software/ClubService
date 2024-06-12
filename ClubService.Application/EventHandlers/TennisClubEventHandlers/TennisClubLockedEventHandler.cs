@@ -17,17 +17,17 @@ public class TennisClubLockedEventHandler(
 
         loggerService.LogHandleEvent(domainEnvelope);
 
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
 
-        if (tennisClub == null)
+        if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
 
-        tennisClub.Lock();
+        tennisClubReadModel.Lock();
         await tennisClubReadModelRepository.Update();
-        loggerService.LogTennisClubLocked(tennisClub.TennisClubId.Id);
+        loggerService.LogTennisClubLocked(tennisClubReadModel.TennisClubId.Id);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

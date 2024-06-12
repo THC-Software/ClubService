@@ -20,17 +20,17 @@ public class TennisClubSubscriptionTierChangedEventHandler(
         loggerService.LogHandleEvent(domainEnvelope);
 
         var tennisClubSubscriptionTierChangedEvent = (TennisClubSubscriptionTierChangedEvent)domainEnvelope.EventData;
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
 
-        if (tennisClub == null)
+        if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
 
-        tennisClub.ChangeSubscriptionTier(tennisClubSubscriptionTierChangedEvent.SubscriptionTierId);
+        tennisClubReadModel.ChangeSubscriptionTier(tennisClubSubscriptionTierChangedEvent.SubscriptionTierId);
         await tennisClubReadModelRepository.Update();
-        loggerService.LogTennisClubUpdated(tennisClub.TennisClubId.Id);
+        loggerService.LogTennisClubSubscriptionTierChanged(tennisClubReadModel.TennisClubId.Id);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

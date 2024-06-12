@@ -20,10 +20,11 @@ public class TennisClubRegisteredEventHandler(
 
         loggerService.LogHandleEvent(domainEnvelope);
 
-        var tennisClub = TennisClubReadModel.FromDomainEvent((TennisClubRegisteredEvent)domainEnvelope.EventData);
+        var tennisClubReadModel =
+            TennisClubReadModel.FromDomainEvent((TennisClubRegisteredEvent)domainEnvelope.EventData);
 
-        await tennisClubReadModelRepository.Add(tennisClub);
-        loggerService.LogTennisClubRegistered(tennisClub.TennisClubId.Id);
+        await tennisClubReadModelRepository.Add(tennisClubReadModel);
+        loggerService.LogTennisClubRegistered(tennisClubReadModel.TennisClubId.Id);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

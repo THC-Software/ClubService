@@ -18,17 +18,17 @@ public class TennisClubUnlockedEventHandler(
 
         loggerService.LogHandleEvent(domainEnvelope);
 
-        var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
+        var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(domainEnvelope.EntityId);
 
-        if (tennisClub == null)
+        if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
             return;
         }
 
-        tennisClub.Unlock();
+        tennisClubReadModel.Unlock();
         await tennisClubReadModelRepository.Update();
-        loggerService.LogTennisClubUnlocked(tennisClub.TennisClubId.Id);
+        loggerService.LogTennisClubUnlocked(tennisClubReadModel.TennisClubId.Id);
     }
 
     private static bool Supports(DomainEnvelope<IDomainEvent> domainEnvelope)

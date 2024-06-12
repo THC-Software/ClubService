@@ -38,6 +38,8 @@ public interface ILoggerService<T>
     void LogTennisClubUnlocked(Guid id);
     void LogUpdateTennisClub(Guid id, string? name, Guid? subscriptionTierId);
     void LogTennisClubUpdated(Guid id);
+    void LogTennisClubNameChanged(Guid id);
+    void LogTennisClubSubscriptionTierChanged(Guid id);
     void LogSubscriptionTierCreated(Guid id);
     void LogSubscriptionTierNotFound(Guid id);
     void LogLogin(string username, Guid tennisClubId);
