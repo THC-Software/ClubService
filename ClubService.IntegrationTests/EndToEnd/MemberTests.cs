@@ -344,7 +344,8 @@ public class MemberTests : TestBase
         var secondEventDataTypeExpected = typeof(MemberEmailChangedEvent);
         
         var name = new FullName("Jane", "Doe");
-        var updateMemberCommand = new MemberUpdateCommand(name.FirstName, name.LastName, "armin.otter@fhv.gorillaKaefig");
+        var updateMemberCommand =
+            new MemberUpdateCommand(name.FirstName, name.LastName, "armin.otter@fhv.gorillaKaefig");
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
         
