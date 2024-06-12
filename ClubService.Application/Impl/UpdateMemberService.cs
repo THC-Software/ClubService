@@ -1,4 +1,5 @@
-﻿using ClubService.Application.Api;
+﻿using System.ComponentModel.DataAnnotations;
+using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event.Member;
@@ -245,8 +246,72 @@ public class UpdateMemberService(
         }
     }
     
-    public Task<Guid> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
+    public async Task<Guid> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
     {
-        throw new NotImplementedException();
+        if ((string.IsNullOrWhiteSpace(memberUpdateCommand.FirstName) ||
+             string.IsNullOrWhiteSpace(memberUpdateCommand.LastName)) &&
+            string.IsNullOrWhiteSpace(memberUpdateCommand.Email))
+        {
+            throw new ValidationException("You have to provide either first and last name or an e-mail address!");
+        }
+        
+        var memberId = id;
+        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId);
+        
+        if (existingMemberDomainEvents.Count == 0)
+        {
+            throw new MemberNotFoundException(memberId);
+        }
+        
+        var member = new Member();
+        foreach (var domainEvent in existingMemberDomainEvents)
+        {
+            member.Apply(domainEvent);
+        }
+        
+        var tennisClubDomainEvents =
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+        
+        var tennisClub = new TennisClub();
+        foreach (var domainEvent in tennisClubDomainEvents)
+        {
+            tennisClub.Apply(domainEvent);
+        }
+        
+        switch (tennisClub.Status)
+        {
+            case TennisClubStatus.ACTIVE:
+                try
+                {
+                    var domainEvents = member.ProcessMemberUpdateCommand(
+                        memberUpdateCommand.FirstName,
+                        memberUpdateCommand.LastName,
+                        memberUpdateCommand.Email
+                    );
+                    
+                    var expectedEventCount = existingMemberDomainEvents.Count;
+                    
+                    await eventStoreTransactionManager.TransactionScope(async () =>
+                    {
+                        foreach (var domainEvent in domainEvents)
+                        {
+                            member.Apply(domainEvent);
+                            expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
+                        }
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new ConflictException(ex.Message, ex);
+                }
+                
+                return id;
+            case TennisClubStatus.LOCKED:
+                throw new ConflictException("Tennis club is locked!");
+            case TennisClubStatus.DELETED:
+                throw new ConflictException("Tennis club already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 }
