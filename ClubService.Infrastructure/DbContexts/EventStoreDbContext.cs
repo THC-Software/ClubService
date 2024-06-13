@@ -3,6 +3,8 @@ using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Event.Tournament;
+using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Infrastructure.EntityConfigurations;
@@ -15,23 +17,23 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
     : DbContext(options)
 {
     public DbSet<DomainEnvelope<IDomainEvent>> DomainEvents { get; init; }
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
         optionsBuilder.UseCamelCaseNamingConvention();
     }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new DomainEnvelopeConfiguration());
-        
+
         if (env.IsProduction())
         {
             return;
         }
-        
+
         modelBuilder.Entity<DomainEnvelope<IDomainEvent>>().HasData(
             // Subscription Tiers
             new DomainEnvelope<ISubscriptionTierDomainEvent>(
@@ -234,6 +236,27 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options, 
                 EntityType.ADMIN,
                 DateTime.UtcNow.AddMilliseconds(1000.0),
                 new AdminDeletedEvent()
+            ),
+
+            // Tournament
+            new DomainEnvelope<ITournamentDomainEvent>(
+                new Guid("e00d1436-ab76-4fe6-b202-88a834cfb715"),
+                new Guid("45c1f6cd-f497-4cc0-b47b-c52c0ec206b5"),
+                EventType.TOURNAMENT_CONFIRMED,
+                EntityType.TOURNAMENT,
+                DateTime.UtcNow,
+                new TournamentConfirmedEvent(
+                    new Guid("45c1f6cd-f497-4cc0-b47b-c52c0ec206b5"),
+                    new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"),
+                    false,
+                    "World Tennis Championship",
+                    "Lorem ipsum dolor sit amet",
+                    15,
+                    [new TournamentCourt(new Guid("6bb205e2-2baa-419b-8bef-3b46cfe7f3a6"))],
+                    [new TournamentDay(DateOnly.FromDateTime(DateTime.Now), TimeOnly.MinValue, TimeOnly.MaxValue)],
+                    [new TournamentParticipant(new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc"))],
+                    1,
+                    TournamentStatus.CREATED)
             )
         );
     }

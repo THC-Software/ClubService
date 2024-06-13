@@ -12,9 +12,11 @@ using ClubService.Domain.Api;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
 using ClubService.Infrastructure;
+using ClubService.Infrastructure.Configurations;
 using ClubService.Infrastructure.DbContexts;
 using ClubService.Infrastructure.EventHandling;
 using ClubService.Infrastructure.Logging;
+using ClubService.Infrastructure.Mail;
 using ClubService.Infrastructure.Repositories;
 using ClubService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -94,6 +96,10 @@ builder.Services.AddScoped<IEventHandler, MemberEmailChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler, TournamentConfirmedEventHandler>();
 builder.Services.AddScoped<IEventHandler, TournamentCanceledEventHandler>();
 builder.Services.AddScoped<ChainEventHandler>();
+
+// Mail
+builder.Services.Configure<SmtpConfiguration>(builder.Configuration.GetSection("SmtpConfiguration"));
+builder.Services.AddScoped<IMailService, MailService>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>

@@ -3,7 +3,7 @@ using ClubService.Domain.Event;
 
 namespace ClubService.Infrastructure.EventHandling;
 
-public class EventParser
+public static class EventParser
 {
     public static DomainEnvelope<IDomainEvent> ParseEvent(JsonNode jsonEvent)
     {
@@ -13,7 +13,7 @@ public class EventParser
         var jsonEntityType = jsonEvent["entityType"];
         var jsonTimestamp = jsonEvent["timestamp"];
         var jsonEventData = jsonEvent["eventData"];
-        
+
         if (jsonEventId == null ||
             jsonEntityId == null ||
             jsonEventType == null ||
@@ -23,16 +23,16 @@ public class EventParser
         {
             throw new InvalidOperationException("event has missing properties");
         }
-        
+
         var eventId = Guid.Parse(jsonEventId.GetValue<string>());
         var entityId = Guid.Parse(jsonEntityId.GetValue<string>());
         var eventType = (EventType)Enum.Parse(typeof(EventType), jsonEventType.GetValue<string>());
         var entityType = (EntityType)Enum.Parse(typeof(EntityType), jsonEntityType.GetValue<string>());
         var timestamp = DateTime.Parse(jsonTimestamp.GetValue<string>()).ToUniversalTime();
         var eventData = jsonEventData.GetValue<string>();
-        
+
         var deserializedEventData = EventDeserializer.DeserializeEventData<IDomainEvent>(eventType, eventData);
-        
+
         return new DomainEnvelope<IDomainEvent>(
             eventId,
             entityId,
