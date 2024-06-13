@@ -6,6 +6,9 @@ namespace ClubService.Application.EventHandlers.TournamentEventHandlers;
 
 public class TournamentCanceledEventHandler(
     ITournamentReadModelRepository tournamentReadModelRepository,
+    ITennisClubReadModelRepository tennisClubReadModelRepository,
+    IMemberReadModelRepository memberReadModelRepository,
+    IMailService mailService,
     ILoggerService<TournamentCanceledEventHandler> loggerService)
     : IEventHandler
 {
@@ -27,8 +30,30 @@ public class TournamentCanceledEventHandler(
             return;
         }
 
-        // TODO: Send email
+        var tennisClubReadModel =
+            await tennisClubReadModelRepository.GetTennisClubById(tournamentReadModel.TennisClubId);
+
+        if (tennisClubReadModel == null)
+        {
+            loggerService.LogTennisClubNotFound(tournamentReadModel.TennisClubId);
+            return;
+        }
+
         await tournamentReadModelRepository.Delete(tournamentReadModel);
+
+        var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubReadModel.TennisClubId.Id);
+        var mailSubject = $"Tournament {tournamentReadModel.Name} canceled";
+        var mailBody = $"""
+                        Unfortunately the tournament '{tournamentReadModel.Name}' that would have been taking 
+                        place from the {tournamentReadModel.StartDate} to the {tournamentReadModel.EndDate} has 
+                        been canceled.
+                        """;
+
+        foreach (var member in members)
+        {
+            await mailService.Send(member.Email, mailSubject, mailBody);
+        }
+
         loggerService.LogTournamentCanceled(tournamentReadModel.TournamentId);
     }
 
