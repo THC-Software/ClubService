@@ -4,7 +4,6 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
-using ClubService.IntegrationTests.TestSetup;
 using Newtonsoft.Json;
 
 namespace ClubService.IntegrationTests.EndToEnd;
@@ -13,7 +12,7 @@ namespace ClubService.IntegrationTests.EndToEnd;
 public class TennisClubTests : TestBase
 {
     private const string BaseUrl = "/api/v1.0/tennisClubs";
-    
+
     [Test]
     public async Task
         GivenRegisterTennisClubCommand_WhenRegisterTennisClub_ThenTennisClubRegisteredEventExistsInRepository()
@@ -27,16 +26,16 @@ public class TennisClubTests : TestBase
         var registerTennisClubCommand = new TennisClubRegisterCommand("Test", subscriptionTierIdExpected);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerTennisClubCommand), Encoding.UTF8,
             "application/json");
-        
+
         // When
         var response = await HttpClient.PostAsync(BaseUrl, httpContent);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var clubId = JsonConvert.DeserializeObject<Guid>(responseContent);
-        
+
         var storedEvents =
             await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubId);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
@@ -56,7 +55,7 @@ public class TennisClubTests : TestBase
                 Is.EqualTo(subscriptionTierIdExpected));
         });
     }
-    
+
     [Test]
     public async Task GivenTennisClubId_WhenLockTennisClub_ThenTennisClubLockedEventExistsInRepositoryAndIdIsReturned()
     {
@@ -66,20 +65,20 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_LOCKED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubLockedEvent);
-        
+
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/{clubIdExpected}/lock", null);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(clubIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[1];
         Assert.Multiple(() =>
         {
@@ -89,7 +88,7 @@ public class TennisClubTests : TestBase
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task
         GivenTennisClubId_WhenUnlockTennisClub_ThenTennisClubUnlockedEventExistsInRepositoryAndIdIsReturned()
@@ -100,20 +99,20 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_UNLOCKED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubUnlockedEvent);
-        
+
         // When
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected}/lock");
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(clubIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[2];
         Assert.Multiple(() =>
         {
@@ -123,7 +122,7 @@ public class TennisClubTests : TestBase
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
     }
-    
+
     [Test]
     public async Task
         GivenUpdateTennisClubCommand_WhenUpdateTennisClub_ThenTennisClubSubscriptionTierChangedEventExistsInRepositoryAndIdIsReturned()
@@ -138,20 +137,20 @@ public class TennisClubTests : TestBase
         var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, subscriptionTierId.Id);
         var jsonContent = JsonConvert.SerializeObject(tennisClubUpdateCommand);
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-        
+
         // When
         var response = await HttpClient.PutAsync($"{BaseUrl}/{clubIdExpected}", content);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(clubIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[1];
         Assert.Multiple(() =>
         {
@@ -160,13 +159,13 @@ public class TennisClubTests : TestBase
             Assert.That(storedEvent.EntityId, Is.EqualTo(clubIdExpected));
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
-        
+
         var tennisClubSubscriptionTierChangedEventActual =
             (TennisClubSubscriptionTierChangedEvent)storedEvent.EventData;
         Assert.That(tennisClubSubscriptionTierChangedEventActual.SubscriptionTierId.Id,
             Is.EqualTo(tennisClubUpdateCommand.SubscriptionTierId));
     }
-    
+
     [Test]
     public async Task
         GivenUpdateTennisClubCommand_WhenUpdateTennisClub_ThenTennisClubNameChangedEventExistsInRepositoryAndIdIsReturned()
@@ -180,20 +179,20 @@ public class TennisClubTests : TestBase
         var tennisClubUpdateCommand = new TennisClubUpdateCommand("Some new name", null);
         var jsonContent = JsonConvert.SerializeObject(tennisClubUpdateCommand);
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-        
+
         // When
         var response = await HttpClient.PutAsync($"{BaseUrl}/{clubIdExpected}", content);
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(clubIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[1];
         Assert.Multiple(() =>
         {
@@ -202,13 +201,13 @@ public class TennisClubTests : TestBase
             Assert.That(storedEvent.EntityId, Is.EqualTo(clubIdExpected));
             Assert.That(storedEvent.EventData.GetType(), Is.EqualTo(eventDataTypeExpected));
         });
-        
+
         var tennisClubNameChangedEvent =
             (TennisClubNameChangedEvent)storedEvent.EventData;
         Assert.That(tennisClubNameChangedEvent.Name,
             Is.EqualTo(tennisClubUpdateCommand.Name));
     }
-    
+
     [Test]
     public async Task
         GivenTennisClubId_WhenDeleteTennisClub_ThenTennisClubDeletedEventExistsInRepositoryAndIdIsReturned()
@@ -219,20 +218,20 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_DELETED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubDeletedEvent);
-        
+
         // When
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected}");
-        
+
         // Then
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(clubIdExpected));
-        
+
         var storedEvents = await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(clubIdExpected);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
-        
+
         var storedEvent = storedEvents[1];
         Assert.Multiple(() =>
         {

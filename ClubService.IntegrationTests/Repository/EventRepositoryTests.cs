@@ -2,7 +2,6 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
-using ClubService.IntegrationTests.TestSetup;
 
 namespace ClubService.IntegrationTests.Repository;
 
@@ -23,17 +22,17 @@ public class EventRepositoryTests : TestBase
                 tennisClubRegisteredEventExpected.TennisClubId.Id,
                 EventType.TENNIS_CLUB_REGISTERED, EntityType.TENNIS_CLUB, DateTime.UtcNow,
                 tennisClubRegisteredEventExpected);
-        
+
         // When
         var eventCountActual = await EventRepository.Append(domainEnvelopeExpected, eventCount);
-        
+
         // Then
         Assert.That(eventCountActual, Is.EqualTo(eventCountExpected));
-        
+
         var savedEvents =
             await EventRepository.GetEventsForEntity<ITennisClubDomainEvent>(domainEnvelopeExpected.EntityId);
         Assert.That(savedEvents, Has.Count.EqualTo(eventCountExpected));
-        
+
         var domainEnvelopeActual = savedEvents[0];
         Assert.Multiple(() =>
         {
@@ -46,7 +45,7 @@ public class EventRepositoryTests : TestBase
             Assert.That(domainEnvelopeActual.EventData.GetType(),
                 Is.EqualTo(domainEnvelopeExpected.EventData.GetType()));
         });
-        
+
         var tennisClubRegisteredEventActual = (TennisClubRegisteredEvent)domainEnvelopeActual.EventData;
         Assert.Multiple(() =>
         {

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace ClubService.IntegrationTests.TestSetup;
+namespace ClubService.IntegrationTests;
 
 public class WebAppFactory(
     string connectionString,
@@ -20,21 +20,21 @@ public class WebAppFactory(
         base.ConfigureWebHost(builder);
         builder.ConfigureServices(ReplaceDbContext);
     }
-    
+
     private void ReplaceDbContext(IServiceCollection services)
     {
         var existingDbContextRegistration = services.SingleOrDefault(
             d => d.ServiceType == typeof(DbContextOptions<EventStoreDbContext>)
         );
-        
+
         if (existingDbContextRegistration != null)
         {
             services.Remove(existingDbContextRegistration);
         }
-        
+
         services.AddDbContext<EventStoreDbContext>(options =>
             options.UseNpgsql(connectionString));
-        
+
         // mock repositories for write side integration tests
         services.AddScoped(_ => mockTennisClubReadModelRepository.Object);
         services.AddScoped(_ => mockSubscriptionTierReadModelRepository.Object);
