@@ -17,11 +17,8 @@ public static class IntegrationTestSetup
     public static Mock<IAdminReadModelRepository> MockAdminReadModelRepository { get; private set; } = null!;
     public static Mock<IMemberReadModelRepository> MockMemberReadModelRepository { get; private set; } = null!;
 
-    public static Mock<ISubscriptionTierReadModelRepository> MockSubscriptionTierReadModelRepository
-    {
-        get;
-        private set;
-    } = null!;
+    public static Mock<ISubscriptionTierReadModelRepository>
+        MockSubscriptionTierReadModelRepository { get; private set; } = null!;
 
     public static Mock<ITennisClubReadModelRepository> MockTennisClubReadModelRepository { get; private set; } = null!;
 
