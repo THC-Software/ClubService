@@ -1,5 +1,6 @@
 using System.Text.Json.Nodes;
 using ClubService.Application.EventHandlers;
+using ClubService.Domain.Repository;
 using ClubService.Infrastructure.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,15 +13,20 @@ public class RedisEventReader : BackgroundService
 {
     private readonly string _groupName;
     private readonly IServiceProvider _services;
+    private readonly ILoggerService<RedisEventReader> _loggerService;
     private readonly string _streamName;
     private IDatabase db { get; }
     private ConnectionMultiplexer connectionMultiplexer { get; }
 
-    public RedisEventReader(IServiceProvider services, IOptions<RedisConfiguration> redisConfig)
+    public RedisEventReader(
+        IServiceProvider services,
+        IOptions<RedisConfiguration> redisConfig,
+        ILoggerService<RedisEventReader> loggerService)
     {
         _streamName = redisConfig.Value.StreamName;
         _groupName = redisConfig.Value.ConsumerGroup;
         _services = services;
+        _loggerService = loggerService;
 
         var configurationOptions = ConfigurationOptions.Parse(redisConfig.Value.Host);
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
@@ -77,13 +83,13 @@ public class RedisEventReader : BackgroundService
         }
         catch (InvalidOperationException e)
         {
-            //TODO: Use logger
-            Console.WriteLine("Event Ignored: " + e.Message);
+            _loggerService.LogInvalidOperationException(e);
         }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _loggerService.LogEventReaderStart();
         await ConsumeMessagesAsync();
 
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
@@ -98,7 +104,7 @@ public class RedisEventReader : BackgroundService
         catch (OperationCanceledException)
         {
             await connectionMultiplexer.DisposeAsync();
-            Console.WriteLine("Timed Hosted Service is stopping.");
+            _loggerService.LogEventReaderStop();
         }
     }
 }

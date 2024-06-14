@@ -274,4 +274,14 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     {
         logger.LogDebug("Rejected event: {domainEnvelope}", domainEnvelope);
     }
+
+    public void LogEventReaderStart()
+    {
+        logger.LogInformation("EventReader is running. ");
+    }
+
+    public void LogEventReaderStop()
+    {
+        logger.LogInformation("EventReader is stopping.");
+    }
 }
