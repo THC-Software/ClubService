@@ -20,6 +20,7 @@ using ClubService.Infrastructure.Mail;
 using ClubService.Infrastructure.Repositories;
 using ClubService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,8 +35,7 @@ builder.Services.AddDbContext<ReadStoreDbContext>(options =>
 });
 builder.Services.AddDbContext<LoginStoreDbContext>(options =>
 {
-    options
-        .UseNpgsql(builder.Configuration.GetConnectionString("login-store-connection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("login-store-connection"));
 });
 
 // Logging
@@ -101,6 +101,18 @@ builder.Services.AddScoped<ChainEventHandler>();
 builder.Services.Configure<SmtpConfiguration>(builder.Configuration.GetSection("SmtpConfiguration"));
 builder.Services.AddScoped<IMailService, MailService>();
 
+// Redis
+builder.Services.Configure<RedisConfiguration>(builder.Configuration.GetSection("RedisConfiguration"));
+
+builder.Services.AddSingleton<IEventReader>(sp =>
+{
+    var redisConfig = sp.GetRequiredService<IOptions<RedisConfiguration>>();
+    var cancellationToken = new CancellationTokenSource().Token;
+    return new RedisEventReader(sp, redisConfig, cancellationToken);
+});
+
+builder.Services.AddHostedService<EventReaderScheduler>();
+
 // API Versioning
 builder.Services.AddApiVersioning(options =>
 {
@@ -112,25 +124,6 @@ builder.Services.AddApiVersioning(options =>
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
 });
-
-// TODO: Logging/errorhandling?
-var redisHost = builder.Configuration["RedisConfig:Host"];
-var redisStreamName = builder.Configuration["RedisConfig:StreamName"];
-var redisGroupName = builder.Configuration["RedisConfig:ConsumerGroup"];
-if (redisHost == null || redisStreamName == null || redisGroupName == null)
-{
-    Console.WriteLine("RedisConfig is not correctly configured");
-}
-else
-{
-    builder.Services.AddSingleton<IEventReader>(sp =>
-    {
-        var cancellationToken = new CancellationTokenSource().Token;
-        return new RedisEventReader(cancellationToken, sp, redisHost, redisStreamName, redisGroupName);
-    });
-
-    builder.Services.AddHostedService<EventReaderScheduler>();
-}
 
 builder.Services.AddControllers();
 
