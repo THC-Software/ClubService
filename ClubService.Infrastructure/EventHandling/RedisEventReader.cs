@@ -1,105 +1,115 @@
 using System.Text.Json.Nodes;
-using ClubService.Application.Api;
 using ClubService.Application.EventHandlers;
+using ClubService.Domain.Repository;
+using ClubService.Infrastructure.Configurations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using RedisStream = ClubService.Infrastructure.Configurations.RedisStream;
 
 namespace ClubService.Infrastructure.EventHandling;
 
-public class RedisEventReader : IEventReader
+public class RedisEventReader : BackgroundService
 {
-    private readonly CancellationToken _cancellationToken;
-    private readonly IDatabase _db;
-    private readonly string _groupName;
-    private readonly ConnectionMultiplexer _muxer;
+    private readonly ILoggerService<RedisEventReader> _loggerService;
+    private readonly List<RedisStream> _redisStreams;
     private readonly IServiceProvider _services;
-    private readonly string _streamName;
-    
+    private IDatabase db { get; }
+    private ConnectionMultiplexer connectionMultiplexer { get; }
+
     public RedisEventReader(
-        CancellationToken cancellationToken,
         IServiceProvider services,
-        string host,
-        string streamName,
-        string groupName)
+        IOptions<RedisConfiguration> redisConfig,
+        ILoggerService<RedisEventReader> loggerService)
     {
-        _streamName = streamName;
-        _groupName = groupName;
         _services = services;
-        _cancellationToken = cancellationToken;
-        var configurationOptions = ConfigurationOptions.Parse(host);
+        _loggerService = loggerService;
+        _redisStreams = redisConfig.Value.Streams;
+        var configurationOptions = ConfigurationOptions.Parse(redisConfig.Value.Host);
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
-        _muxer = ConnectionMultiplexer.Connect(configurationOptions);
-        _db = _muxer.GetDatabase();
+        connectionMultiplexer = ConnectionMultiplexer.Connect(configurationOptions);
+        db = connectionMultiplexer.GetDatabase();
     }
-    
-    public async Task ConsumeMessagesAsync()
+
+    private async Task ConsumeMessages()
     {
-        if (!await _db.KeyExistsAsync(_streamName) ||
-            (await _db.StreamGroupInfoAsync(_streamName)).All(x => x.Name != _groupName))
+        try
         {
-            await _db.StreamCreateConsumerGroupAsync(_streamName, _groupName, "0-0");
-        }
-        
-        var id = string.Empty;
-        while (!_cancellationToken.IsCancellationRequested)
-        {
-            try
+            foreach (var stream in _redisStreams)
             {
-                if (!string.IsNullOrEmpty(id))
-                {
-                    await _db.StreamAcknowledgeAsync(_streamName, _groupName, id);
-                    id = string.Empty;
-                }
-                
-                var result = await _db.StreamReadGroupAsync(_streamName, _groupName, "pos-member", ">", 1);
+                var result = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
+                    "pos-member", ">", 1);
                 if (result.Any())
                 {
                     var streamEntry = result.First();
                     var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
                     var jsonContent = JsonNode.Parse(dict.Values.First());
-                    
+
                     if (jsonContent == null)
                     {
                         throw new InvalidOperationException("json content is null");
                     }
-                    
+
                     var payload = jsonContent["payload"];
                     if (payload == null)
                     {
                         throw new InvalidOperationException("payload is null");
                     }
-                    
+
                     var eventInfo = payload["after"];
                     if (eventInfo == null)
                     {
                         throw new InvalidOperationException("event info is null");
                     }
-                    
+
                     var parsedEvent = EventParser.ParseEvent(eventInfo);
-                    
+
                     using var scope = _services.CreateScope();
                     var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
                     await chainEventHandler.Handle(parsedEvent);
+
+                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
                 }
-                
-                await Task.Delay(1000, _cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                Console.WriteLine("Redis Event Reader stopped!");
-                Dispose();
-                break;
-            }
-            catch (InvalidOperationException e)
-            {
-                //TODO: Use logger
-                Console.WriteLine("Event Ignored: " + e.Message);
             }
         }
+        catch (InvalidOperationException e)
+        {
+            _loggerService.LogInvalidOperationException(e);
+        }
     }
-    
-    public void Dispose()
+
+    private async Task EnsureStreamAndGroupExists(RedisStream stream)
     {
-        _muxer.Dispose();
+        if (!await db.KeyExistsAsync(stream.StreamName) ||
+            (await db.StreamGroupInfoAsync(stream.StreamName)).All(x => x.Name != stream.ConsumerGroup))
+        {
+            await db.StreamCreateConsumerGroupAsync(stream.StreamName, stream.ConsumerGroup, "0-0");
+        }
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _loggerService.LogEventReaderStart();
+
+        foreach (var redisStream in _redisStreams)
+        {
+            await EnsureStreamAndGroupExists(redisStream);
+        }
+
+        using PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
+
+        try
+        {
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+            {
+                await ConsumeMessages();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            await connectionMultiplexer.DisposeAsync();
+            _loggerService.LogEventReaderStop();
+        }
     }
 }

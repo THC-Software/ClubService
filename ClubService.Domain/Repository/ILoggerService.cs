@@ -54,4 +54,6 @@ public interface ILoggerService<T>
     void LogValidationFailure(string validationMessage);
     void LogHandleEvent(DomainEnvelope<IDomainEvent> domainEnvelope);
     void LogRejectEvent(DomainEnvelope<IDomainEvent> domainEnvelope);
+    void LogEventReaderStart();
+    void LogEventReaderStop();
 }
