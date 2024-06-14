@@ -6,15 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using RedisStream = ClubService.Infrastructure.Configurations.RedisStream;
 
 namespace ClubService.Infrastructure.EventHandling;
 
 public class RedisEventReader : BackgroundService
 {
-    private readonly string _groupName;
-    private readonly IServiceProvider _services;
     private readonly ILoggerService<RedisEventReader> _loggerService;
-    private readonly string _streamName;
+    private readonly List<RedisStream> _redisStreams;
+    private readonly IServiceProvider _services;
     private IDatabase db { get; }
     private ConnectionMultiplexer connectionMultiplexer { get; }
 
@@ -23,62 +23,54 @@ public class RedisEventReader : BackgroundService
         IOptions<RedisConfiguration> redisConfig,
         ILoggerService<RedisEventReader> loggerService)
     {
-        _streamName = redisConfig.Value.StreamName;
-        _groupName = redisConfig.Value.ConsumerGroup;
         _services = services;
         _loggerService = loggerService;
-
+        _redisStreams = redisConfig.Value.Streams;
         var configurationOptions = ConfigurationOptions.Parse(redisConfig.Value.Host);
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
         connectionMultiplexer = ConnectionMultiplexer.Connect(configurationOptions);
         db = connectionMultiplexer.GetDatabase();
     }
 
-    private async Task ConsumeMessagesAsync()
+    private async Task ConsumeMessages()
     {
-        if (!await db.KeyExistsAsync(_streamName) ||
-            (await db.StreamGroupInfoAsync(_streamName)).All(x => x.Name != _groupName))
-        {
-            await db.StreamCreateConsumerGroupAsync(_streamName, _groupName, "0-0");
-        }
-
-        var id = string.Empty;
         try
         {
-            if (!string.IsNullOrEmpty(id))
+            foreach (var stream in _redisStreams)
             {
-                await db.StreamAcknowledgeAsync(_streamName, _groupName, id);
-            }
-
-            var result = await db.StreamReadGroupAsync(_streamName, _groupName, "pos-member", ">", 1);
-            if (result.Any())
-            {
-                var streamEntry = result.First();
-                var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
-                var jsonContent = JsonNode.Parse(dict.Values.First());
-
-                if (jsonContent == null)
+                var result = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
+                    "pos-member", ">", 1);
+                if (result.Any())
                 {
-                    throw new InvalidOperationException("json content is null");
+                    var streamEntry = result.First();
+                    var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
+                    var jsonContent = JsonNode.Parse(dict.Values.First());
+
+                    if (jsonContent == null)
+                    {
+                        throw new InvalidOperationException("json content is null");
+                    }
+
+                    var payload = jsonContent["payload"];
+                    if (payload == null)
+                    {
+                        throw new InvalidOperationException("payload is null");
+                    }
+
+                    var eventInfo = payload["after"];
+                    if (eventInfo == null)
+                    {
+                        throw new InvalidOperationException("event info is null");
+                    }
+
+                    var parsedEvent = EventParser.ParseEvent(eventInfo);
+
+                    using var scope = _services.CreateScope();
+                    var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
+                    await chainEventHandler.Handle(parsedEvent);
+
+                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
                 }
-
-                var payload = jsonContent["payload"];
-                if (payload == null)
-                {
-                    throw new InvalidOperationException("payload is null");
-                }
-
-                var eventInfo = payload["after"];
-                if (eventInfo == null)
-                {
-                    throw new InvalidOperationException("event info is null");
-                }
-
-                var parsedEvent = EventParser.ParseEvent(eventInfo);
-
-                using var scope = _services.CreateScope();
-                var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
-                await chainEventHandler.Handle(parsedEvent);
             }
         }
         catch (InvalidOperationException e)
@@ -87,10 +79,23 @@ public class RedisEventReader : BackgroundService
         }
     }
 
+    private async Task EnsureStreamAndGroupExists(RedisStream stream)
+    {
+        if (!await db.KeyExistsAsync(stream.StreamName) ||
+            (await db.StreamGroupInfoAsync(stream.StreamName)).All(x => x.Name != stream.ConsumerGroup))
+        {
+            await db.StreamCreateConsumerGroupAsync(stream.StreamName, stream.ConsumerGroup, "0-0");
+        }
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _loggerService.LogEventReaderStart();
-        await ConsumeMessagesAsync();
+
+        foreach (var redisStream in _redisStreams)
+        {
+            await EnsureStreamAndGroupExists(redisStream);
+        }
 
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
 
@@ -98,7 +103,7 @@ public class RedisEventReader : BackgroundService
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                await ConsumeMessagesAsync();
+                await ConsumeMessages();
             }
         }
         catch (OperationCanceledException)
