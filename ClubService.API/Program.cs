@@ -102,8 +102,7 @@ builder.Services.AddScoped<IMailService, MailService>();
 
 // Redis
 builder.Services.Configure<RedisConfiguration>(builder.Configuration.GetSection("RedisConfiguration"));
-builder.Services.AddSingleton<IEventReader, RedisEventReader>();
-builder.Services.AddHostedService<EventReaderScheduler>();
+builder.Services.AddHostedService<RedisEventReader>();
 
 // API Versioning
 builder.Services.AddApiVersioning(options =>
