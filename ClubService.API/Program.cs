@@ -20,7 +20,6 @@ using ClubService.Infrastructure.Mail;
 using ClubService.Infrastructure.Repositories;
 using ClubService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,14 +102,7 @@ builder.Services.AddScoped<IMailService, MailService>();
 
 // Redis
 builder.Services.Configure<RedisConfiguration>(builder.Configuration.GetSection("RedisConfiguration"));
-
-builder.Services.AddSingleton<IEventReader>(sp =>
-{
-    var redisConfig = sp.GetRequiredService<IOptions<RedisConfiguration>>();
-    var cancellationToken = new CancellationTokenSource().Token;
-    return new RedisEventReader(sp, redisConfig, cancellationToken);
-});
-
+builder.Services.AddSingleton<IEventReader, RedisEventReader>();
 builder.Services.AddHostedService<EventReaderScheduler>();
 
 // API Versioning

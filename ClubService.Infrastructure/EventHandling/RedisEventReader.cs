@@ -10,29 +10,24 @@ namespace ClubService.Infrastructure.EventHandling;
 
 public class RedisEventReader : IEventReader
 {
-    private readonly CancellationToken _cancellationToken;
     private readonly IDatabase _db;
     private readonly string _groupName;
     private readonly ConnectionMultiplexer _muxer;
     private readonly IServiceProvider _services;
     private readonly string _streamName;
 
-    public RedisEventReader(
-        IServiceProvider services,
-        IOptions<RedisConfiguration> redisConfig,
-        CancellationToken cancellationToken)
+    public RedisEventReader(IServiceProvider services, IOptions<RedisConfiguration> redisConfig)
     {
         _streamName = redisConfig.Value.StreamName;
         _groupName = redisConfig.Value.ConsumerGroup;
         _services = services;
-        _cancellationToken = cancellationToken;
         var configurationOptions = ConfigurationOptions.Parse(redisConfig.Value.Host);
         configurationOptions.AbortOnConnectFail = false; // Allow retrying
         _muxer = ConnectionMultiplexer.Connect(configurationOptions);
         _db = _muxer.GetDatabase();
     }
 
-    public async Task ConsumeMessagesAsync()
+    public async Task ConsumeMessagesAsync(CancellationToken cancellationToken)
     {
         if (!await _db.KeyExistsAsync(_streamName) ||
             (await _db.StreamGroupInfoAsync(_streamName)).All(x => x.Name != _groupName))
@@ -41,7 +36,7 @@ public class RedisEventReader : IEventReader
         }
 
         var id = string.Empty;
-        while (!_cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
@@ -82,7 +77,7 @@ public class RedisEventReader : IEventReader
                     await chainEventHandler.Handle(parsedEvent);
                 }
 
-                await Task.Delay(1000, _cancellationToken);
+                await Task.Delay(1000, cancellationToken);
             }
             catch (OperationCanceledException)
             {

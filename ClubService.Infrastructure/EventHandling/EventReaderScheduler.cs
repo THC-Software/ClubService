@@ -9,7 +9,7 @@ public class EventReaderScheduler(IEventReader eventReader) : BackgroundService
     {
         try
         {
-            await eventReader.ConsumeMessagesAsync();
+            await eventReader.ConsumeMessagesAsync(stoppingToken);
         }
         catch (OperationCanceledException)
         {
@@ -17,7 +17,7 @@ public class EventReaderScheduler(IEventReader eventReader) : BackgroundService
             Dispose();
         }
     }
-    
+
     public override void Dispose()
     {
         eventReader.Dispose();
