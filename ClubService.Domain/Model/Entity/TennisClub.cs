@@ -37,44 +37,54 @@ public class TennisClub
 
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubLockCommand()
     {
-        if (Status.Equals(TennisClubStatus.LOCKED))
+        switch (Status)
         {
-            throw new InvalidOperationException("Tennis Club is already locked!");
+            case TennisClubStatus.ACTIVE:
+                var tennisClubLockedEvent = new TennisClubLockedEvent();
+                
+                var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+                    Guid.NewGuid(),
+                    TennisClubId.Id,
+                    EventType.TENNIS_CLUB_LOCKED,
+                    EntityType.TENNIS_CLUB,
+                    DateTime.UtcNow,
+                    tennisClubLockedEvent
+                );
+                
+                return [domainEnvelope];
+            case TennisClubStatus.LOCKED:
+                throw new InvalidOperationException("Tennis Club is already locked!");
+            case TennisClubStatus.DELETED:
+                throw new InvalidOperationException("Tennis Club is already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
-
-        var tennisClubLockedEvent = new TennisClubLockedEvent();
-
-        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
-            Guid.NewGuid(),
-            TennisClubId.Id,
-            EventType.TENNIS_CLUB_LOCKED,
-            EntityType.TENNIS_CLUB,
-            DateTime.UtcNow,
-            tennisClubLockedEvent
-        );
-
-        return [domainEnvelope];
     }
 
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUnlockCommand()
     {
-        if (Status.Equals(TennisClubStatus.ACTIVE))
+        switch (Status)
         {
-            throw new InvalidOperationException("Tennis Club needs to be locked!");
+            case TennisClubStatus.LOCKED:
+                var tennisClubUnlockedEvent = new TennisClubUnlockedEvent();
+                
+                var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+                    Guid.NewGuid(),
+                    TennisClubId.Id,
+                    EventType.TENNIS_CLUB_UNLOCKED,
+                    EntityType.TENNIS_CLUB,
+                    DateTime.UtcNow,
+                    tennisClubUnlockedEvent
+                );
+                
+                return [domainEnvelope];
+            case TennisClubStatus.ACTIVE:
+                throw new InvalidOperationException("Tennis Club needs to be locked!");
+            case TennisClubStatus.DELETED:
+                throw new InvalidOperationException("Tennis Club is already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
-
-        var tennisClubUnlockedEvent = new TennisClubUnlockedEvent();
-
-        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
-            Guid.NewGuid(),
-            TennisClubId.Id,
-            EventType.TENNIS_CLUB_UNLOCKED,
-            EntityType.TENNIS_CLUB,
-            DateTime.UtcNow,
-            tennisClubUnlockedEvent
-        );
-
-        return [domainEnvelope];
     }
 
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubUpdateCommand(
@@ -126,45 +136,29 @@ public class TennisClub
             default:
                 throw new ArgumentOutOfRangeException(nameof(Status));
         }
-
-        if (subscriptionTierId != null && !subscriptionTierId.Equals(SubscriptionTierId))
-        {
-            var subscriptionTierChangedEvent = new TennisClubSubscriptionTierChangedEvent(subscriptionTierId);
-
-            var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
-                Guid.NewGuid(),
-                TennisClubId.Id,
-                EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED,
-                EntityType.TENNIS_CLUB,
-                DateTime.UtcNow,
-                subscriptionTierChangedEvent
-            );
-
-            domainEnvelopes.Add(domainEnvelope);
-        }
-
-        return domainEnvelopes;
     }
 
     public List<DomainEnvelope<ITennisClubDomainEvent>> ProcessTennisClubDeleteCommand()
     {
-        if (Status.Equals(TennisClubStatus.DELETED))
+        switch (Status)
         {
-            throw new InvalidOperationException("Tennis Club is already deleted!");
+            case TennisClubStatus.ACTIVE:
+            case TennisClubStatus.LOCKED:
+                var tennisClubDeletedEvent = new TennisClubDeletedEvent();
+                var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+                    Guid.NewGuid(),
+                    TennisClubId.Id,
+                    EventType.TENNIS_CLUB_DELETED,
+                    EntityType.TENNIS_CLUB,
+                    DateTime.UtcNow,
+                    tennisClubDeletedEvent
+                );
+                return [domainEnvelope];
+            case TennisClubStatus.DELETED:
+                throw new InvalidOperationException("Tennis Club is already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
-
-        var tennisClubDeletedEvent = new TennisClubDeletedEvent();
-
-        var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
-            Guid.NewGuid(),
-            TennisClubId.Id,
-            EventType.TENNIS_CLUB_DELETED,
-            EntityType.TENNIS_CLUB,
-            DateTime.UtcNow,
-            tennisClubDeletedEvent
-        );
-
-        return [domainEnvelope];
     }
 
     public void Apply(DomainEnvelope<ITennisClubDomainEvent> domainEnvelope)
