@@ -40,23 +40,24 @@ public class Admin
 
     public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminDeleteCommand()
     {
-        if (Status.Equals(AdminStatus.DELETED))
+        switch (Status)
         {
-            throw new InvalidOperationException("Admin is already deleted!");
+            case AdminStatus.ACTIVE:
+                var adminDeletedEvent = new AdminDeletedEvent();
+                var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
+                    Guid.NewGuid(),
+                    AdminId.Id,
+                    EventType.ADMIN_DELETED,
+                    EntityType.ADMIN,
+                    DateTime.UtcNow,
+                    adminDeletedEvent
+                );
+                return [domainEnvelope];
+            case AdminStatus.DELETED:
+                throw new InvalidOperationException("Admin is already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
-
-        var adminDeletedEvent = new AdminDeletedEvent();
-
-        var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
-            Guid.NewGuid(),
-            AdminId.Id,
-            EventType.ADMIN_DELETED,
-            EntityType.ADMIN,
-            DateTime.UtcNow,
-            adminDeletedEvent
-        );
-
-        return [domainEnvelope];
     }
 
     public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminChangeFullNameCommand(FullName fullName)
