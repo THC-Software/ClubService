@@ -81,23 +81,50 @@ public class TennisClub
         string? name,
         SubscriptionTierId? subscriptionTierId)
     {
-        // TODO: Check state
-        var domainEnvelopes = new List<DomainEnvelope<ITennisClubDomainEvent>>();
-
-        if (!string.IsNullOrWhiteSpace(name) && !name.Equals(Name))
+        switch (Status)
         {
-            var nameChangedEvent = new TennisClubNameChangedEvent(name);
-
-            var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
-                Guid.NewGuid(),
-                TennisClubId.Id,
-                EventType.TENNIS_CLUB_NAME_CHANGED,
-                EntityType.TENNIS_CLUB,
-                DateTime.UtcNow,
-                nameChangedEvent
-            );
-
-            domainEnvelopes.Add(domainEnvelope);
+            case TennisClubStatus.ACTIVE:
+                var domainEnvelopes = new List<DomainEnvelope<ITennisClubDomainEvent>>();
+                
+                if (!string.IsNullOrWhiteSpace(name) && !name.Equals(Name))
+                {
+                    var nameChangedEvent = new TennisClubNameChangedEvent(name);
+                    
+                    var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+                        Guid.NewGuid(),
+                        TennisClubId.Id,
+                        EventType.TENNIS_CLUB_NAME_CHANGED,
+                        EntityType.TENNIS_CLUB,
+                        DateTime.UtcNow,
+                        nameChangedEvent
+                    );
+                    
+                    domainEnvelopes.Add(domainEnvelope);
+                }
+                
+                if (subscriptionTierId != null && !subscriptionTierId.Equals(SubscriptionTierId))
+                {
+                    var subscriptionTierChangedEvent = new TennisClubSubscriptionTierChangedEvent(subscriptionTierId);
+                    
+                    var domainEnvelope = new DomainEnvelope<ITennisClubDomainEvent>(
+                        Guid.NewGuid(),
+                        TennisClubId.Id,
+                        EventType.TENNIS_CLUB_SUBSCRIPTION_TIER_CHANGED,
+                        EntityType.TENNIS_CLUB,
+                        DateTime.UtcNow,
+                        subscriptionTierChangedEvent
+                    );
+                    
+                    domainEnvelopes.Add(domainEnvelope);
+                }
+                
+                return domainEnvelopes;
+            case TennisClubStatus.LOCKED:
+                throw new InvalidOperationException("Tennis Club is locked!");
+            case TennisClubStatus.DELETED:
+                throw new InvalidOperationException("Tennis Club is already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
 
         if (subscriptionTierId != null && !subscriptionTierId.Equals(SubscriptionTierId))
