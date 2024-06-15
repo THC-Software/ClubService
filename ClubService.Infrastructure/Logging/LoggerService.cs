@@ -262,7 +262,7 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
 
     public void LogValidationFailure(string validationMessage)
     {
-        logger.LogError(validationMessage);
+        logger.LogError("Validation Error: {validationMessage}", validationMessage);
     }
 
     public void LogHandleEvent(DomainEnvelope<IDomainEvent> domainEnvelope)
@@ -283,5 +283,10 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     public void LogEventReaderStop()
     {
         logger.LogInformation("EventReader is stopping.");
+    }
+
+    public void LogException(Exception exception)
+    {
+        logger.LogError(exception, "Exception occured:");
     }
 }

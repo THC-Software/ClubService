@@ -264,4 +264,17 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
             await SaveChangesAsync();
         }
     }
+
+    public async Task ClearDatabase()
+    {
+        await Database.ExecuteSqlRawAsync(@"
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'DomainEvent') THEN
+                DELETE FROM ""DomainEvent"";
+            END IF;
+        END
+        $$;");
+        await SaveChangesAsync();
+    }
 }
