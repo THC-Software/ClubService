@@ -28,7 +28,7 @@ public class AdminReadModelRepository(ReadStoreDbContext readStoreDbContext) : I
     public async Task DeleteAdminsByTennisClubId(Guid tennisClubId)
     {
         var adminsToDelete = await readStoreDbContext.Admins
-            .Where(admin => admin.TennisClubId.Id == tennisClubId)
+            .Where(admin => admin.TennisClubId == new TennisClubId(tennisClubId))
             .ToListAsync();
         
         readStoreDbContext.Admins.RemoveRange(adminsToDelete);
