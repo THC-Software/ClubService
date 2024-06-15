@@ -61,7 +61,7 @@ public class RegisterMemberService(
                         memberRegisterCommand.Email,
                         tennisClubReadModel.Name,
                         tennisClubId.Id);
-                    throw new MemberEmailAlreadyExists(
+                    throw new MemberEmailAlreadyExistsException(
                         memberRegisterCommand.Email,
                         tennisClubReadModel.Name,
                         tennisClubId.Id
@@ -96,7 +96,7 @@ public class RegisterMemberService(
             case TennisClubStatus.DELETED:
                 throw new ConflictException("Tennis club already deleted!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(tennisClubReadModel.Status));
         }
     }
 

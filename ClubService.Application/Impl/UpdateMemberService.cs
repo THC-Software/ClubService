@@ -232,7 +232,7 @@ public class UpdateMemberService(
             case TennisClubStatus.DELETED:
                 throw new ConflictException("Tennis club already deleted!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(tennisClub.Status));
         }
     }
 }

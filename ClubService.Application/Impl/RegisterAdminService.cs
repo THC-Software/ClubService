@@ -52,7 +52,7 @@ public class RegisterAdminService(
                         adminRegisterCommand.Username,
                         tennisClub.Name,
                         tennisClubId.Id);
-                    throw new AdminUsernameAlreadyExists(
+                    throw new AdminUsernameAlreadyExistsException(
                         adminRegisterCommand.Username,
                         tennisClub.Name,
                         tennisClubId.Id
@@ -85,7 +85,7 @@ public class RegisterAdminService(
             case TennisClubStatus.DELETED:
                 throw new ConflictException("Tennis club already deleted!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(tennisClub.Status));
         }
     }
 

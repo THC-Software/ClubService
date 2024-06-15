@@ -16,7 +16,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             Detail = exception.Message
         };
-        
+
         switch (exception)
         {
             case TennisClubNotFoundException:
@@ -30,8 +30,8 @@ public class GlobalExceptionHandler : IExceptionHandler
             case ConcurrencyException:
             case ConflictException:
             case MemberLimitExceededException:
-            case AdminUsernameAlreadyExists:
-            case MemberEmailAlreadyExists:
+            case AdminUsernameAlreadyExistsException:
+            case MemberEmailAlreadyExistsException:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.10";
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";
@@ -47,13 +47,13 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Title = "Internal Server Error";
                 break;
         }
-        
+
         httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
-        
+
         await httpContext
             .Response
             .WriteAsJsonAsync(problemDetails, cancellationToken);
-        
+
         return true;
     }
 }

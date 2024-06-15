@@ -39,7 +39,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 
 app.UseExceptionHandler();
 app.MapControllers();
-app.Run();
+await app.RunAsync();
 
 // For integration tests
 public abstract partial class Program
