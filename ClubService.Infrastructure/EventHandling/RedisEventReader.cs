@@ -43,37 +43,40 @@ public class RedisEventReader : BackgroundService
             {
                 var result = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
                     "pos-member", ">", 1);
-                if (result.Any())
+
+                if (result.Length == 0)
                 {
-                    var streamEntry = result.First();
-                    var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
-                    var jsonContent = JsonNode.Parse(dict.Values.First());
-
-                    if (jsonContent == null)
-                    {
-                        throw new InvalidOperationException("json content is null");
-                    }
-
-                    var payload = jsonContent["payload"];
-                    if (payload == null)
-                    {
-                        throw new InvalidOperationException("payload is null");
-                    }
-
-                    var eventInfo = payload["after"];
-                    if (eventInfo == null)
-                    {
-                        throw new InvalidOperationException("event info is null");
-                    }
-
-                    var parsedEvent = EventParser.ParseEvent(eventInfo);
-
-                    using var scope = _services.CreateScope();
-                    var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
-                    await chainEventHandler.Handle(parsedEvent);
-
-                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
+                    continue;
                 }
+
+                var streamEntry = result.First();
+                var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
+                var jsonContent = JsonNode.Parse(dict.Values.First());
+
+                if (jsonContent == null)
+                {
+                    throw new InvalidOperationException("json content is null");
+                }
+
+                var payload = jsonContent["payload"];
+                if (payload == null)
+                {
+                    throw new InvalidOperationException("payload is null");
+                }
+
+                var eventInfo = payload["after"];
+                if (eventInfo == null)
+                {
+                    throw new InvalidOperationException("event info is null");
+                }
+
+                var parsedEvent = EventParser.ParseEvent(eventInfo);
+
+                using var scope = _services.CreateScope();
+                var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
+                await chainEventHandler.Handle(parsedEvent);
+
+                await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
             }
         }
         catch (InvalidOperationException e)
