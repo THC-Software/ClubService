@@ -89,25 +89,29 @@ public class Member
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberDeleteCommand()
     {
-        if (Status.Equals(MemberStatus.DELETED))
+        switch (Status)
         {
-            throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.ACTIVE:
+            case MemberStatus.LOCKED:
+                var memberDeletedEvent = new MemberDeletedEvent();
+
+                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                    Guid.NewGuid(),
+                    MemberId.Id,
+                    EventType.MEMBER_DELETED,
+                    EntityType.MEMBER,
+                    DateTime.UtcNow,
+                    memberDeletedEvent
+                );
+
+                return [domainEnvelope];
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
-        
-        var memberDeletedEvent = new MemberDeletedEvent();
-        
-        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-            Guid.NewGuid(),
-            MemberId.Id,
-            EventType.MEMBER_DELETED,
-            EntityType.MEMBER,
-            DateTime.UtcNow,
-            memberDeletedEvent
-        );
-        
-        return [domainEnvelope];
     }
-    
+
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand(
         string? firstName,
         string? lastName,

@@ -13,16 +13,16 @@ namespace ClubService.Infrastructure.EventHandling;
 public class RedisEventReader : BackgroundService
 {
     private readonly ILoggerService<RedisEventReader> _loggerService;
+    private readonly int _pollingInterval;
     private readonly List<RedisStream> _redisStreams;
     private readonly IServiceProvider _services;
-    private IDatabase db { get; }
-    private ConnectionMultiplexer connectionMultiplexer { get; }
 
     public RedisEventReader(
         IServiceProvider services,
         IOptions<RedisConfiguration> redisConfig,
         ILoggerService<RedisEventReader> loggerService)
     {
+        _pollingInterval = redisConfig.Value.PollingInterval;
         _services = services;
         _loggerService = loggerService;
         _redisStreams = redisConfig.Value.Streams;
@@ -32,6 +32,9 @@ public class RedisEventReader : BackgroundService
         db = connectionMultiplexer.GetDatabase();
     }
 
+    private IDatabase db { get; }
+    private ConnectionMultiplexer connectionMultiplexer { get; }
+
     private async Task ConsumeMessages()
     {
         try
@@ -40,37 +43,40 @@ public class RedisEventReader : BackgroundService
             {
                 var result = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
                     "pos-member", ">", 1);
-                if (result.Any())
+
+                if (result.Length == 0)
                 {
-                    var streamEntry = result.First();
-                    var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
-                    var jsonContent = JsonNode.Parse(dict.Values.First());
-
-                    if (jsonContent == null)
-                    {
-                        throw new InvalidOperationException("json content is null");
-                    }
-
-                    var payload = jsonContent["payload"];
-                    if (payload == null)
-                    {
-                        throw new InvalidOperationException("payload is null");
-                    }
-
-                    var eventInfo = payload["after"];
-                    if (eventInfo == null)
-                    {
-                        throw new InvalidOperationException("event info is null");
-                    }
-
-                    var parsedEvent = EventParser.ParseEvent(eventInfo);
-
-                    using var scope = _services.CreateScope();
-                    var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
-                    await chainEventHandler.Handle(parsedEvent);
-
-                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
+                    continue;
                 }
+
+                var streamEntry = result.First();
+                var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
+                var jsonContent = JsonNode.Parse(dict.Values.First());
+
+                if (jsonContent == null)
+                {
+                    throw new InvalidOperationException("json content is null");
+                }
+
+                var payload = jsonContent["payload"];
+                if (payload == null)
+                {
+                    throw new InvalidOperationException("payload is null");
+                }
+
+                var eventInfo = payload["after"];
+                if (eventInfo == null)
+                {
+                    throw new InvalidOperationException("event info is null");
+                }
+
+                var parsedEvent = EventParser.ParseEvent(eventInfo);
+
+                using var scope = _services.CreateScope();
+                var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
+                await chainEventHandler.Handle(parsedEvent);
+
+                await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
             }
         }
         catch (InvalidOperationException e)
@@ -97,7 +103,7 @@ public class RedisEventReader : BackgroundService
             await EnsureStreamAndGroupExists(redisStream);
         }
 
-        using PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
+        using PeriodicTimer timer = new(TimeSpan.FromSeconds(_pollingInterval));
 
         try
         {

@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
 using ClubService.Domain.Api;
 using Microsoft.AspNetCore.Identity;
 
@@ -6,12 +5,11 @@ namespace ClubService.Infrastructure.Services;
 
 public class PasswordHasherService : IPasswordHasherService
 {
-
-    private readonly IPasswordHasher<object> _passwordHasher = new PasswordHasher<object>();
+    private readonly PasswordHasher<object> _passwordHasher = new();
 
     public string HashPassword(string password)
     {
-        return _passwordHasher.HashPassword(new object() ,password);
+        return _passwordHasher.HashPassword(new object(), password);
     }
 
     public bool VerifyPassword(string hashedPassword, string providedPassword)

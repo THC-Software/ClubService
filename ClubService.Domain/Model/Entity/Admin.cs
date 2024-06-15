@@ -12,7 +12,7 @@ public class Admin
     public FullName Name { get; private set; } = null!;
     public TennisClubId TennisClubId { get; private set; } = null!;
     public AdminStatus Status { get; private set; }
-    
+
     public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminRegisterCommand(
         string username,
         FullName name,
@@ -25,7 +25,7 @@ public class Admin
             tennisClubId,
             AdminStatus.ACTIVE
         );
-        
+
         var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
             Guid.NewGuid(),
             adminRegisteredEvent.AdminId.Id,
@@ -34,19 +34,19 @@ public class Admin
             DateTime.UtcNow,
             adminRegisteredEvent
         );
-        
+
         return [domainEnvelope];
     }
-    
+
     public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminDeleteCommand()
     {
         if (Status.Equals(AdminStatus.DELETED))
         {
             throw new InvalidOperationException("Admin is already deleted!");
         }
-        
+
         var adminDeletedEvent = new AdminDeletedEvent();
-        
+
         var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
             Guid.NewGuid(),
             AdminId.Id,
@@ -55,35 +55,39 @@ public class Admin
             DateTime.UtcNow,
             adminDeletedEvent
         );
-        
+
         return [domainEnvelope];
     }
-    
+
     public List<DomainEnvelope<IAdminDomainEvent>> ProcessAdminChangeFullNameCommand(FullName fullName)
     {
-        if (Status.Equals(AdminStatus.DELETED))
+        switch (Status)
         {
-            throw new InvalidOperationException("Admin is already deleted!");
+            case AdminStatus.ACTIVE:
+                if (fullName.Equals(Name))
+                {
+                    throw new InvalidOperationException("This name is already set!");
+                }
+
+                var adminChangedFullNameEvent = new AdminFullNameChangedEvent(fullName);
+
+                var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
+                    Guid.NewGuid(),
+                    AdminId.Id,
+                    EventType.ADMIN_FULL_NAME_CHANGED,
+                    EntityType.ADMIN,
+                    DateTime.UtcNow,
+                    adminChangedFullNameEvent
+                );
+
+                return [domainEnvelope];
+            case AdminStatus.DELETED:
+                throw new InvalidOperationException("Admin is already deleted!");
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
-        if (fullName.Equals(Name))
-        {
-            throw new InvalidOperationException("This name is already set!");
-        }
-        
-        var adminChangedFullNameEvent = new AdminFullNameChangedEvent(fullName);
-        
-        var domainEnvelope = new DomainEnvelope<IAdminDomainEvent>(
-            Guid.NewGuid(),
-            AdminId.Id,
-            EventType.ADMIN_FULL_NAME_CHANGED,
-            EntityType.ADMIN,
-            DateTime.UtcNow,
-            adminChangedFullNameEvent
-        );
-        
-        return [domainEnvelope];
     }
-    
+
     public void Apply(DomainEnvelope<IAdminDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -115,7 +119,7 @@ public class Admin
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity Admin!");
         }
     }
-    
+
     private void Apply(AdminRegisteredEvent adminRegisteredEvent)
     {
         AdminId = adminRegisteredEvent.AdminId;
@@ -124,43 +128,43 @@ public class Admin
         TennisClubId = adminRegisteredEvent.TennisClubId;
         Status = adminRegisteredEvent.Status;
     }
-    
+
     private void Apply(AdminFullNameChangedEvent adminFullNameChangedEvent)
     {
         Name = adminFullNameChangedEvent.Name;
     }
-    
+
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(AdminDeletedEvent adminDeletedEvent)
     {
         Status = AdminStatus.DELETED;
     }
-    
+
     protected bool Equals(Admin other)
     {
         return AdminId.Equals(other.AdminId);
     }
-    
+
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
         {
             return false;
         }
-        
+
         if (ReferenceEquals(this, obj))
         {
             return true;
         }
-        
+
         if (obj.GetType() != GetType())
         {
             return false;
         }
-        
+
         return Equals((Admin)obj);
     }
-    
+
     public override int GetHashCode()
     {
         return AdminId.GetHashCode();

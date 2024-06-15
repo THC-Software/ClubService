@@ -36,7 +36,11 @@ public class UpdateAdminService(
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(admin.TennisClubId.Id);
 
-        // TODO: Check if tennisClubDomainEvents.Count > 0
+        if (tennisClubDomainEvents.Count == 0)
+        {
+            loggerService.LogTennisClubNotFound(admin.TennisClubId.Id);
+            throw new TennisClubNotFoundException(admin.TennisClubId.Id);
+        }
 
         var tennisClub = new TennisClub();
         foreach (var domainEvent in tennisClubDomainEvents)
@@ -74,7 +78,7 @@ public class UpdateAdminService(
             case TennisClubStatus.DELETED:
                 throw new ConflictException("Tennis club already deleted!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(tennisClub.Status));
         }
     }
 }
