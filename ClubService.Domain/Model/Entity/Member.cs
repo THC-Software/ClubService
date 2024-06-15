@@ -142,45 +142,55 @@ public class Member
         string? lastName,
         string? email)
     {
-        var domainEnvelopes = new List<DomainEnvelope<IMemberDomainEvent>>();
-        
-        if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName))
+        switch (Status)
         {
-            var fullName = new FullName(firstName, lastName);
-            if (!fullName.Equals(Name))
-            {
-                var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
+            case MemberStatus.ACTIVE:
+                var domainEnvelopes = new List<DomainEnvelope<IMemberDomainEvent>>();
                 
-                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-                    Guid.NewGuid(),
-                    MemberId.Id,
-                    EventType.MEMBER_FULL_NAME_CHANGED,
-                    EntityType.MEMBER,
-                    DateTime.UtcNow,
-                    memberFullNameChangedEvent
-                );
+                if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName))
+                {
+                    var fullName = new FullName(firstName, lastName);
+                    if (!fullName.Equals(Name))
+                    {
+                        var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
+                        
+                        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                            Guid.NewGuid(),
+                            MemberId.Id,
+                            EventType.MEMBER_FULL_NAME_CHANGED,
+                            EntityType.MEMBER,
+                            DateTime.UtcNow,
+                            memberFullNameChangedEvent
+                        );
+                        
+                        domainEnvelopes.Add(domainEnvelope);
+                    }
+                }
                 
-                domainEnvelopes.Add(domainEnvelope);
-            }
+                if (!string.IsNullOrWhiteSpace(email) && !email.Equals(Email))
+                {
+                    var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
+                    
+                    var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
+                        Guid.NewGuid(),
+                        MemberId.Id,
+                        EventType.MEMBER_EMAIL_CHANGED,
+                        EntityType.MEMBER,
+                        DateTime.UtcNow,
+                        memberEmailChangedEvent
+                    );
+                    
+                    domainEnvelopes.Add(domainEnvelope);
+                }
+                
+                return domainEnvelopes;
+            case MemberStatus.DELETED:
+                throw new InvalidOperationException("Member is already deleted!");
+            case MemberStatus.LOCKED:
+                throw new InvalidOperationException("Member is locked!");
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        
-        if (!string.IsNullOrWhiteSpace(email) && !email.Equals(Email))
-        {
-            var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
-            
-            var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-                Guid.NewGuid(),
-                MemberId.Id,
-                EventType.MEMBER_EMAIL_CHANGED,
-                EntityType.MEMBER,
-                DateTime.UtcNow,
-                memberEmailChangedEvent
-            );
-            
-            domainEnvelopes.Add(domainEnvelope);
-        }
-        
-        return domainEnvelopes;
     }
     
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
