@@ -164,7 +164,7 @@ public class Member
             case MemberStatus.LOCKED:
                 throw new InvalidOperationException("Member is locked!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
     }
     
