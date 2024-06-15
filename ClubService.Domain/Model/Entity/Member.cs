@@ -108,35 +108,6 @@ public class Member
         return [domainEnvelope];
     }
     
-    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeFullNameCommand(FullName fullName)
-    {
-        switch (Status)
-        {
-            case MemberStatus.ACTIVE:
-                if (fullName.Equals(Name))
-                {
-                    throw new InvalidOperationException("This name is already set!");
-                }
-                
-                var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
-                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-                    Guid.NewGuid(),
-                    MemberId.Id,
-                    EventType.MEMBER_FULL_NAME_CHANGED,
-                    EntityType.MEMBER,
-                    DateTime.UtcNow,
-                    memberFullNameChangedEvent
-                );
-                return [domainEnvelope];
-            case MemberStatus.DELETED:
-                throw new InvalidOperationException("Member is already deleted!");
-            case MemberStatus.LOCKED:
-                throw new InvalidOperationException("Member is locked!");
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-    
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand(
         string? firstName,
         string? lastName,
@@ -184,35 +155,6 @@ public class Member
                 }
                 
                 return domainEnvelopes;
-            case MemberStatus.DELETED:
-                throw new InvalidOperationException("Member is already deleted!");
-            case MemberStatus.LOCKED:
-                throw new InvalidOperationException("Member is locked!");
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-    
-    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
-    {
-        switch (Status)
-        {
-            case MemberStatus.ACTIVE:
-                if (email.Equals(Email))
-                {
-                    throw new InvalidOperationException("This email is already set!");
-                }
-                
-                var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
-                var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-                    Guid.NewGuid(),
-                    MemberId.Id,
-                    EventType.MEMBER_EMAIL_CHANGED,
-                    EntityType.MEMBER,
-                    DateTime.UtcNow,
-                    memberEmailChangedEvent
-                );
-                return [domainEnvelope];
             case MemberStatus.DELETED:
                 throw new InvalidOperationException("Member is already deleted!");
             case MemberStatus.LOCKED:
