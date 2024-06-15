@@ -25,8 +25,6 @@ public static class IntegrationTestSetup
     [OneTimeSetUp]
     public static async Task OneTimeSetup()
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
-
         _postgresContainer = new PostgreSqlBuilder()
             .WithImage("debezium/postgres:16-alpine")
             .WithUsername("user")
@@ -53,21 +51,13 @@ public static class IntegrationTestSetup
 
         HttpClient = _webAppFactory.CreateClient();
 
-        var scopeFactory = _webAppFactory.Services.GetService<IServiceScopeFactory>() ??
-                           throw new Exception("Scope factory not found");
-        var scope = scopeFactory.CreateScope() ??
-                    throw new Exception("Could not create Scope");
-
-        EventStoreDbContext = scope.ServiceProvider.GetService<EventStoreDbContext>() ??
-                              throw new Exception("Could not get ApplicationDbContext");
-        EventRepository = scope.ServiceProvider.GetService<IEventRepository>() ??
-                          throw new Exception("Could not get EventRepository");
+        EventStoreDbContext = _webAppFactory.Services.GetRequiredService<EventStoreDbContext>();
+        EventRepository = _webAppFactory.Services.GetRequiredService<IEventRepository>();
     }
 
     [OneTimeTearDown]
     public static async Task OneTimeTearDown()
     {
-        await EventStoreDbContext.DisposeAsync();
         await _postgresContainer.StopAsync();
         await _postgresContainer.DisposeAsync();
         HttpClient.Dispose();

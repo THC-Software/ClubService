@@ -39,7 +39,11 @@ public class UpdateMemberService(
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
 
-        // TODO: Check if tennisClubDomainEvents.Count > 0
+        if (tennisClubDomainEvents.Count == 0)
+        {
+            loggerService.LogTennisClubNotFound(member.TennisClubId.Id);
+            throw new TennisClubNotFoundException(member.TennisClubId.Id);
+        }
 
         var tennisClub = new TennisClub();
         foreach (var domainEvent in tennisClubDomainEvents)
@@ -103,7 +107,11 @@ public class UpdateMemberService(
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
 
-        // TODO: Check if tennisClubDomainEvents.Count > 0
+        if (tennisClubDomainEvents.Count == 0)
+        {
+            loggerService.LogTennisClubNotFound(member.TennisClubId.Id);
+            throw new TennisClubNotFoundException(member.TennisClubId.Id);
+        }
 
         var tennisClub = new TennisClub();
         foreach (var domainEvent in tennisClubDomainEvents)
@@ -177,7 +185,11 @@ public class UpdateMemberService(
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
 
-        // TODO: Check if tennisClubDomainEvents.Count > 0
+        if (tennisClubDomainEvents.Count == 0)
+        {
+            loggerService.LogTennisClubNotFound(member.TennisClubId.Id);
+            throw new TennisClubNotFoundException(member.TennisClubId.Id);
+        }
 
         var tennisClub = new TennisClub();
         foreach (var domainEvent in tennisClubDomainEvents)
@@ -220,7 +232,7 @@ public class UpdateMemberService(
             case TennisClubStatus.DELETED:
                 throw new ConflictException("Tennis club already deleted!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(tennisClub.Status));
         }
     }
 }

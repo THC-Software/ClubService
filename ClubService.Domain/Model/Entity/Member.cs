@@ -12,7 +12,7 @@ public class Member
     public string Email { get; private set; } = null!;
     public TennisClubId TennisClubId { get; private set; } = null!;
     public MemberStatus Status { get; private set; }
-    
+
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberRegisterCommand(
         string firstName,
         string lastName,
@@ -26,7 +26,7 @@ public class Member
             tennisClubId,
             MemberStatus.ACTIVE
         );
-        
+
         var domainEnvelop = new DomainEnvelope<IMemberDomainEvent>(
             Guid.NewGuid(),
             memberRegisteredEvent.MemberId.Id,
@@ -35,10 +35,10 @@ public class Member
             DateTime.UtcNow,
             memberRegisteredEvent
         );
-        
+
         return [domainEnvelop];
     }
-    
+
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberLockCommand()
     {
         switch (Status)
@@ -59,10 +59,10 @@ public class Member
             case MemberStatus.LOCKED:
                 throw new InvalidOperationException("Member is already locked!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
     }
-    
+
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUnlockCommand()
     {
         switch (Status)
@@ -83,74 +83,50 @@ public class Member
             case MemberStatus.ACTIVE:
                 throw new InvalidOperationException("Member needs to be locked!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
     }
-    
+
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberDeleteCommand()
-    {
-        if (Status.Equals(MemberStatus.DELETED))
-        {
-            throw new InvalidOperationException("Member is already deleted!");
-        }
-        
-        var memberDeletedEvent = new MemberDeletedEvent();
-        
-        var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
-            Guid.NewGuid(),
-            MemberId.Id,
-            EventType.MEMBER_DELETED,
-            EntityType.MEMBER,
-            DateTime.UtcNow,
-            memberDeletedEvent
-        );
-        
-        return [domainEnvelope];
-    }
-    
-    public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeFullNameCommand(FullName fullName)
     {
         switch (Status)
         {
             case MemberStatus.ACTIVE:
-                if (fullName.Equals(Name))
-                {
-                    throw new InvalidOperationException("This name is already set!");
-                }
-                
-                var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
+            case MemberStatus.LOCKED:
+                var memberDeletedEvent = new MemberDeletedEvent();
+
                 var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
                     Guid.NewGuid(),
                     MemberId.Id,
-                    EventType.MEMBER_FULL_NAME_CHANGED,
+                    EventType.MEMBER_DELETED,
                     EntityType.MEMBER,
                     DateTime.UtcNow,
-                    memberFullNameChangedEvent
+                    memberDeletedEvent
                 );
+
                 return [domainEnvelope];
             case MemberStatus.DELETED:
                 throw new InvalidOperationException("Member is already deleted!");
-            case MemberStatus.LOCKED:
-                throw new InvalidOperationException("Member is locked!");
             default:
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(Status));
         }
     }
-    
+
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberUpdateCommand(
         string? firstName,
         string? lastName,
         string? email)
     {
+        // TODO: Check state
         var domainEnvelopes = new List<DomainEnvelope<IMemberDomainEvent>>();
-        
+
         if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName))
         {
             var fullName = new FullName(firstName, lastName);
             if (!fullName.Equals(Name))
             {
                 var memberFullNameChangedEvent = new MemberFullNameChangedEvent(fullName);
-                
+
                 var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
                     Guid.NewGuid(),
                     MemberId.Id,
@@ -159,15 +135,15 @@ public class Member
                     DateTime.UtcNow,
                     memberFullNameChangedEvent
                 );
-                
+
                 domainEnvelopes.Add(domainEnvelope);
             }
         }
-        
+
         if (!string.IsNullOrWhiteSpace(email) && !email.Equals(Email))
         {
             var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
-            
+
             var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
                 Guid.NewGuid(),
                 MemberId.Id,
@@ -176,13 +152,13 @@ public class Member
                 DateTime.UtcNow,
                 memberEmailChangedEvent
             );
-            
+
             domainEnvelopes.Add(domainEnvelope);
         }
-        
+
         return domainEnvelopes;
     }
-    
+
     public List<DomainEnvelope<IMemberDomainEvent>> ProcessMemberChangeEmailCommand(string email)
     {
         switch (Status)
@@ -192,7 +168,7 @@ public class Member
                 {
                     throw new InvalidOperationException("This email is already set!");
                 }
-                
+
                 var memberEmailChangedEvent = new MemberEmailChangedEvent(email);
                 var domainEnvelope = new DomainEnvelope<IMemberDomainEvent>(
                     Guid.NewGuid(),
@@ -211,7 +187,7 @@ public class Member
                 throw new ArgumentOutOfRangeException();
         }
     }
-    
+
     public void Apply(DomainEnvelope<IMemberDomainEvent> domainEnvelope)
     {
         switch (domainEnvelope.EventType)
@@ -249,7 +225,7 @@ public class Member
                     $"{nameof(domainEnvelope.EventType)} is not supported for the entity Member!");
         }
     }
-    
+
     private void Apply(MemberRegisteredEvent memberRegisteredEvent)
     {
         MemberId = memberRegisteredEvent.MemberId;
@@ -258,60 +234,60 @@ public class Member
         TennisClubId = memberRegisteredEvent.TennisClubId;
         Status = memberRegisteredEvent.Status;
     }
-    
+
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(MemberLockedEvent memberLockedEvent)
     {
         Status = MemberStatus.LOCKED;
     }
-    
+
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(MemberUnlockedEvent memberUnlockedEvent)
     {
         Status = MemberStatus.ACTIVE;
     }
-    
+
     // Parameter is only in method signature to distinguish the Apply method from the others
     private void Apply(MemberDeletedEvent memberDeletedEvent)
     {
         Status = MemberStatus.DELETED;
     }
-    
+
     private void Apply(MemberFullNameChangedEvent memberFullNameChangedEvent)
     {
         Name = memberFullNameChangedEvent.Name;
     }
-    
+
     private void Apply(MemberEmailChangedEvent memberEmailChangedEvent)
     {
         Email = memberEmailChangedEvent.Email;
     }
-    
+
     protected bool Equals(Member other)
     {
         return MemberId.Equals(other.MemberId);
     }
-    
+
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
         {
             return false;
         }
-        
+
         if (ReferenceEquals(this, obj))
         {
             return true;
         }
-        
+
         if (obj.GetType() != GetType())
         {
             return false;
         }
-        
+
         return Equals((Member)obj);
     }
-    
+
     public override int GetHashCode()
     {
         return MemberId.GetHashCode();
