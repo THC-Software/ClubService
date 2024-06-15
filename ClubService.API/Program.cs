@@ -27,6 +27,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
     await eventStoreDbContext.Database.EnsureDeletedAsync();
     await eventStoreDbContext.Database.EnsureCreatedAsync();
+    await eventStoreDbContext.SeedData();
 
     var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
     await readStoreDbContext.Database.EnsureDeletedAsync();
