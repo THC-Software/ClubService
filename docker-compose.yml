@@ -12,6 +12,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=DockerDevelopment
     depends_on:
       - debezium-postgres
+      - mailhog
     ports:
       - "5000:8080"
       - "5001:8081"
@@ -39,6 +40,16 @@ services:
       - debezium-postgres
     volumes:
       - ./debezium-conf:/debezium/conf
+    networks:
+      - tennis-club-network
+  
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: "club-service-mailhog"
+    restart: always
+    ports:
+      - "1025:1025"
+      - "8025:8025"
     networks:
       - tennis-club-network
 
