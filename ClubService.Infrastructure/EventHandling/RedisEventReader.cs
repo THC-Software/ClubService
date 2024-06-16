@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using ClubService.Application.EventHandlers;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.Configurations;
@@ -37,51 +37,25 @@ public class RedisEventReader : BackgroundService
 
     private async Task ConsumeMessages()
     {
-        try
+        foreach (var stream in _redisStreams)
         {
-            foreach (var stream in _redisStreams)
+            var entries = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
+                "club-service", ">", 1);
+
+            foreach (var entry in entries)
             {
-                var result = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
-                    "pos-member", ">", 1);
+                var jsonValue = entry.Values.FirstOrDefault().Value.ToString();
+                var document = JsonDocument.Parse(jsonValue);
+                var payload = document.RootElement.GetProperty("payload").GetProperty("after");
 
-                if (result.Length == 0)
-                {
-                    continue;
-                }
-
-                var streamEntry = result.First();
-                var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
-                var jsonContent = JsonNode.Parse(dict.Values.First());
-
-                if (jsonContent == null)
-                {
-                    throw new InvalidOperationException("json content is null");
-                }
-
-                var payload = jsonContent["payload"];
-                if (payload == null)
-                {
-                    throw new InvalidOperationException("payload is null");
-                }
-
-                var eventInfo = payload["after"];
-                if (eventInfo == null)
-                {
-                    throw new InvalidOperationException("event info is null");
-                }
-
-                var parsedEvent = EventParser.ParseEvent(eventInfo);
+                var parsedEvent = EventParser.ParseEvent(payload);
 
                 using var scope = _services.CreateScope();
                 var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
                 await chainEventHandler.Handle(parsedEvent);
 
-                await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
+                await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
             }
-        }
-        catch (InvalidOperationException e)
-        {
-            _loggerService.LogInvalidOperationException(e);
         }
     }
 
