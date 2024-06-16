@@ -24,6 +24,8 @@ public class TestBase
     public async Task Setup()
     {
         await IntegrationTestSetup.EventStoreDbContext.Database.EnsureCreatedAsync();
+        IntegrationTestSetup.EventStoreDbContext.ChangeTracker.Clear();
+        await IntegrationTestSetup.EventStoreDbContext.SeedData();
     }
 
     [TearDown]

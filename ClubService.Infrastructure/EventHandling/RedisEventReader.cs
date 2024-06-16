@@ -117,5 +117,9 @@ public class RedisEventReader : BackgroundService
             await connectionMultiplexer.DisposeAsync();
             _loggerService.LogEventReaderStop();
         }
+        catch (Exception e)
+        {
+            _loggerService.LogException(e);
+        }
     }
 }

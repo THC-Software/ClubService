@@ -56,4 +56,5 @@ public interface ILoggerService<T>
     void LogRejectEvent(DomainEnvelope<IDomainEvent> domainEnvelope);
     void LogEventReaderStart();
     void LogEventReaderStop();
+    void LogException(Exception exception);
 }

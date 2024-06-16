@@ -25,8 +25,9 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
 
     var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
-    await eventStoreDbContext.Database.EnsureDeletedAsync();
+    await eventStoreDbContext.ClearDatabase();
     await eventStoreDbContext.Database.EnsureCreatedAsync();
+    await eventStoreDbContext.SeedData();
 
     var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
     await readStoreDbContext.Database.EnsureDeletedAsync();
