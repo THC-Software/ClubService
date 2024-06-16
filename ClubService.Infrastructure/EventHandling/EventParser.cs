@@ -1,36 +1,34 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Text.Json;
 using ClubService.Domain.Event;
 
 namespace ClubService.Infrastructure.EventHandling;
 
 public static class EventParser
 {
-    public static DomainEnvelope<IDomainEvent> ParseEvent(JsonNode jsonEvent)
+    public static DomainEnvelope<IDomainEvent> ParseEvent(JsonElement jsonEvent)
     {
-        var jsonEventId = jsonEvent["eventId"];
-        var jsonEntityId = jsonEvent["entityId"];
-        var jsonEventType = jsonEvent["eventType"];
-        var jsonEntityType = jsonEvent["entityType"];
-        var jsonTimestamp = jsonEvent["timestamp"];
-        var jsonEventData = jsonEvent["eventData"];
+        var eventIdStr = jsonEvent.GetProperty("eventId").GetString();
+        var entityIdStr = jsonEvent.GetProperty("entityId").GetString();
+        var eventTypeStr = jsonEvent.GetProperty("eventType").GetString();
+        var entityTypeStr = jsonEvent.GetProperty("entityType").GetString();
+        var timestampStr = jsonEvent.GetProperty("timestamp").GetString();
+        var eventData = jsonEvent.GetProperty("eventData").GetString();
 
-        if (jsonEventId == null ||
-            jsonEntityId == null ||
-            jsonEventType == null ||
-            jsonEntityType == null ||
-            jsonTimestamp == null ||
-            jsonEventData == null)
+        if (eventIdStr == null ||
+            entityIdStr == null ||
+            eventTypeStr == null ||
+            entityTypeStr == null ||
+            timestampStr == null ||
+            eventData == null)
         {
-            throw new InvalidOperationException("event has missing properties");
+            throw new InvalidOperationException("Event has missing properties");
         }
 
-        var eventId = Guid.Parse(jsonEventId.GetValue<string>());
-        var entityId = Guid.Parse(jsonEntityId.GetValue<string>());
-        var eventType = (EventType)Enum.Parse(typeof(EventType), jsonEventType.GetValue<string>());
-        var entityType = (EntityType)Enum.Parse(typeof(EntityType), jsonEntityType.GetValue<string>());
-        var timestamp = DateTime.Parse(jsonTimestamp.GetValue<string>()).ToUniversalTime();
-        var eventData = jsonEventData.GetValue<string>();
-
+        var eventId = Guid.Parse(eventIdStr);
+        var entityId = Guid.Parse(entityIdStr);
+        var eventType = (EventType)Enum.Parse(typeof(EventType), eventTypeStr);
+        var entityType = (EntityType)Enum.Parse(typeof(EntityType), entityTypeStr);
+        var timestamp = DateTime.Parse(timestampStr).ToUniversalTime();
         var deserializedEventData = EventDeserializer.DeserializeEventData<IDomainEvent>(eventType, eventData);
 
         return new DomainEnvelope<IDomainEvent>(

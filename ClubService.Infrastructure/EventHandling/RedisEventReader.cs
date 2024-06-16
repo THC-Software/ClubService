@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using ClubService.Application.EventHandlers;
 using ClubService.Domain.Repository;
 using ClubService.Infrastructure.Configurations;
@@ -37,51 +37,50 @@ public class RedisEventReader : BackgroundService
 
     private async Task ConsumeMessages()
     {
-        try
+        foreach (var stream in _redisStreams)
         {
-            foreach (var stream in _redisStreams)
-            {
-                var result = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
-                    "pos-member", ">", 1);
+            var entries = await db.StreamReadGroupAsync(stream.StreamName, stream.ConsumerGroup,
+                "club-service", ">", 1);
 
-                if (result.Length == 0)
+            foreach (var entry in entries)
+            {
+                var jsonValue = entry.Values.FirstOrDefault().Value.ToString();
+
+                if (string.IsNullOrWhiteSpace(jsonValue))
                 {
+                    _loggerService.LogEmptyStreamEntry();
                     continue;
                 }
 
-                var streamEntry = result.First();
-                var dict = streamEntry.Values.ToDictionary(x => x.Name.ToString(), x => x.Value.ToString());
-                var jsonContent = JsonNode.Parse(dict.Values.First());
-
-                if (jsonContent == null)
+                JsonDocument document;
+                try
                 {
-                    throw new InvalidOperationException("json content is null");
+                    document = JsonDocument.Parse(jsonValue);
+                }
+                catch (JsonException ex)
+                {
+                    _loggerService.LogJsonException(ex, jsonValue);
+                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
+                    continue;
                 }
 
-                var payload = jsonContent["payload"];
-                if (payload == null)
+                if (!document.RootElement.TryGetProperty("payload", out var payload) ||
+                    !payload.TryGetProperty("after", out var after) ||
+                    after.ValueKind == JsonValueKind.Null)
                 {
-                    throw new InvalidOperationException("payload is null");
+                    _loggerService.LogJsonMissingProperties(jsonValue);
+                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
+                    continue;
                 }
 
-                var eventInfo = payload["after"];
-                if (eventInfo == null)
-                {
-                    throw new InvalidOperationException("event info is null");
-                }
-
-                var parsedEvent = EventParser.ParseEvent(eventInfo);
+                var parsedEvent = EventParser.ParseEvent(after);
 
                 using var scope = _services.CreateScope();
                 var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
                 await chainEventHandler.Handle(parsedEvent);
 
-                await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, streamEntry.Id);
+                await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
             }
-        }
-        catch (InvalidOperationException e)
-        {
-            _loggerService.LogInvalidOperationException(e);
         }
     }
 

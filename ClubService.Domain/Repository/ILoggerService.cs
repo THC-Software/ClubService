@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ClubService.Domain.Event;
 
 namespace ClubService.Domain.Repository;
@@ -57,4 +58,7 @@ public interface ILoggerService<T>
     void LogEventReaderStart();
     void LogEventReaderStop();
     void LogException(Exception exception);
+    void LogEmptyStreamEntry();
+    void LogJsonException(JsonException jsonException, string jsonValue);
+    void LogJsonMissingProperties(string jsonValue);
 }

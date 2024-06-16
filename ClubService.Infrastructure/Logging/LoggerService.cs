@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ClubService.Domain.Event;
 using ClubService.Domain.Repository;
 using Microsoft.Extensions.Logging;
@@ -288,5 +289,20 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     public void LogException(Exception exception)
     {
         logger.LogError(exception, "Exception occured:");
+    }
+
+    public void LogEmptyStreamEntry()
+    {
+        logger.LogWarning("Received empty or null JSON value");
+    }
+
+    public void LogJsonException(JsonException jsonException, string jsonValue)
+    {
+        logger.LogError(jsonException, "JSON parsing error: Invalid JSON format. Value: {Json}", jsonValue);
+    }
+
+    public void LogJsonMissingProperties(string jsonValue)
+    {
+        logger.LogWarning("Message missing 'payload' or 'after' properties or 'after' is null: {Json}", jsonValue);
     }
 }
