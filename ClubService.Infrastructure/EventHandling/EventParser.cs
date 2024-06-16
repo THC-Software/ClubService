@@ -21,7 +21,7 @@ public static class EventParser
             timestampStr == null ||
             eventData == null)
         {
-            throw new InvalidOperationException("event has missing properties");
+            throw new InvalidOperationException("Event has missing properties");
         }
 
         var eventId = Guid.Parse(eventIdStr);

@@ -45,10 +45,36 @@ public class RedisEventReader : BackgroundService
             foreach (var entry in entries)
             {
                 var jsonValue = entry.Values.FirstOrDefault().Value.ToString();
-                var document = JsonDocument.Parse(jsonValue);
-                var payload = document.RootElement.GetProperty("payload").GetProperty("after");
 
-                var parsedEvent = EventParser.ParseEvent(payload);
+                if (string.IsNullOrWhiteSpace(jsonValue))
+                {
+                    // TODO: Logging
+                    continue;
+                }
+
+
+                JsonDocument document;
+                try
+                {
+                    document = JsonDocument.Parse(jsonValue);
+                }
+                catch (JsonException ex)
+                {
+                    // TODO: Logging
+                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
+                    continue;
+                }
+
+                if (!document.RootElement.TryGetProperty("payload", out var payload) ||
+                    !payload.TryGetProperty("after", out var after) ||
+                    after.ValueKind == JsonValueKind.Null)
+                {
+                    // TODO: Logging
+                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
+                    continue;
+                }
+
+                var parsedEvent = EventParser.ParseEvent(after);
 
                 using var scope = _services.CreateScope();
                 var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
