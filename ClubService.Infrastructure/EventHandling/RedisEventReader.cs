@@ -48,10 +48,9 @@ public class RedisEventReader : BackgroundService
 
                 if (string.IsNullOrWhiteSpace(jsonValue))
                 {
-                    // TODO: Logging
+                    _loggerService.LogEmptyStreamEntry();
                     continue;
                 }
-
 
                 JsonDocument document;
                 try
@@ -60,7 +59,7 @@ public class RedisEventReader : BackgroundService
                 }
                 catch (JsonException ex)
                 {
-                    // TODO: Logging
+                    _loggerService.LogJsonException(ex, jsonValue);
                     await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
                     continue;
                 }
@@ -69,7 +68,7 @@ public class RedisEventReader : BackgroundService
                     !payload.TryGetProperty("after", out var after) ||
                     after.ValueKind == JsonValueKind.Null)
                 {
-                    // TODO: Logging
+                    _loggerService.LogJsonMissingProperties(jsonValue);
                     await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
                     continue;
                 }
