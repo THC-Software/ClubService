@@ -44,7 +44,7 @@ public class LoginService(
             loggerService.LogUserLoggedIn(admin.AdminId.Id, admin.Username, UserRole.ADMIN.ToString(),
                 admin.Status.ToString());
             return new UserInformationDto(new UserId(admin.AdminId.Id), admin.Username, UserRole.ADMIN, admin.Status
-                .ToUserStatus());
+                .ToUserStatus(), loginDto.TennisClubId);
         }
 
         if (member != null)
@@ -67,7 +67,7 @@ public class LoginService(
             loggerService.LogUserLoggedIn(member.MemberId.Id, member.Email, UserRole.MEMBER.ToString(),
                 member.Status.ToString());
             return new UserInformationDto(new UserId(member.MemberId.Id), member.Email, UserRole.MEMBER,
-                member.Status.ToUserStatus());
+                member.Status.ToUserStatus(), loginDto.TennisClubId);
         }
 
         // We are only allowed to return this exception here in our backend as this function is only called by the gateway
