@@ -14,5 +14,5 @@ public class UserInformationDto(
     public string Username { get; } = username;
     public UserRole UserRole { get; } = userRole;
     public UserStatus UserStatus { get; } = userStatus;
-    public TennisClubId TennisClubId = tennisClubId;
+    public TennisClubId TennisClubId { get; } = tennisClubId;
 }
