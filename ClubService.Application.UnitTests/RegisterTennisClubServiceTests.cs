@@ -1,9 +1,12 @@
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Application.Impl;
+using ClubService.Domain.Api;
 using ClubService.Domain.Event;
+using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.Repository;
 using ClubService.Domain.Repository.Transaction;
@@ -19,6 +22,8 @@ public class RegisterTennisClubServiceTests
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
         _eventStoreTransactionManagerMock = new Mock<IEventStoreTransactionManager>();
+        _passwordHasherServiceMock = new Mock<IPasswordHasherService>();
+        _loginRepositoryMock = new Mock<ILoginRepository>();
         _loggerMock = new Mock<ILoggerService<RegisterTennisClubService>>();
 
         // set up the TransactionScope method to call the passed function
@@ -29,12 +34,16 @@ public class RegisterTennisClubServiceTests
         _registerTennisClubService = new RegisterTennisClubService(
             _eventRepositoryMock.Object,
             _eventStoreTransactionManagerMock.Object,
+            _passwordHasherServiceMock.Object,
+            _loginRepositoryMock.Object,
             _loggerMock.Object
         );
     }
 
     private Mock<IEventRepository> _eventRepositoryMock;
     private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private Mock<IPasswordHasherService> _passwordHasherServiceMock;
+    private Mock<ILoginRepository> _loginRepositoryMock;
     private Mock<ILoggerService<RegisterTennisClubService>> _loggerMock;
     private RegisterTennisClubService _registerTennisClubService;
 
@@ -43,12 +52,13 @@ public class RegisterTennisClubServiceTests
     {
         // Given
         const int eventCountExpected = 0;
-        const EventType eventTypeExpected = EventType.TENNIS_CLUB_REGISTERED;
-        const EntityType entityTypeExpected = EntityType.TENNIS_CLUB;
-        var eventDataTypeExpected = typeof(TennisClubRegisteredEvent);
+        const string adminUsername = "testuser";
+        const string adminPassword = "test";
+        const string adminFirstName = "John";
+        const string adminLastName = "Doe";
         var subscriptionTierId = Guid.NewGuid();
-        var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId);
+        var tennisClubRegisterCommand = new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId,
+            adminUsername, adminPassword, adminFirstName, adminLastName);
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents =
         [
             new DomainEnvelope<ISubscriptionTierDomainEvent>(
@@ -66,6 +76,7 @@ public class RegisterTennisClubServiceTests
 
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))
             .ReturnsAsync(subscriptionTierDomainEvents);
+        _passwordHasherServiceMock.Setup(service => service.HashPassword(adminPassword)).Returns(adminPassword);
 
         // When
         _ = await _registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
@@ -73,11 +84,21 @@ public class RegisterTennisClubServiceTests
         // Then
         _eventRepositoryMock.Verify(repo =>
                 repo.Append(It.Is<DomainEnvelope<ITennisClubDomainEvent>>(e =>
-                        e.EventType == eventTypeExpected &&
-                        e.EntityType == entityTypeExpected &&
-                        e.EventData.GetType() == eventDataTypeExpected),
+                        e.EventType == EventType.TENNIS_CLUB_REGISTERED &&
+                        e.EntityType == EntityType.TENNIS_CLUB &&
+                        e.EventData.GetType() == typeof(TennisClubRegisteredEvent)),
                     eventCountExpected), Times.Once
         );
+
+        _eventRepositoryMock.Verify(repo =>
+                repo.Append(It.Is<DomainEnvelope<IAdminDomainEvent>>(e =>
+                        e.EventType == EventType.ADMIN_REGISTERED &&
+                        e.EntityType == EntityType.ADMIN &&
+                        e.EventData.GetType() == typeof(AdminRegisteredEvent)),
+                    eventCountExpected), Times.Once
+        );
+
+        _loginRepositoryMock.Verify(repo => repo.Add(It.Is<UserPassword>(up => up.HashedPassword == adminPassword)));
     }
 
     [Test]
@@ -86,7 +107,7 @@ public class RegisterTennisClubServiceTests
         // Given
         var subscriptionTierId = Guid.NewGuid();
         var tennisClubRegisterCommand =
-            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId);
+            new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId, "testuser", "test", "John", "Doe");
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents = [];
 
         _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))

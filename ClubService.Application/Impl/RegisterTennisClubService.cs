@@ -34,13 +34,12 @@ public class RegisterTennisClubService(
         }
 
         var tennisClub = new TennisClub();
+        var admin = new Admin();
 
         var tennisClubDomainEvents =
             tennisClub.ProcessTennisClubRegisterCommand(tennisClubRegisterCommand.Name,
                 subscriptionTierId);
         var expectedEventCount = 0;
-
-        var admin = new Admin();
 
         await eventStoreTransactionManager.TransactionScope(async () =>
         {

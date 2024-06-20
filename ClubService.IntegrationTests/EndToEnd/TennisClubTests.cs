@@ -22,8 +22,13 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_REGISTERED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubRegisteredEvent);
+        const string adminUsername = "testuser";
+        const string adminPassword = "test";
+        const string adminFirstName = "John";
+        const string adminLastName = "Doe";
         var subscriptionTierIdExpected = new Guid("38888969-d579-46ec-9cd6-0208569a077e");
-        var registerTennisClubCommand = new TennisClubRegisterCommand("Test", subscriptionTierIdExpected);
+        var registerTennisClubCommand = new TennisClubRegisterCommand("Test", subscriptionTierIdExpected,
+            adminUsername, adminPassword, adminFirstName, adminLastName);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerTennisClubCommand), Encoding.UTF8,
             "application/json");
 
