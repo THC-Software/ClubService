@@ -45,6 +45,8 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.6.1";
                 problemDetails.Status = StatusCodes.Status500InternalServerError;
                 problemDetails.Title = "Internal Server Error";
+                // Override details to not expose internal error details
+                problemDetails.Detail = "Something went wrong.";
                 break;
         }
 
