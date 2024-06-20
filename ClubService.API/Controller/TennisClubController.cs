@@ -28,17 +28,17 @@ public class TennisClubController(
         int pageNumber = 1)
     {
         var tennisClubs = await tennisClubReadModelRepository.GetAllTennisClubs(pageSize, pageNumber);
-        
+
         var metadata = new
         {
             pageSize,
             pageNumber
         };
         Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-        
+
         return Ok(tennisClubs);
     }
-    
+
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -46,15 +46,15 @@ public class TennisClubController(
     public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(Guid id)
     {
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(id);
-        
+
         if (tennisClub == null)
         {
             return NotFound($"Tennis Club with id {id} not found!");
         }
-        
+
         return Ok(tennisClub);
     }
-    
+
     [HttpGet("{id:guid}/admins")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,7 +64,7 @@ public class TennisClubController(
         var admins = await adminReadModelRepository.GetAdminsByTennisClubId(id);
         return Ok(admins);
     }
-    
+
     [HttpGet("{id:guid}/members")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,7 +74,7 @@ public class TennisClubController(
         var members = await memberReadModelRepository.GetMembersByTennisClubId(id);
         return Ok(members);
     }
-    
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -84,9 +84,9 @@ public class TennisClubController(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
         var registeredTennisClubId = await registerTennisClubService.RegisterTennisClub(tennisClubRegisterCommand);
-        return CreatedAtAction(nameof(RegisterTennisClub), new { id = registeredTennisClubId }, registeredTennisClubId);
+        return CreatedAtAction(nameof(GetTennisClubById), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
-    
+
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -99,7 +99,7 @@ public class TennisClubController(
         var updatedTennisClubId = await updateTennisClubService.UpdateTennisClub(id, tennisClubUpdateCommand);
         return Ok(updatedTennisClubId);
     }
-    
+
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -110,7 +110,7 @@ public class TennisClubController(
         var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(id);
         return Ok(deletedTennisClubId);
     }
-    
+
     [HttpPost("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -121,7 +121,7 @@ public class TennisClubController(
         var lockedTennisClubId = await updateTennisClubService.LockTennisClub(id);
         return Ok(lockedTennisClubId);
     }
-    
+
     [HttpDelete("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

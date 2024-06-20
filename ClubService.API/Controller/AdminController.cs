@@ -26,9 +26,9 @@ public class AdminController(
         [FromBody] AdminRegisterCommand adminRegisterCommand)
     {
         var registeredAdminId = await registerAdminService.RegisterAdmin(adminRegisterCommand);
-        return CreatedAtAction(nameof(RegisterAdmin), new { id = registeredAdminId }, registeredAdminId);
+        return CreatedAtAction(nameof(GetAdminById), new { id = registeredAdminId }, registeredAdminId);
     }
-    
+
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -39,7 +39,7 @@ public class AdminController(
         var deletedAdminId = await deleteAdminService.DeleteAdmin(id);
         return Ok(deletedAdminId);
     }
-    
+
     [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,7 +54,7 @@ public class AdminController(
         );
         return Ok(updatedAdminId);
     }
-    
+
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -62,12 +62,12 @@ public class AdminController(
     public async Task<ActionResult<AdminReadModel>> GetAdminById(Guid id)
     {
         var adminReadModel = await adminReadModelRepository.GetAdminById(id);
-        
+
         if (adminReadModel == null)
         {
             return NotFound($"Admin with id {id} not found!");
         }
-        
+
         return Ok(adminReadModel);
     }
 }

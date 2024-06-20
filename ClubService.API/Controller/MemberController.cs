@@ -24,15 +24,15 @@ public class MemberController(
     public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
         var memberReadModel = await memberReadModelRepository.GetMemberById(id);
-        
+
         if (memberReadModel == null)
         {
             return NotFound($"Member with id {id} not found!");
         }
-        
+
         return Ok(memberReadModel);
     }
-    
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -41,9 +41,9 @@ public class MemberController(
     public async Task<ActionResult<Guid>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
     {
         var registeredMemberId = await registerMemberService.RegisterMember(memberRegisterCommand);
-        return CreatedAtAction(nameof(RegisterMember), new { id = registeredMemberId }, registeredMemberId);
+        return CreatedAtAction(nameof(GetMemberById), new { id = registeredMemberId }, registeredMemberId);
     }
-    
+
     [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,7 +54,7 @@ public class MemberController(
         var updatedMemberId = await updateMemberService.UpdateMember(id, memberUpdateCommand);
         return Ok(updatedMemberId);
     }
-    
+
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -65,7 +65,7 @@ public class MemberController(
         var deletedMemberId = await deleteMemberService.DeleteMember(id);
         return Ok(deletedMemberId);
     }
-    
+
     [HttpPost("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -76,7 +76,7 @@ public class MemberController(
         var lockedMemberId = await updateMemberService.LockMember(id);
         return Ok(lockedMemberId);
     }
-    
+
     [HttpDelete("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
