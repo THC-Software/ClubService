@@ -85,9 +85,9 @@ public class RegisterMemberService(
                         member.Apply(domainEvent);
                         expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
                     }
-                });
 
-                SaveLoginCredentials(member.MemberId, memberRegisterCommand.Password);
+                    SaveLoginCredentials(member.MemberId, memberRegisterCommand.Password);
+                });
 
                 loggerService.LogMemberRegistered(member.MemberId.Id);
                 return member.MemberId.Id;

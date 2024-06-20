@@ -74,9 +74,9 @@ public class RegisterAdminService(
                         admin.Apply(domainEvent);
                         expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
                     }
-                });
 
-                SaveLoginCredentials(admin.AdminId, adminRegisterCommand.Password);
+                    SaveLoginCredentials(admin.AdminId, adminRegisterCommand.Password);
+                });
 
                 loggerService.LogAdminRegistered(admin.AdminId.Id);
                 return admin.AdminId.Id;
