@@ -87,7 +87,7 @@ public class TennisClubController(
         return CreatedAtAction(nameof(GetTennisClubById), new { id = registeredTennisClubId }, registeredTennisClubId);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
