@@ -139,7 +139,7 @@ public class TennisClubTests : TestBase
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
         // When
-        var response = await HttpClient.PutAsync($"{BaseUrl}/{clubIdExpected}", content);
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
 
         // Then
         response.EnsureSuccessStatusCode();
@@ -181,7 +181,7 @@ public class TennisClubTests : TestBase
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
         // When
-        var response = await HttpClient.PutAsync($"{BaseUrl}/{clubIdExpected}", content);
+        var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
 
         // Then
         response.EnsureSuccessStatusCode();
