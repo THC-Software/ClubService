@@ -1,6 +1,6 @@
 namespace ClubService.Domain.ReadModel;
 
-public class EMailOutbox(Guid id, string recipientEMailAddress, string subject, string body, DateTime timestamp)
+public class EmailMessage(Guid id, string recipientEMailAddress, string subject, string body, DateTime timestamp)
 {
     public Guid Id { get; } = id;
     public string RecipientEMailAddress { get; } = recipientEMailAddress;

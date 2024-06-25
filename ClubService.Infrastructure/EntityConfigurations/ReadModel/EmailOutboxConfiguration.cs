@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ClubService.Infrastructure.EntityConfigurations.ReadModel;
 
-public class EMailOutboxConfiguration : IEntityTypeConfiguration<EMailOutbox>
+public class EmailOutboxConfiguration : IEntityTypeConfiguration<EmailMessage>
 {
-    public void Configure(EntityTypeBuilder<EMailOutbox> builder)
+    public void Configure(EntityTypeBuilder<EmailMessage> builder)
     {
-        builder.ToTable("EMailOutbox");
+        builder.ToTable("EmailOutbox");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
