@@ -1,4 +1,5 @@
 ﻿using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Repository;
@@ -25,7 +26,7 @@ public class AdminFullNameChangedEventHandler(
         if (adminReadModel == null)
         {
             loggerService.LogAdminNotFound(domainEnvelope.EntityId);
-            return;
+            throw new AdminNotFoundException(domainEnvelope.EntityId);
         }
 
         adminReadModel.ChangeFullName(adminNameChangedEvent.Name);

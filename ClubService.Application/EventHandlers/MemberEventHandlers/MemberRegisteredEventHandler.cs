@@ -1,9 +1,9 @@
 ﻿using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
-using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
@@ -29,7 +29,7 @@ public class MemberRegisteredEventHandler(
         if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(memberRegisteredEvent.TennisClubId.Id);
-            return;
+            throw new TennisClubNotFoundException(memberRegisteredEvent.TennisClubId.Id);
         }
 
         tennisClubReadModel.IncreaseMemberCount();

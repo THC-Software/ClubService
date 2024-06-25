@@ -1,7 +1,7 @@
 ﻿using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Repository;
-using ClubService.Domain.Repository.Transaction;
 
 namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 
@@ -25,7 +25,7 @@ public class MemberDeletedEventHandler(
         if (memberReadModel == null)
         {
             loggerService.LogMemberNotFound(domainEnvelope.EntityId);
-            return;
+            throw new MemberNotFoundException(domainEnvelope.EntityId);
         }
 
         var tennisClubReadModel =
@@ -34,7 +34,7 @@ public class MemberDeletedEventHandler(
         if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(memberReadModel.TennisClubId.Id);
-            return;
+            throw new TennisClubNotFoundException(memberReadModel.TennisClubId.Id);
         }
 
         tennisClubReadModel.DecreaseMemberCount();

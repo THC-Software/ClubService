@@ -1,4 +1,5 @@
 ﻿using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Repository;
@@ -25,7 +26,7 @@ public class MemberFullNameChangedEventHandler(
         if (memberReadModel == null)
         {
             loggerService.LogMemberNotFound(domainEnvelope.EntityId);
-            return;
+            throw new MemberNotFoundException(domainEnvelope.EntityId);
         }
 
         memberReadModel.ChangeFullName(memberFullNameChangedEvent.Name);

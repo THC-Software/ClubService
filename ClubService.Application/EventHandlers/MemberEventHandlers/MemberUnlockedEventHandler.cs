@@ -1,4 +1,5 @@
 ﻿using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Repository;
 
@@ -23,7 +24,7 @@ public class MemberUnlockedEventHandler(
         if (memberReadModel == null)
         {
             loggerService.LogMemberNotFound(domainEnvelope.EntityId);
-            return;
+            throw new MemberNotFoundException(domainEnvelope.EntityId);
         }
 
         memberReadModel.Unlock();
