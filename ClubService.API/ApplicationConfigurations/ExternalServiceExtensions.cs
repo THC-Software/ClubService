@@ -14,5 +14,7 @@ public static class ExternalServiceExtensions
 
         services.Configure<RedisConfiguration>(configuration.GetSection("RedisConfiguration"));
         services.AddHostedService<RedisEventReader>();
+
+        services.AddHostedService<EmailMessageRelay>();
     }
 }
