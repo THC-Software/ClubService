@@ -1,6 +1,7 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
+using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
 
 namespace ClubService.Application.EventHandlers.TournamentEventHandlers;
@@ -9,7 +10,7 @@ public class TournamentCanceledEventHandler(
     ITournamentReadModelRepository tournamentReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
     IMemberReadModelRepository memberReadModelRepository,
-    IMailService mailService,
+    IEmailOutboxRepository emailOutboxRepository,
     ILoggerService<TournamentCanceledEventHandler> loggerService)
     : IEventHandler
 {
@@ -52,7 +53,9 @@ public class TournamentCanceledEventHandler(
 
         foreach (var member in members)
         {
-            await mailService.Send(member.Email, mailSubject, mailBody);
+            var emailMessage = new EmailMessage(Guid.NewGuid(), member.Email, mailSubject, mailBody,
+                DateTime.UtcNow);
+            await emailOutboxRepository.Add(emailMessage);
         }
 
         loggerService.LogTournamentCanceled(tournamentReadModel.TournamentId);
