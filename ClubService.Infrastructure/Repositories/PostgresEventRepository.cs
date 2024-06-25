@@ -14,23 +14,23 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
     private const string SelectSqlQuery = @"
         SELECT * 
         FROM ""DomainEvent"" 
-        WHERE ""entityId"" = @entityId 
+        WHERE ""entityId"" = @entityId and ""entityType"" = @entityType
         ORDER BY ""timestamp"";
     ";
-    
+
     private const string InsertSqlQuery = @"
         INSERT INTO ""DomainEvent""(""eventId"", ""entityId"", ""eventType"", ""entityType"", ""timestamp"", ""eventData"")
         SELECT @eventId, @entityId, @eventType, @entityType, @timestamp, @eventData
         WHERE (SELECT COUNT(*) FROM ""DomainEvent"" WHERE ""entityId"" = @entityId) = @expectedEventCount;
     ";
-    
+
     public async Task<int> Append<T>(DomainEnvelope<T> domainEnvelope, int expectedEventCount) where T : IDomainEvent
     {
         await eventStoreDbContext.Database.OpenConnectionAsync();
-        
+
         await using var insertCommand = eventStoreDbContext.Database.GetDbConnection().CreateCommand();
         insertCommand.CommandText = InsertSqlQuery;
-        
+
         var jsonSerializedEventData = JsonConvert.SerializeObject(domainEnvelope.EventData);
         insertCommand.Parameters.Add(new NpgsqlParameter("@eventId", domainEnvelope.EventId));
         insertCommand.Parameters.Add(new NpgsqlParameter("@entityId", domainEnvelope.EntityId));
@@ -39,41 +39,41 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
         insertCommand.Parameters.Add(new NpgsqlParameter("@timestamp", domainEnvelope.Timestamp));
         insertCommand.Parameters.Add(new NpgsqlParameter("@eventData", jsonSerializedEventData));
         insertCommand.Parameters.Add(new NpgsqlParameter("@expectedEventCount", expectedEventCount));
-        
+
         var affectedRows = await insertCommand.ExecuteNonQueryAsync();
         await eventStoreDbContext.Database.CloseConnectionAsync();
-        
+
         if (affectedRows == 0)
         {
             throw new DataException(
                 $"Expected event count {expectedEventCount} did not match current event count.");
         }
-        
+
         return expectedEventCount + 1;
     }
-    
-    public async Task<List<DomainEnvelope<T>>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent
+
+    public async Task<List<DomainEnvelope<T>>> GetEventsForEntity<T>(Guid entityId, EntityType entityType)
+        where T : IDomainEvent
     {
         var events = new List<DomainEnvelope<T>>();
-        
+
         await using var command = eventStoreDbContext.Database.GetDbConnection().CreateCommand();
         command.CommandText = SelectSqlQuery;
         command.Parameters.Add(new NpgsqlParameter("@entityId", entityId));
-        
+        command.Parameters.Add(new NpgsqlParameter("@entityType", entityType.ToString()));
+
         await eventStoreDbContext.Database.OpenConnectionAsync();
-        
+
         await using var result = await command.ExecuteReaderAsync();
         while (await result.ReadAsync())
         {
             var eventType = (EventType)Enum.Parse(typeof(EventType),
                 result.GetString(result.GetOrdinal("EventType")));
-            var entityType = (EntityType)Enum.Parse(typeof(EntityType),
-                result.GetString(result.GetOrdinal("EntityType")));
             var eventDataJson = result.GetString(result.GetOrdinal("EventData"));
-            
+
             // Determine the type of event and deserialize accordingly
             var eventData = EventDeserializer.DeserializeEventData<T>(eventType, eventDataJson);
-            
+
             events.Add(new DomainEnvelope<T>(
                 result.GetGuid(result.GetOrdinal("EventId")),
                 entityId,
@@ -83,9 +83,9 @@ public class PostgresEventRepository(EventStoreDbContext eventStoreDbContext) : 
                 eventData
             ));
         }
-        
+
         await eventStoreDbContext.Database.CloseConnectionAsync();
-        
+
         return events;
     }
 }
