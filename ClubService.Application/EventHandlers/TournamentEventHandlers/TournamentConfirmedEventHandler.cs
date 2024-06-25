@@ -1,4 +1,5 @@
 using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Tournament;
 using ClubService.Domain.ReadModel;
@@ -31,7 +32,7 @@ public class TournamentConfirmedEventHandler(
         if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(tournamentConfirmedEvent.ClubId);
-            return;
+            throw new TennisClubNotFoundException(domainEnvelope.EntityId);
         }
 
         var tournamentReadModel = TournamentReadModel.FromDomainEvent(tournamentConfirmedEvent);

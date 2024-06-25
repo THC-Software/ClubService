@@ -1,4 +1,5 @@
 using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Repository;
 
@@ -27,7 +28,7 @@ public class TournamentCanceledEventHandler(
         if (tournamentReadModel == null)
         {
             loggerService.LogTournamentNotFound(domainEnvelope.EntityId);
-            return;
+            throw new TournamentNotFoundException(domainEnvelope.EntityId);
         }
 
         var tennisClubReadModel =
@@ -36,7 +37,7 @@ public class TournamentCanceledEventHandler(
         if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(tournamentReadModel.TennisClubId);
-            return;
+            throw new TennisClubNotFoundException(domainEnvelope.EntityId);
         }
 
         await tournamentReadModelRepository.Delete(tournamentReadModel);

@@ -1,4 +1,5 @@
 using ClubService.Application.Api;
+using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Repository;
 
@@ -23,7 +24,7 @@ public class TennisClubLockedEventHandler(
         if (tennisClubReadModel == null)
         {
             loggerService.LogTennisClubNotFound(domainEnvelope.EntityId);
-            return;
+            throw new TennisClubNotFoundException(domainEnvelope.EntityId);
         }
 
         tennisClubReadModel.Lock();
