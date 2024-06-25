@@ -1,5 +1,6 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
@@ -20,7 +21,8 @@ public class DeleteMemberService(
         loggerService.LogDeleteMember(id);
 
         var memberId = new MemberId(id);
-        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+        var existingMemberDomainEvents =
+            await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id, EntityType.MEMBER);
 
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -35,7 +37,8 @@ public class DeleteMemberService(
         }
 
         var tennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id,
+                EntityType.TENNIS_CLUB);
 
         if (tennisClubDomainEvents.Count == 0)
         {

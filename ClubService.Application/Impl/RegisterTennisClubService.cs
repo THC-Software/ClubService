@@ -2,6 +2,7 @@ using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Domain.Api;
+using ClubService.Domain.Event;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
@@ -25,7 +26,8 @@ public class RegisterTennisClubService(
 
         var subscriptionTierId = new SubscriptionTierId(tennisClubRegisterCommand.SubscriptionTierId);
         var subscriptionTierDomainEvents =
-            await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id);
+            await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id,
+                EntityType.SUBSCRIPTION_TIER);
 
         if (subscriptionTierDomainEvents.Count == 0)
         {
