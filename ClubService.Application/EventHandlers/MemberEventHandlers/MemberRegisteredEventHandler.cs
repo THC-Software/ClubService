@@ -10,7 +10,6 @@ namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 public class MemberRegisteredEventHandler(
     IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    IReadStoreTransactionManager readStoreTransactionManager,
     ILoggerService<MemberRegisteredEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
@@ -33,14 +32,11 @@ public class MemberRegisteredEventHandler(
             return;
         }
 
-        await readStoreTransactionManager.TransactionScope(async () =>
-        {
-            tennisClubReadModel.IncreaseMemberCount();
-            await tennisClubReadModelRepository.Update();
+        tennisClubReadModel.IncreaseMemberCount();
+        await tennisClubReadModelRepository.Update();
 
-            var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
-            await memberReadModelRepository.Add(memberReadModel);
-        });
+        var memberReadModel = MemberReadModel.FromDomainEvent(memberRegisteredEvent);
+        await memberReadModelRepository.Add(memberReadModel);
 
         loggerService.LogMemberRegistered(memberRegisteredEvent.MemberId.Id);
     }

@@ -8,7 +8,6 @@ namespace ClubService.Application.EventHandlers.MemberEventHandlers;
 public class MemberDeletedEventHandler(
     IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    IReadStoreTransactionManager readStoreTransactionManager,
     ILoggerService<MemberDeletedEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
@@ -38,13 +37,9 @@ public class MemberDeletedEventHandler(
             return;
         }
 
-        await readStoreTransactionManager.TransactionScope(async () =>
-        {
-            tennisClubReadModel.DecreaseMemberCount();
-            await tennisClubReadModelRepository.Update();
-
-            await memberReadModelRepository.Delete(memberReadModel);
-        });
+        tennisClubReadModel.DecreaseMemberCount();
+        await tennisClubReadModelRepository.Update();
+        await memberReadModelRepository.Delete(memberReadModel);
 
         loggerService.LogMemberDeleted(memberReadModel.MemberId.Id);
     }
