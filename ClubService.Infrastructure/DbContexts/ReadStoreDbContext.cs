@@ -28,5 +28,6 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
         modelBuilder.ApplyConfiguration(new MemberReadModelConfiguration());
         modelBuilder.ApplyConfiguration(new TournamentReadModelConfiguration());
         modelBuilder.ApplyConfiguration(new ProcessedEventConfiguration());
+        modelBuilder.ApplyConfiguration(new EMailOutboxConfiguration());
     }
 }
