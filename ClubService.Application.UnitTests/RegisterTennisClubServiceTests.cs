@@ -74,7 +74,8 @@ public class RegisterTennisClubServiceTests
             )
         ];
 
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))
+        _eventRepositoryMock.Setup(repo =>
+                repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId, EntityType.SUBSCRIPTION_TIER))
             .ReturnsAsync(subscriptionTierDomainEvents);
         _passwordHasherServiceMock.Setup(service => service.HashPassword(adminPassword)).Returns(adminPassword);
 
@@ -110,7 +111,8 @@ public class RegisterTennisClubServiceTests
             new TennisClubRegisterCommand("Test Tennis Club", subscriptionTierId, "testuser", "test", "John", "Doe");
         List<DomainEnvelope<ISubscriptionTierDomainEvent>> subscriptionTierDomainEvents = [];
 
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId))
+        _eventRepositoryMock.Setup(repo =>
+                repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId, EntityType.SUBSCRIPTION_TIER))
             .ReturnsAsync(subscriptionTierDomainEvents);
 
         // When ... Then

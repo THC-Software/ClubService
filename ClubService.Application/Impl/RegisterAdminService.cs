@@ -2,6 +2,7 @@
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Domain.Api;
+using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
@@ -27,7 +28,7 @@ public class RegisterAdminService(
         var tennisClubId = new TennisClubId(adminRegisterCommand.TennisClubId);
 
         var tennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB);
 
         if (tennisClubDomainEvents.Count == 0)
         {
