@@ -12,9 +12,4 @@ public class ProcessedEventRepository(ReadStoreDbContext readStoreDbContext) : I
         await readStoreDbContext.ProcessedEvents.AddAsync(processedEvent);
         await readStoreDbContext.SaveChangesAsync();
     }
-    
-    public async Task<List<ProcessedEvent>> GetAllProcessedEvents()
-    {
-        return await readStoreDbContext.ProcessedEvents.ToListAsync();
-    }
 }
