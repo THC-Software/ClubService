@@ -2,6 +2,7 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
+using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
@@ -22,7 +23,8 @@ public class UpdateMemberService(
         loggerService.LogLockMember(id);
 
         var memberId = new MemberId(id);
-        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+        var existingMemberDomainEvents =
+            await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id, EntityType.MEMBER);
 
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -37,7 +39,8 @@ public class UpdateMemberService(
         }
 
         var tennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id,
+                EntityType.TENNIS_CLUB);
 
         if (tennisClubDomainEvents.Count == 0)
         {
@@ -90,7 +93,8 @@ public class UpdateMemberService(
         loggerService.LogUnlockMember(id);
 
         var memberId = new MemberId(id);
-        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id);
+        var existingMemberDomainEvents =
+            await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId.Id, EntityType.MEMBER);
 
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -105,7 +109,8 @@ public class UpdateMemberService(
         }
 
         var tennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id,
+                EntityType.TENNIS_CLUB);
 
         if (tennisClubDomainEvents.Count == 0)
         {
@@ -168,7 +173,8 @@ public class UpdateMemberService(
         }
 
         var memberId = id;
-        var existingMemberDomainEvents = await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId);
+        var existingMemberDomainEvents =
+            await eventRepository.GetEventsForEntity<IMemberDomainEvent>(memberId, EntityType.MEMBER);
 
         if (existingMemberDomainEvents.Count == 0)
         {
@@ -183,7 +189,8 @@ public class UpdateMemberService(
         }
 
         var tennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id,
+                EntityType.TENNIS_CLUB);
 
         if (tennisClubDomainEvents.Count == 0)
         {

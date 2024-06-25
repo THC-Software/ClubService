@@ -69,7 +69,7 @@ public class MemberTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         var id = JsonConvert.DeserializeObject<Guid>(responseContent);
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(id);
+        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(id, EntityType.MEMBER);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -110,7 +110,8 @@ public class MemberTests : TestBase
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(memberIdExpected));
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected, EntityType.MEMBER);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -143,7 +144,8 @@ public class MemberTests : TestBase
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(memberIdExpected));
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected, EntityType.MEMBER);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -176,7 +178,8 @@ public class MemberTests : TestBase
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(memberIdExpected));
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected, EntityType.MEMBER);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -259,7 +262,8 @@ public class MemberTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected, EntityType.MEMBER);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -313,7 +317,8 @@ public class MemberTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected, EntityType.MEMBER);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -356,7 +361,8 @@ public class MemberTests : TestBase
         var responseContent = await response.Content.ReadAsStringAsync();
         Assert.That(responseContent, Is.Not.Null);
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IMemberDomainEvent>(memberIdExpected, EntityType.MEMBER);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var firstStoredEvent = storedEvents[numberOfEventsExpected - 2];
