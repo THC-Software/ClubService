@@ -8,22 +8,32 @@ using Microsoft.Extensions.Options;
 
 namespace ClubService.Infrastructure.Mail;
 
-public class EmailMessageRelay(
-    IServiceProvider services,
-    IOptions<SmtpConfiguration> smtpConfiguration,
-    ILoggerService<EmailMessageRelay> loggerService)
-    : BackgroundService
+public class EmailMessageRelay : BackgroundService
 {
-    private readonly int _pollingInterval = smtpConfiguration.Value.PollingInterval;
-    private readonly string _senderEmailAddress = smtpConfiguration.Value.SenderEmailAddress;
-    private readonly SmtpClient _smtpClient = new(smtpConfiguration.Value.Host, smtpConfiguration.Value.Port);
+    private readonly ILoggerService<EmailMessageRelay> _loggerService;
+    private readonly int _pollingInterval;
+    private readonly string _senderEmailAddress;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly SmtpClient _smtpClient;
+
+    public EmailMessageRelay(
+        IServiceProvider serviceProvider,
+        IOptions<SmtpConfiguration> smtpConfiguration,
+        ILoggerService<EmailMessageRelay> loggerService)
+    {
+        _serviceProvider = serviceProvider;
+        _loggerService = loggerService;
+        _pollingInterval = smtpConfiguration.Value.PollingInterval;
+        _senderEmailAddress = smtpConfiguration.Value.SenderEmailAddress;
+        _smtpClient = new SmtpClient(smtpConfiguration.Value.Host, smtpConfiguration.Value.Port);
+        _smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+    }
 
     private async Task SendEmails()
     {
-        using var scope = services.CreateScope();
+        using var scope = _serviceProvider.CreateScope();
         var emailOutboxRepository = scope.ServiceProvider.GetRequiredService<IEmailOutboxRepository>();
         var readStoreTransactionManager = scope.ServiceProvider.GetRequiredService<IReadStoreTransactionManager>();
-        _smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
 
         await readStoreTransactionManager.TransactionScope(async () =>
         {
@@ -57,12 +67,12 @@ public class EmailMessageRelay(
         }
         catch (OperationCanceledException)
         {
-            loggerService.LogEmailMessageRelayStop();
+            _loggerService.LogEmailMessageRelayStop();
             _smtpClient.Dispose();
         }
         catch (Exception e)
         {
-            loggerService.LogException(e);
+            _loggerService.LogException(e);
         }
     }
 }
