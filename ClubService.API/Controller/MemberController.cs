@@ -40,7 +40,7 @@ public class MemberController(
             return NotFound($"Member with id {id} not found!");
         }
 
-        if (userTennisClubId.Equals(memberReadModel.TennisClubId.ToString()))
+        if (!userTennisClubId.Equals(memberReadModel.TennisClubId.ToString()))
         {
             return Forbid("You do not have access to this resource.");
         }

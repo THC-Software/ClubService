@@ -162,7 +162,7 @@ public class UpdateMemberService(
             tennisClub.Apply(domainEvent);
         }
 
-        if (jwtTennisClubId.Equals(tennisClub.TennisClubId.ToString()))
+        if (!jwtTennisClubId.Equals(tennisClub.TennisClubId.ToString()))
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
@@ -245,7 +245,7 @@ public class UpdateMemberService(
             tennisClub.Apply(domainEvent);
         }
 
-        if (jwtTennisClubId.Equals(tennisClub.TennisClubId.ToString()))
+        if (!jwtTennisClubId.Equals(tennisClub.TennisClubId.ToString()))
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
