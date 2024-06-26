@@ -17,11 +17,16 @@ public class UserPassword
     }
 
     public UserId UserId { get; } = null!;
-    public string HashedPassword { get; }
+    public string HashedPassword { get; private set; }
 
     public static UserPassword Create(Guid userId, string password, IPasswordHasherService passwordHasherService)
     {
         var hashedPassword = passwordHasherService.HashPassword(password);
         return new UserPassword(userId, hashedPassword);
+    }
+
+    public void ChangePassword(string password, IPasswordHasherService passwordHasherService)
+    {
+        HashedPassword = passwordHasherService.HashPassword(password);
     }
 }
