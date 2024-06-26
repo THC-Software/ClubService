@@ -18,14 +18,14 @@ public class EmailMessageRelay(
     private readonly string _senderEmailAddress = smtpConfiguration.Value.SenderEmailAddress;
     private readonly SmtpClient _smtpClient = new(smtpConfiguration.Value.Host, smtpConfiguration.Value.Port);
 
-    private void SendEmails()
+    private async Task SendEmails()
     {
         using var scope = services.CreateScope();
         var emailOutboxRepository = scope.ServiceProvider.GetRequiredService<IEmailOutboxRepository>();
         var readStoreTransactionManager = scope.ServiceProvider.GetRequiredService<IReadStoreTransactionManager>();
         _smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
 
-        readStoreTransactionManager.TransactionScope(async () =>
+        await readStoreTransactionManager.TransactionScope(async () =>
         {
             var emails = await emailOutboxRepository.GetAllEmails();
 
@@ -52,7 +52,7 @@ public class EmailMessageRelay(
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                SendEmails();
+                await SendEmails();
             }
         }
         catch (OperationCanceledException)
