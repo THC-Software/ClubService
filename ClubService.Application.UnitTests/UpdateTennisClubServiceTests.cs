@@ -63,7 +63,8 @@ public class UpdateTennisClubServiceTests
             domainEnvelopeTennisClubRegistered
         };
 
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock.Setup(repo =>
+                repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB))
             .ReturnsAsync(existingDomainEvents);
 
         // When
@@ -77,7 +78,8 @@ public class UpdateTennisClubServiceTests
                         e.EventData.GetType() == eventDataTypeExpected),
                     eventCountExpected), Times.Once
         );
-        _eventRepositoryMock.Verify(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id),
+        _eventRepositoryMock.Verify(
+            repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB),
             Times.Once);
     }
 
@@ -86,7 +88,8 @@ public class UpdateTennisClubServiceTests
     {
         // Given
         var clubId = Guid.NewGuid();
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock
+            .Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(clubId, EntityType.TENNIS_CLUB))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
 
         // When ... Then
@@ -123,7 +126,8 @@ public class UpdateTennisClubServiceTests
             domainEnvelopeTennisClubLocked
         };
 
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock.Setup(repo =>
+                repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB))
             .ReturnsAsync(existingDomainEvents);
 
         // When
@@ -137,7 +141,8 @@ public class UpdateTennisClubServiceTests
                         e.EventData.GetType() == eventDataTypeExpected),
                     eventCountExpected), Times.Once
         );
-        _eventRepositoryMock.Verify(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id),
+        _eventRepositoryMock.Verify(
+            repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB),
             Times.Once);
     }
 
@@ -146,7 +151,8 @@ public class UpdateTennisClubServiceTests
     {
         // Given
         var clubId = Guid.NewGuid();
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock
+            .Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(clubId, EntityType.TENNIS_CLUB))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
 
         // When ... Then
@@ -188,9 +194,12 @@ public class UpdateTennisClubServiceTests
             domainEnvelopeSubscriptionTierCreated
         };
 
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock.Setup(repo =>
+                repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB))
             .ReturnsAsync(existingTennisClubDomainEvents);
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock.Setup(repo =>
+                repo.GetEventsForEntity<ISubscriptionTierDomainEvent>(newSubscriptionTierId.Id,
+                    EntityType.SUBSCRIPTION_TIER))
             .ReturnsAsync(existingSubscriptionTierDomainEvents);
 
         // When
@@ -205,7 +214,8 @@ public class UpdateTennisClubServiceTests
                         e.EventData.GetType() == eventDataTypeExpected),
                     eventCountExpected), Times.Once
         );
-        _eventRepositoryMock.Verify(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id),
+        _eventRepositoryMock.Verify(
+            repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB),
             Times.Once);
     }
 
@@ -215,7 +225,8 @@ public class UpdateTennisClubServiceTests
         // Given
         var clubId = Guid.NewGuid();
         var tennisClubUpdateCommand = new TennisClubUpdateCommand(null, Guid.NewGuid());
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock
+            .Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(clubId, EntityType.TENNIS_CLUB))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
 
         // When ... Then
@@ -248,7 +259,8 @@ public class UpdateTennisClubServiceTests
             domainEnvelopeTennisClubRegistered
         };
 
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock.Setup(repo =>
+                repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB))
             .ReturnsAsync(existingDomainEvents);
 
         // When
@@ -263,7 +275,8 @@ public class UpdateTennisClubServiceTests
                         e.EventData.GetType() == eventDataTypeExpected),
                     eventCountExpected), Times.Once
         );
-        _eventRepositoryMock.Verify(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id),
+        _eventRepositoryMock.Verify(
+            repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB),
             Times.Once);
     }
 
@@ -273,7 +286,8 @@ public class UpdateTennisClubServiceTests
         // Given
         var clubId = Guid.NewGuid();
         var tennisClubUpdateCommand = new TennisClubUpdateCommand("Test", null);
-        _eventRepositoryMock.Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(It.IsAny<Guid>()))
+        _eventRepositoryMock
+            .Setup(repo => repo.GetEventsForEntity<ITennisClubDomainEvent>(clubId, EntityType.TENNIS_CLUB))
             .ReturnsAsync(new List<DomainEnvelope<ITennisClubDomainEvent>>());
 
         // When ... Then

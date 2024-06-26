@@ -2,5 +2,5 @@
 
 public class TournamentNotFoundException(Guid id) : Exception
 {
-    public override string Message { get; } = $"Tournament with id {id} not found.";
+    public override string Message { get; } = $"Tournament with id '{id}' not found.";
 }

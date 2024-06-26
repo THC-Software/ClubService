@@ -12,6 +12,6 @@ public interface IEventRepository
     /// <typeparam name="T">is of type IDomainEvent</typeparam>
     /// <returns>The event count after appending the new domain envelope</returns>
     Task<int> Append<T>(DomainEnvelope<T> domainEnvelope, int expectedEventCount) where T : IDomainEvent;
-    
-    Task<List<DomainEnvelope<T>>> GetEventsForEntity<T>(Guid entityId) where T : IDomainEvent;
+
+    Task<List<DomainEnvelope<T>>> GetEventsForEntity<T>(Guid entityId, EntityType entityType) where T : IDomainEvent;
 }

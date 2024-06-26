@@ -1,6 +1,7 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
+using ClubService.Domain.Event;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
@@ -24,7 +25,7 @@ public class UpdateTennisClubService(
         var tennisClub = new TennisClub();
 
         var existingTennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB);
 
         if (existingTennisClubDomainEvents.Count == 0)
         {
@@ -69,7 +70,7 @@ public class UpdateTennisClubService(
         var tennisClub = new TennisClub();
 
         var existingTennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB);
 
         if (existingTennisClubDomainEvents.Count == 0)
         {
@@ -121,7 +122,7 @@ public class UpdateTennisClubService(
         var tennisClubId = new TennisClubId(id);
 
         var existingTennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(tennisClubId.Id, EntityType.TENNIS_CLUB);
 
         if (existingTennisClubDomainEvents.Count == 0)
         {
@@ -135,7 +136,8 @@ public class UpdateTennisClubService(
             subscriptionTierId = new SubscriptionTierId((Guid)tennisClubUpdateCommand.SubscriptionTierId);
 
             var existingSubscriptionTierDomainEvents =
-                await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id);
+                await eventRepository.GetEventsForEntity<ISubscriptionTierDomainEvent>(subscriptionTierId.Id,
+                    EntityType.SUBSCRIPTION_TIER);
 
             if (existingSubscriptionTierDomainEvents.Count == 0)
             {

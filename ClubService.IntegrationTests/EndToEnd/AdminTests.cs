@@ -47,7 +47,7 @@ public class AdminTests : TestBase
         Assert.That(responseContent, Is.Not.Null);
         var id = JsonConvert.DeserializeObject<Guid>(responseContent);
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(id);
+        var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(id, EntityType.ADMIN);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -88,7 +88,8 @@ public class AdminTests : TestBase
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(adminIdExpected));
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(adminIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IAdminDomainEvent>(adminIdExpected, EntityType.ADMIN);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];
@@ -142,7 +143,8 @@ public class AdminTests : TestBase
         var actualId = JsonConvert.DeserializeObject<Guid>(responseContent);
         Assert.That(actualId, Is.EqualTo(adminIdExpected));
 
-        var storedEvents = await EventRepository.GetEventsForEntity<IAdminDomainEvent>(adminIdExpected);
+        var storedEvents =
+            await EventRepository.GetEventsForEntity<IAdminDomainEvent>(adminIdExpected, EntityType.ADMIN);
         Assert.That(storedEvents, Has.Count.EqualTo(numberOfEventsExpected));
 
         var storedEvent = storedEvents[numberOfEventsExpected - 1];

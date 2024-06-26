@@ -1,5 +1,6 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Domain.Event;
 using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.ValueObject;
@@ -18,7 +19,8 @@ public class DeleteAdminService(
         loggerService.LogDeleteAdmin(id);
 
         var adminId = new AdminId(id);
-        var existingAdminDomainEvents = await eventRepository.GetEventsForEntity<IAdminDomainEvent>(adminId.Id);
+        var existingAdminDomainEvents =
+            await eventRepository.GetEventsForEntity<IAdminDomainEvent>(adminId.Id, EntityType.ADMIN);
 
         if (existingAdminDomainEvents.Count == 0)
         {

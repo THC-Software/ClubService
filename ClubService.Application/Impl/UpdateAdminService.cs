@@ -1,5 +1,6 @@
 ﻿using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Domain.Event;
 using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Entity;
@@ -19,7 +20,8 @@ public class UpdateAdminService(
     {
         loggerService.LogAdminChangeFullName(id, firstName, lastName);
 
-        var existingAdminDomainEvents = await eventRepository.GetEventsForEntity<IAdminDomainEvent>(id);
+        var existingAdminDomainEvents =
+            await eventRepository.GetEventsForEntity<IAdminDomainEvent>(id, EntityType.ADMIN);
 
         if (existingAdminDomainEvents.Count == 0)
         {
@@ -34,7 +36,8 @@ public class UpdateAdminService(
         }
 
         var tennisClubDomainEvents =
-            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(admin.TennisClubId.Id);
+            await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(admin.TennisClubId.Id,
+                EntityType.TENNIS_CLUB);
 
         if (tennisClubDomainEvents.Count == 0)
         {
