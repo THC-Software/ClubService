@@ -3,12 +3,15 @@ using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
 
 [Route("api/v{version:apiVersion}/members")]
 [ApiController]
+[Authorize(Policy = "AdminPolicy")]
+[Authorize(Policy = "MemberPolicy")]
 [ApiVersion("1.0")]
 public class MemberController(
     IRegisterMemberService registerMemberService,
