@@ -13,6 +13,7 @@ builder.Services.AddExternalServiceConfigurations(builder.Configuration);
 builder.Services.AddApiVersioningConfigurations();
 builder.Services.AddSwaggerConfigurations();
 builder.Services.AddExceptionHandlerConfigurations();
+builder.Services.AddAuthenticationConfigurations(builder.Configuration);
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -39,6 +40,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 }
 
 app.UseExceptionHandler();
+app.UseAuthorization();
 app.MapControllers();
 await app.RunAsync();
 
