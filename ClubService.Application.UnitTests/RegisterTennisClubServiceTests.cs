@@ -21,19 +21,19 @@ public class RegisterTennisClubServiceTests
     public void Setup()
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
-        _eventStoreTransactionManagerMock = new Mock<IEventStoreTransactionManager>();
+        _transactionManagerMock = new Mock<ITransactionManager>();
         _passwordHasherServiceMock = new Mock<IPasswordHasherService>();
         _loginRepositoryMock = new Mock<ILoginRepository>();
         _loggerMock = new Mock<ILoggerService<RegisterTennisClubService>>();
 
         // set up the TransactionScope method to call the passed function
-        _eventStoreTransactionManagerMock
+        _transactionManagerMock
             .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
             .Returns((Func<Task> transactionalOperation) => transactionalOperation());
 
         _registerTennisClubService = new RegisterTennisClubService(
             _eventRepositoryMock.Object,
-            _eventStoreTransactionManagerMock.Object,
+            _transactionManagerMock.Object,
             _passwordHasherServiceMock.Object,
             _loginRepositoryMock.Object,
             _loggerMock.Object
@@ -41,7 +41,7 @@ public class RegisterTennisClubServiceTests
     }
 
     private Mock<IEventRepository> _eventRepositoryMock;
-    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private Mock<ITransactionManager> _transactionManagerMock;
     private Mock<IPasswordHasherService> _passwordHasherServiceMock;
     private Mock<ILoginRepository> _loginRepositoryMock;
     private Mock<ILoggerService<RegisterTennisClubService>> _loggerMock;

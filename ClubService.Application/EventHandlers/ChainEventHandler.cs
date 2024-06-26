@@ -9,14 +9,14 @@ namespace ClubService.Application.EventHandlers;
 public class ChainEventHandler(
     IEnumerable<IEventHandler> eventHandlers,
     IProcessedEventRepository processedEventRepository,
-    IReadStoreTransactionManager readStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<ChainEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
     {
         loggerService.LogHandleEvent(domainEnvelope);
 
-        await readStoreTransactionManager.TransactionScope(async () =>
+        await transactionManager.TransactionScope(async () =>
         {
             foreach (var eventHandler in eventHandlers)
             {

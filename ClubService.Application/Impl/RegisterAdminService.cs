@@ -17,7 +17,7 @@ public class RegisterAdminService(
     IAdminReadModelRepository adminReadModelRepository,
     ILoginRepository loginRepository,
     IPasswordHasherService passwordHasherService,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<RegisterAdminService> loggerService) : IRegisterAdminService
 {
     public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
@@ -68,7 +68,7 @@ public class RegisterAdminService(
                 );
                 var expectedEventCount = 0;
 
-                await eventStoreTransactionManager.TransactionScope(async () =>
+                await transactionManager.TransactionScope(async () =>
                 {
                     foreach (var domainEvent in domainEvents)
                     {

@@ -15,7 +15,7 @@ public class DeleteTennisClubService(
     IAdminReadModelRepository adminReadModelRepository,
     IDeleteMemberService deleteMemberService,
     IDeleteAdminService deleteAdminService,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<DeleteTennisClubService> loggerService) : IDeleteTennisClubService
 {
     public async Task<Guid> DeleteTennisClub(Guid id)
@@ -33,17 +33,18 @@ public class DeleteTennisClubService(
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
 
+        var membersForTennisClub = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubId.Id);
+        var adminsForTennisClub = await adminReadModelRepository.GetAdminsByTennisClubId(tennisClubId.Id);
+
         try
         {
-            await eventStoreTransactionManager.TransactionScope(async () =>
+            await transactionManager.TransactionScope(async () =>
             {
-                var membersForTennisClub = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubId.Id);
                 foreach (var member in membersForTennisClub)
                 {
                     await deleteMemberService.DeleteMember(member.MemberId.Id);
                 }
 
-                var adminsForTennisClub = await adminReadModelRepository.GetAdminsByTennisClubId(tennisClubId.Id);
                 foreach (var admin in adminsForTennisClub)
                 {
                     await deleteAdminService.DeleteAdmin(admin.AdminId.Id);
