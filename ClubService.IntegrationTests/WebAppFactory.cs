@@ -28,7 +28,9 @@ public class WebAppFactory(
 
         // SMTP Configuration
         ["SmtpConfiguration:Host"] = "localhost",
-        ["SmtpConfiguration:Port"] = "1025"
+        ["SmtpConfiguration:Port"] = "1025",
+        ["SmtpConfiguration:SenderEmailAddress"] = "admin@thcdornbirn.at",
+        ["SmtpConfiguration:PollingInterval"] = "10"
     };
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
