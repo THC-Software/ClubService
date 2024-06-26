@@ -1,4 +1,5 @@
-﻿using ClubService.Application.Api;
+﻿using System.Security.Authentication;
+using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
@@ -16,8 +17,16 @@ public class DeleteMemberService(
     IEventStoreTransactionManager eventStoreTransactionManager,
     ILoggerService<DeleteMemberService> loggerService) : IDeleteMemberService
 {
-    public async Task<Guid> DeleteMember(Guid id)
+    public async Task<Guid> DeleteMember(
+        Guid id,
+        string? jwtUserId,
+        string? jwtTennisClubId)
     {
+        if (jwtUserId == null || jwtTennisClubId == null)
+        {
+            throw new AuthenticationException("Authentication error.");
+        }
+
         loggerService.LogDeleteMember(id);
 
         var memberId = new MemberId(id);
@@ -50,6 +59,11 @@ public class DeleteMemberService(
         foreach (var domainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
+        }
+
+        if (jwtTennisClubId.Equals(tennisClub.TennisClubId.ToString()))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
 
         switch (tennisClub.Status)

@@ -10,8 +10,6 @@ namespace ClubService.API.Controller;
 
 [Route("api/v{version:apiVersion}/members")]
 [ApiController]
-[Authorize(Policy = "AdminPolicy")]
-[Authorize(Policy = "MemberPolicy")]
 [ApiVersion("1.0")]
 public class MemberController(
     IRegisterMemberService registerMemberService,
@@ -24,13 +22,27 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "MemberPolicy")]
     public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
-        var memberReadModel = await memberReadModelRepository.GetMemberById(id);
+        var userId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        var userTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
 
+        if (userId == null || userTennisClubId == null)
+        {
+            return Unauthorized("Authentication error.");
+        }
+
+        var memberReadModel = await memberReadModelRepository.GetMemberById(id);
         if (memberReadModel == null)
         {
             return NotFound($"Member with id {id} not found!");
+        }
+
+        if (userTennisClubId.Equals(memberReadModel.TennisClubId.ToString()))
+        {
+            return Forbid("You do not have access to this resource.");
         }
 
         return Ok(memberReadModel);
@@ -41,9 +53,15 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<ActionResult<Guid>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
     {
-        var registeredMemberId = await registerMemberService.RegisterMember(memberRegisterCommand);
+        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+
+        var registeredMemberId =
+            await registerMemberService.RegisterMember(memberRegisterCommand, jwtUserId, jwtUserTennisClubId);
+
         return CreatedAtAction(nameof(GetMemberById), new { id = registeredMemberId }, registeredMemberId);
     }
 
@@ -52,9 +70,15 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "MemberPolicy")]
     public async Task<ActionResult<Guid>> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
     {
-        var updatedMemberId = await updateMemberService.UpdateMember(id, memberUpdateCommand);
+        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+
+        var updatedMemberId =
+            await updateMemberService.UpdateMember(id, memberUpdateCommand, jwtUserId, jwtUserTennisClubId);
+
         return Ok(updatedMemberId);
     }
 
@@ -63,9 +87,14 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<ActionResult<Guid>> DeleteMember(Guid id)
     {
-        var deletedMemberId = await deleteMemberService.DeleteMember(id);
+        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+
+        var deletedMemberId = await deleteMemberService.DeleteMember(id, jwtUserId, jwtUserTennisClubId);
+
         return Ok(deletedMemberId);
     }
 
@@ -74,9 +103,14 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<ActionResult<Guid>> LockMember(Guid id)
     {
-        var lockedMemberId = await updateMemberService.LockMember(id);
+        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+
+        var lockedMemberId = await updateMemberService.LockMember(id, jwtUserId, jwtUserTennisClubId);
+
         return Ok(lockedMemberId);
     }
 
@@ -85,9 +119,14 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<ActionResult<Guid>> UnlockMember(Guid id)
     {
-        var unlockedMemberId = await updateMemberService.UnlockMember(id);
+        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+
+        var unlockedMemberId = await updateMemberService.UnlockMember(id, jwtUserId, jwtUserTennisClubId);
+
         return Ok(unlockedMemberId);
     }
 }
