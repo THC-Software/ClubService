@@ -11,7 +11,7 @@ public class TournamentConfirmedEventHandler(
     ITennisClubReadModelRepository tennisClubReadModelRepository,
     ITournamentReadModelRepository tournamentReadModelRepository,
     IMemberReadModelRepository memberReadModelRepository,
-    IMailService mailService,
+    IEmailOutboxRepository emailOutboxRepository,
     ILoggerService<TournamentConfirmedEventHandler> loggerService)
     : IEventHandler
 {
@@ -41,7 +41,10 @@ public class TournamentConfirmedEventHandler(
         var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubReadModel.TennisClubId.Id);
         foreach (var member in members)
         {
-            await mailService.Send(member.Email, tournamentConfirmedEvent.Name, tournamentConfirmedEvent.Description);
+            var emailMessage = new EmailMessage(Guid.NewGuid(), member.Email,
+                tournamentConfirmedEvent.Name, tournamentConfirmedEvent.Description, DateTime.UtcNow);
+
+            await emailOutboxRepository.Add(emailMessage);
         }
 
         loggerService.LogTournamentConfirmed(tournamentReadModel.TournamentId);

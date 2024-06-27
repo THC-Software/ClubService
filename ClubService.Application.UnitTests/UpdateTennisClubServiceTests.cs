@@ -19,23 +19,23 @@ public class UpdateTennisClubServiceTests
     public void OneTimeSetUp()
     {
         _eventRepositoryMock = new Mock<IEventRepository>();
-        _eventStoreTransactionManagerMock = new Mock<IEventStoreTransactionManager>();
+        _transactionManagerMock = new Mock<ITransactionManager>();
         _loggerServiceMock = new Mock<ILoggerService<UpdateTennisClubService>>();
 
         // set up the TransactionScope method to call the passed function
-        _eventStoreTransactionManagerMock
+        _transactionManagerMock
             .Setup(mgr => mgr.TransactionScope(It.IsAny<Func<Task>>()))
             .Returns((Func<Task> transactionalOperation) => transactionalOperation());
 
         _updateTennisClubService = new UpdateTennisClubService(
             _eventRepositoryMock.Object,
-            _eventStoreTransactionManagerMock.Object,
+            _transactionManagerMock.Object,
             _loggerServiceMock.Object
         );
     }
 
     private Mock<IEventRepository> _eventRepositoryMock;
-    private Mock<IEventStoreTransactionManager> _eventStoreTransactionManagerMock;
+    private Mock<ITransactionManager> _transactionManagerMock;
     private Mock<ILoggerService<UpdateTennisClubService>> _loggerServiceMock;
     private UpdateTennisClubService _updateTennisClubService;
 

@@ -14,6 +14,11 @@ public class LoginRepository(LoginStoreDbContext loginStoreDbContext) : ILoginRe
         await loginStoreDbContext.SaveChangesAsync();
     }
 
+    public async Task ChangePassword()
+    {
+        await loginStoreDbContext.SaveChangesAsync();
+    }
+
     public async Task<UserPassword?> GetById(Guid id)
     {
         return await loginStoreDbContext.UserPasswords

@@ -61,4 +61,5 @@ public interface ILoggerService<T>
     void LogEmptyStreamEntry();
     void LogJsonException(JsonException jsonException, string jsonValue);
     void LogJsonMissingProperties(string jsonValue);
+    void LogEmailMessageRelayStop();
 }

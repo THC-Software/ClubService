@@ -16,7 +16,7 @@ public class RegisterMemberService(
     IMemberReadModelRepository memberReadModelRepository,
     ITennisClubReadModelRepository tennisClubReadModelRepository,
     ISubscriptionTierReadModelRepository subscriptionTierReadModelRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoginRepository loginRepository,
     IPasswordHasherService passwordHasherService,
     ILoggerService<RegisterMemberService> loggerService) : IRegisterMemberService
@@ -91,7 +91,7 @@ public class RegisterMemberService(
                 );
                 var expectedEventCount = 0;
 
-                await eventStoreTransactionManager.TransactionScope(async () =>
+                await transactionManager.TransactionScope(async () =>
                 {
                     foreach (var domainEvent in domainEvents)
                     {

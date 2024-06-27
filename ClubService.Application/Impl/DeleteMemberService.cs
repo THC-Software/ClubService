@@ -14,7 +14,7 @@ namespace ClubService.Application.Impl;
 
 public class DeleteMemberService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<DeleteMemberService> loggerService) : IDeleteMemberService
 {
     public async Task<Guid> DeleteMember(
@@ -73,7 +73,7 @@ public class DeleteMemberService(
                     var domainEvents = member.ProcessMemberDeleteCommand();
                     var expectedEventCount = existingMemberDomainEvents.Count;
 
-                    await eventStoreTransactionManager.TransactionScope(async () =>
+                    await transactionManager.TransactionScope(async () =>
                     {
                         foreach (var domainEvent in domainEvents)
                         {
