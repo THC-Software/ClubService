@@ -1,83 +1,28 @@
 ﻿using System.Data;
+using System.Transactions;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Domain.Repository.Transaction;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ClubService.Infrastructure;
 
-public class TransactionManager<TDbContext>(TDbContext dbContext)
-    : IReadStoreTransactionManager, IEventStoreTransactionManager where TDbContext : DbContext
+public class TransactionManager : ITransactionManager
 {
-    private IDbContextTransaction? _transaction;
-
-    public void Dispose()
-    {
-        if (_transaction == null)
-        {
-            return;
-        }
-
-        _transaction.Dispose();
-        _transaction = null;
-    }
-
     public async Task TransactionScope(Func<Task> transactionalFunction)
     {
+        using var scope =
+            new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled);
+
         try
         {
-            await BeginTransactionAsync();
             await transactionalFunction();
-            await CommitTransactionAsync();
+
+            // The Complete method commits the transaction. If an exception has been thrown,
+            // Complete is not  called and the transaction is rolled back.
+            scope.Complete();
         }
         catch (DataException ex)
         {
-            await RollbackTransactionAsync();
             throw new ConcurrencyException(ex.Message, ex);
         }
-        catch (Exception)
-        {
-            await RollbackTransactionAsync();
-            throw;
-        }
-    }
-
-
-    private async Task BeginTransactionAsync()
-    {
-        _transaction = await dbContext.Database.BeginTransactionAsync();
-    }
-
-    private async Task CommitTransactionAsync()
-    {
-        if (_transaction == null)
-        {
-            return;
-        }
-
-        await _transaction.CommitAsync();
-        await DisposeTransactionAsync();
-    }
-
-    private async Task RollbackTransactionAsync()
-    {
-        if (_transaction == null)
-        {
-            return;
-        }
-
-        await _transaction.RollbackAsync();
-        await DisposeTransactionAsync();
-    }
-
-    private async Task DisposeTransactionAsync()
-    {
-        if (_transaction == null)
-        {
-            return;
-        }
-
-        await _transaction.DisposeAsync();
-        _transaction = null;
     }
 }

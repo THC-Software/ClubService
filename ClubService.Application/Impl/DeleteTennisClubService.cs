@@ -11,7 +11,11 @@ namespace ClubService.Application.Impl;
 
 public class DeleteTennisClubService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    IMemberReadModelRepository memberReadModelRepository,
+    IAdminReadModelRepository adminReadModelRepository,
+    IDeleteMemberService deleteMemberService,
+    IDeleteAdminService deleteAdminService,
+    ITransactionManager transactionManager,
     ILoggerService<DeleteTennisClubService> loggerService) : IDeleteTennisClubService
 {
     public async Task<Guid> DeleteTennisClub(Guid id)
@@ -29,20 +33,32 @@ public class DeleteTennisClubService(
             throw new TennisClubNotFoundException(tennisClubId.Id);
         }
 
-        var tennisClub = new TennisClub();
-        foreach (var domainEvent in existingTennisClubDomainEvents)
-        {
-            tennisClub.Apply(domainEvent);
-        }
+        var membersForTennisClub = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubId.Id);
+        var adminsForTennisClub = await adminReadModelRepository.GetAdminsByTennisClubId(tennisClubId.Id);
 
-        // we decided to only delete the corresponding admins and members on the read side
         try
         {
-            var domainEvents = tennisClub.ProcessTennisClubDeleteCommand();
-            var expectedEventCount = existingTennisClubDomainEvents.Count;
-
-            await eventStoreTransactionManager.TransactionScope(async () =>
+            await transactionManager.TransactionScope(async () =>
             {
+                foreach (var member in membersForTennisClub)
+                {
+                    await deleteMemberService.DeleteMember(member.MemberId.Id);
+                }
+
+                foreach (var admin in adminsForTennisClub)
+                {
+                    await deleteAdminService.DeleteAdmin(admin.AdminId.Id);
+                }
+
+                var tennisClub = new TennisClub();
+                foreach (var domainEvent in existingTennisClubDomainEvents)
+                {
+                    tennisClub.Apply(domainEvent);
+                }
+
+                var domainEvents = tennisClub.ProcessTennisClubDeleteCommand();
+                var expectedEventCount = existingTennisClubDomainEvents.Count;
+
                 foreach (var domainEvent in domainEvents)
                 {
                     tennisClub.Apply(domainEvent);
@@ -57,6 +73,6 @@ public class DeleteTennisClubService(
         }
 
         loggerService.LogTennisClubDeleted(id);
-        return tennisClub.TennisClubId.Id;
+        return id;
     }
 }

@@ -11,7 +11,7 @@ namespace ClubService.Application.Impl;
 
 public class DeleteAdminService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<DeleteAdminService> loggerService) : IDeleteAdminService
 {
     public async Task<Guid> DeleteAdmin(Guid id)
@@ -39,7 +39,7 @@ public class DeleteAdminService(
             var domainEvents = admin.ProcessAdminDeleteCommand();
             var expectedEventCount = existingAdminDomainEvents.Count;
 
-            await eventStoreTransactionManager.TransactionScope(async () =>
+            await transactionManager.TransactionScope(async () =>
             {
                 foreach (var domainEvent in domainEvents)
                 {
