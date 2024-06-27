@@ -58,8 +58,9 @@ public class MemberTests : TestBase
         var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
         var registerMemberCommand = new MemberRegisterCommand(nameExpected.FirstName, nameExpected.LastName,
             "john.doe@dev.com", passwordExpected, tennisClubIdExpected.Id);
-
-        var jwtToken = JwtTokenHelper.GenerateJwtToken("", tennisClubIdExpected.Id.ToString(), ["ADMIN"]);
+        
+        var adminIdExpected = new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe");
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(adminIdExpected.ToString(), tennisClubIdExpected.Id.ToString(), ["ADMIN"]);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerMemberCommand), Encoding.UTF8,
             "application/json");
 
