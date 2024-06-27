@@ -25,10 +25,8 @@ public class MemberController(
     [Authorize(Roles = "ADMIN,MEMBER")]
     public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
-        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
-
-        if (jwtUserId == null || jwtUserTennisClubId == null)
+        if (jwtUserTennisClubId == null)
         {
             return Unauthorized("Authentication error.");
         }
@@ -39,7 +37,7 @@ public class MemberController(
             return NotFound($"Member with id {id} not found!");
         }
 
-        if (!jwtUserTennisClubId.Equals(memberReadModel.TennisClubId.ToString()))
+        if (!jwtUserTennisClubId.Equals(memberReadModel.TennisClubId.Id.ToString()))
         {
             return Forbid("You do not have access to this resource.");
         }
