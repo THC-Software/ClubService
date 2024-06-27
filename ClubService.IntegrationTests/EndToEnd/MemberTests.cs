@@ -103,6 +103,9 @@ public class MemberTests : TestBase
         var eventTypeExpected = EventType.MEMBER_LOCKED;
         var entityTypeExpected = EntityType.MEMBER;
         var eventDataTypeExpected = typeof(MemberLockedEvent);
+        
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken("", tennisClubIdExpected.Id.ToString(), ["ADMIN"]);
 
         // When
         var response = await HttpClient.PostAsync($"{BaseUrl}/{memberIdExpected.ToString()}/lock", null);

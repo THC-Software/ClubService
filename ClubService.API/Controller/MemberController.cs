@@ -57,11 +57,10 @@ public class MemberController(
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
     {
-        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
 
         var registeredMemberId =
-            await registerMemberService.RegisterMember(memberRegisterCommand, jwtUserId, jwtUserTennisClubId);
+            await registerMemberService.RegisterMember(memberRegisterCommand, jwtUserTennisClubId);
 
         return CreatedAtAction(nameof(GetMemberById), new { id = registeredMemberId }, registeredMemberId);
     }

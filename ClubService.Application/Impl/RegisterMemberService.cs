@@ -23,10 +23,9 @@ public class RegisterMemberService(
 {
     public async Task<Guid> RegisterMember(
         MemberRegisterCommand memberRegisterCommand,
-        string? jwtUserId,
         string? jwtTennisClubId)
     {
-        if (jwtUserId == null || jwtTennisClubId == null)
+        if (jwtTennisClubId == null)
         {
             throw new AuthenticationException("Authentication error.");
         }
