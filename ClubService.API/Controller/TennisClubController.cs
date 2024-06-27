@@ -107,7 +107,7 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Guid>> DeleteTennisClub(Guid id)
     {
-        var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(id);
+        var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(id, "");
         return Ok(deletedTennisClubId);
     }
 

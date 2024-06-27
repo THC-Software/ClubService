@@ -18,7 +18,7 @@ public class DeleteTennisClubService(
     ITransactionManager transactionManager,
     ILoggerService<DeleteTennisClubService> loggerService) : IDeleteTennisClubService
 {
-    public async Task<Guid> DeleteTennisClub(Guid id)
+    public async Task<Guid> DeleteTennisClub(Guid id, string? jwtTennisClubId)
     {
         loggerService.LogDeleteTennisClub(id);
 
@@ -42,7 +42,7 @@ public class DeleteTennisClubService(
             {
                 foreach (var member in membersForTennisClub)
                 {
-                    await deleteMemberService.DeleteMember(member.MemberId.Id);
+                    await deleteMemberService.DeleteMember(member.MemberId.Id, jwtTennisClubId);
                 }
 
                 foreach (var admin in adminsForTennisClub)

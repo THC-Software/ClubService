@@ -1,4 +1,5 @@
-﻿using ClubService.Application.Api;
+﻿using System.Security.Authentication;
+using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
 using ClubService.Application.Commands;
 using ClubService.Domain.Api;
@@ -20,8 +21,20 @@ public class RegisterMemberService(
     IPasswordHasherService passwordHasherService,
     ILoggerService<RegisterMemberService> loggerService) : IRegisterMemberService
 {
-    public async Task<Guid> RegisterMember(MemberRegisterCommand memberRegisterCommand)
+    public async Task<Guid> RegisterMember(
+        MemberRegisterCommand memberRegisterCommand,
+        string? jwtTennisClubId)
     {
+        if (jwtTennisClubId == null)
+        {
+            throw new AuthenticationException("Authentication error.");
+        }
+
+        if (!jwtTennisClubId.Equals(memberRegisterCommand.TennisClubId.ToString()))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
+        }
+
         loggerService.LogRegisterMember(memberRegisterCommand.FirstName,
             memberRegisterCommand.LastName, memberRegisterCommand.Email, memberRegisterCommand.TennisClubId);
 
