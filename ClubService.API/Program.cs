@@ -17,9 +17,9 @@ builder.Services.AddSwaggerConfigurations();
 builder.Services.AddExceptionHandlerConfigurations();
 builder.Services.AddControllers();
 
-// By configuring a default authentication scheme, you can ensure that the authorization middleware works correctly
+// By configuring a default authentication scheme, we ensure that the authorization middleware works correctly
 // and returns the appropriate 403 Forbidden response when the user does not have the required role.
-// The custom middleware continues to handle the extraction of claims from the JWT, while the dummy
+// The custom middleware JwtClaimsMiddleware.cs continues to handle the extraction of claims from the JWT, while the dummy
 // authentication scheme satisfies the requirement for a default authentication handler.
 builder.Services
     .AddAuthentication("BasicScheme")
@@ -52,7 +52,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 
 app.UseExceptionHandler();
 app.UseMiddleware<JwtClaimsMiddleware>(); // Use custom middleware to extract JWT claims
-app.UseAuthorization();
 app.UseAuthorization();
 
 app.MapControllers();
