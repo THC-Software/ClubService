@@ -116,11 +116,8 @@ public class MemberController(
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> UnlockMember(Guid id)
     {
-        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
-
-        var unlockedMemberId = await updateMemberService.UnlockMember(id, jwtUserId, jwtUserTennisClubId);
-
+        var unlockedMemberId = await updateMemberService.UnlockMember(id, jwtUserTennisClubId);
         return Ok(unlockedMemberId);
     }
 }
