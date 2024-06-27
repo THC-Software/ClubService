@@ -258,10 +258,15 @@ public class MemberTests : TestBase
         var eventDataTypeExpected = typeof(MemberFullNameChangedEvent);
         var nameExpected = new FullName("Jane", "Doe");
         var updateMemberCommand = new MemberUpdateCommand(nameExpected.FirstName, nameExpected.LastName, null);
+        
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(memberIdExpected.ToString(), tennisClubIdExpected.Id.ToString(), ["MEMBER"]);
+        
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
 
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
 
         // Then
@@ -291,8 +296,12 @@ public class MemberTests : TestBase
         var updateMemberCommand = new MemberUpdateCommand("Jane", null, null);
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
+        
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(memberId.ToString(), tennisClubIdExpected.Id.ToString(), ["MEMBER"]);
 
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberId.ToString()}", httpContent);
 
         // Then
@@ -315,8 +324,12 @@ public class MemberTests : TestBase
         var updateMemberCommand = new MemberUpdateCommand(null, null, "armin.otter@fhv.gorillaKaefig");
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
-
+        
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(memberIdExpected.ToString(), tennisClubIdExpected.Id.ToString(), ["MEMBER"]);
+        
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
 
         // Then
@@ -359,8 +372,12 @@ public class MemberTests : TestBase
             new MemberUpdateCommand(name.FirstName, name.LastName, "armin.otter@fhv.gorillaKaefig");
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
+        
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(memberIdExpected.ToString(), tennisClubIdExpected.Id.ToString(), ["MEMBER"]);
 
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberIdExpected.ToString()}", httpContent);
 
         // Then
@@ -399,8 +416,12 @@ public class MemberTests : TestBase
         var updateMemberCommand = new MemberUpdateCommand(null, null, null);
         var httpContent = new StringContent(JsonConvert.SerializeObject(updateMemberCommand), Encoding.UTF8,
             "application/json");
-
+        
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(memberId.ToString(), tennisClubIdExpected.Id.ToString(), ["MEMBER"]);
+        
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{memberId.ToString()}", httpContent);
 
         // Then

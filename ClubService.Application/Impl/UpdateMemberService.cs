@@ -62,6 +62,11 @@ public class UpdateMemberService(
         {
             member.Apply(domainEvent);
         }
+        
+        if (!jwtTennisClubId.Equals(member.TennisClubId.Id.ToString()))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
+        }
 
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id,
