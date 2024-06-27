@@ -33,9 +33,9 @@ public class EmailMessageRelay : BackgroundService
     {
         using var scope = _serviceProvider.CreateScope();
         var emailOutboxRepository = scope.ServiceProvider.GetRequiredService<IEmailOutboxRepository>();
-        var readStoreTransactionManager = scope.ServiceProvider.GetRequiredService<IReadStoreTransactionManager>();
+        var transactionManager = scope.ServiceProvider.GetRequiredService<ITransactionManager>();
 
-        await readStoreTransactionManager.TransactionScope(async () =>
+        await transactionManager.TransactionScope(async () =>
         {
             var emails = await emailOutboxRepository.GetAllEmails();
 
