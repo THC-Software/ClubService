@@ -4,5 +4,5 @@ namespace ClubService.Application.Api;
 
 public interface IRegisterMemberService
 {
-    Task<Guid> RegisterMember(MemberRegisterCommand memberRegisterCommand, string? tennisClubId);
+    Task<Guid> RegisterMember(MemberRegisterCommand memberRegisterCommand, string? jwtUserTennisClubId);
 }
