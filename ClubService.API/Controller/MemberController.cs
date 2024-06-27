@@ -37,7 +37,7 @@ public class MemberController(
         var memberReadModel = await memberReadModelRepository.GetMemberById(id);
         if (memberReadModel == null)
         {
-            return NotFound($"Member with id {id} not found!");
+            return NotFound($"Member with id '{id}' not found!");
         }
 
         if (!jwtUserTennisClubId.Equals(memberReadModel.TennisClubId.Id.ToString()))
