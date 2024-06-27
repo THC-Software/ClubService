@@ -15,7 +15,7 @@ namespace ClubService.Application.Impl;
 
 public class UpdateMemberService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<UpdateMemberService> loggerService) : IUpdateMemberService
 {
     public async Task<Guid> LockMember(Guid id)
@@ -62,7 +62,7 @@ public class UpdateMemberService(
                     var domainEvents = member.ProcessMemberLockCommand();
                     var expectedEventCount = existingMemberDomainEvents.Count;
 
-                    await eventStoreTransactionManager.TransactionScope(async () =>
+                    await transactionManager.TransactionScope(async () =>
                     {
                         foreach (var domainEvent in domainEvents)
                         {
@@ -132,7 +132,7 @@ public class UpdateMemberService(
                     var domainEvents = member.ProcessMemberUnlockCommand();
                     var expectedEventCount = existingMemberDomainEvents.Count;
 
-                    await eventStoreTransactionManager.TransactionScope(async () =>
+                    await transactionManager.TransactionScope(async () =>
                     {
                         foreach (var domainEvent in domainEvents)
                         {
@@ -217,7 +217,7 @@ public class UpdateMemberService(
 
                     var expectedEventCount = existingMemberDomainEvents.Count;
 
-                    await eventStoreTransactionManager.TransactionScope(async () =>
+                    await transactionManager.TransactionScope(async () =>
                     {
                         foreach (var domainEvent in domainEvents)
                         {

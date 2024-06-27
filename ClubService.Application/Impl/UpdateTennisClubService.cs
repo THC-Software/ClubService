@@ -14,7 +14,7 @@ namespace ClubService.Application.Impl;
 
 public class UpdateTennisClubService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<UpdateTennisClubService> loggerService) : IUpdateTennisClubService
 {
     public async Task<Guid> LockTennisClub(Guid id)
@@ -43,7 +43,7 @@ public class UpdateTennisClubService(
             var domainEvents = tennisClub.ProcessTennisClubLockCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
 
-            await eventStoreTransactionManager.TransactionScope(async () =>
+            await transactionManager.TransactionScope(async () =>
             {
                 foreach (var domainEvent in domainEvents)
                 {
@@ -88,7 +88,7 @@ public class UpdateTennisClubService(
             var domainEvents = tennisClub.ProcessTennisClubUnlockCommand();
             var expectedEventCount = existingTennisClubDomainEvents.Count;
 
-            await eventStoreTransactionManager.TransactionScope(async () =>
+            await transactionManager.TransactionScope(async () =>
             {
                 foreach (var domainEvent in domainEvents)
                 {
@@ -158,7 +158,7 @@ public class UpdateTennisClubService(
                 tennisClub.ProcessTennisClubUpdateCommand(tennisClubUpdateCommand.Name, subscriptionTierId);
             var expectedEventCount = existingTennisClubDomainEvents.Count;
 
-            await eventStoreTransactionManager.TransactionScope(async () =>
+            await transactionManager.TransactionScope(async () =>
             {
                 foreach (var domainEvent in domainEvents)
                 {

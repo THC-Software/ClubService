@@ -7,8 +7,6 @@ namespace ClubService.Application.EventHandlers.TennisClubEventHandlers;
 
 public class TennisClubDeletedEventHandler(
     ITennisClubReadModelRepository tennisClubReadModelRepository,
-    IAdminReadModelRepository adminReadModelRepository,
-    IMemberReadModelRepository memberReadModelRepository,
     ILoggerService<TennisClubDeletedEventHandler> loggerService) : IEventHandler
 {
     public async Task Handle(DomainEnvelope<IDomainEvent> domainEnvelope)
@@ -29,8 +27,6 @@ public class TennisClubDeletedEventHandler(
             throw new TennisClubNotFoundException(domainEnvelope.EntityId);
         }
 
-        await memberReadModelRepository.DeleteMembersByTennisClubId(tennisClubReadModel.TennisClubId.Id);
-        await adminReadModelRepository.DeleteAdminsByTennisClubId(tennisClubReadModel.TennisClubId.Id);
         await tennisClubReadModelRepository.Delete(tennisClubReadModel);
 
         loggerService.LogTennisClubDeleted(tennisClubReadModel.TennisClubId.Id);

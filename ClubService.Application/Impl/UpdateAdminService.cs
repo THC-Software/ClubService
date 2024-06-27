@@ -13,7 +13,7 @@ namespace ClubService.Application.Impl;
 
 public class UpdateAdminService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     ILoggerService<UpdateAdminService> loggerService) : IUpdateAdminService
 {
     public async Task<Guid> ChangeFullName(Guid id, string firstName, string lastName)
@@ -59,7 +59,7 @@ public class UpdateAdminService(
                     var domainEvents = admin.ProcessAdminChangeFullNameCommand(new FullName(firstName, lastName));
                     var expectedEventCount = existingAdminDomainEvents.Count;
 
-                    await eventStoreTransactionManager.TransactionScope(async () =>
+                    await transactionManager.TransactionScope(async () =>
                     {
                         foreach (var domainEvent in domainEvents)
                         {

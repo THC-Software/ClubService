@@ -13,7 +13,7 @@ namespace ClubService.Application.Impl;
 
 public class RegisterTennisClubService(
     IEventRepository eventRepository,
-    IEventStoreTransactionManager eventStoreTransactionManager,
+    ITransactionManager transactionManager,
     IPasswordHasherService passwordHasherService,
     ILoginRepository loginRepository,
     ILoggerService<RegisterTennisClubService> loggerService)
@@ -43,7 +43,7 @@ public class RegisterTennisClubService(
                 subscriptionTierId);
         var expectedEventCount = 0;
 
-        await eventStoreTransactionManager.TransactionScope(async () =>
+        await transactionManager.TransactionScope(async () =>
         {
             foreach (var domainEvent in tennisClubDomainEvents)
             {
