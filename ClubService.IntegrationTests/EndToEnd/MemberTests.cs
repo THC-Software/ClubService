@@ -174,8 +174,13 @@ public class MemberTests : TestBase
         var eventTypeExpected = EventType.MEMBER_DELETED;
         var entityTypeExpected = EntityType.MEMBER;
         var eventDataTypeExpected = typeof(MemberDeletedEvent);
+        
+        var adminIdExpected = new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe");
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(adminIdExpected.ToString(), tennisClubIdExpected.Id.ToString(), ["ADMIN"]);
 
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{memberIdExpected.ToString()}");
 
         // Then
@@ -204,8 +209,13 @@ public class MemberTests : TestBase
     {
         // Given
         var deletedMemberId = new Guid("e8a2cd4c-69ad-4cf2-bca6-a60d88be6649");
-
+        
+        var adminIdExpected = new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe");
+        var tennisClubIdExpected = new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3"));
+        var jwtToken = JwtTokenHelper.GenerateJwtToken(adminIdExpected.ToString(), tennisClubIdExpected.Id.ToString(), ["ADMIN"]);
+        
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{deletedMemberId.ToString()}");
 
         // Then

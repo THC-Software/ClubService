@@ -90,11 +90,8 @@ public class MemberController(
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> DeleteMember(Guid id)
     {
-        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
-
-        var deletedMemberId = await deleteMemberService.DeleteMember(id, jwtUserId, jwtUserTennisClubId);
-
+        var deletedMemberId = await deleteMemberService.DeleteMember(id, jwtUserTennisClubId);
         return Ok(deletedMemberId);
     }
 

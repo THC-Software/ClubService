@@ -19,10 +19,9 @@ public class DeleteMemberService(
 {
     public async Task<Guid> DeleteMember(
         Guid id,
-        string? jwtUserId,
         string? jwtTennisClubId)
     {
-        if (jwtUserId == null || jwtTennisClubId == null)
+        if (jwtTennisClubId == null)
         {
             throw new AuthenticationException("Authentication error.");
         }
@@ -44,6 +43,11 @@ public class DeleteMemberService(
         {
             member.Apply(domainEvent);
         }
+        
+        if (!jwtTennisClubId.Equals(member.TennisClubId.Id.ToString()))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
+        }
 
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id,
@@ -59,11 +63,6 @@ public class DeleteMemberService(
         foreach (var domainEvent in tennisClubDomainEvents)
         {
             tennisClub.Apply(domainEvent);
-        }
-
-        if (!jwtTennisClubId.Equals(tennisClub.TennisClubId.ToString()))
-        {
-            throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
 
         switch (tennisClub.Status)

@@ -2,5 +2,5 @@
 
 public interface IDeleteMemberService
 {
-    Task<Guid> DeleteMember(Guid id, string? jwtUserId, string? jwtTennisClubId);
+    Task<Guid> DeleteMember(Guid id, string? jwtTennisClubId);
 }
