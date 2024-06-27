@@ -15,5 +15,6 @@ public static class RepositoryExtensions
         services.AddScoped<ITournamentReadModelRepository, TournamentReadModelRepository>();
         services.AddScoped<IProcessedEventRepository, ProcessedEventRepository>();
         services.AddScoped<ILoginRepository, LoginRepository>();
+        services.AddScoped<IEmailOutboxRepository, EmailOutboxRepository>();
     }
 }

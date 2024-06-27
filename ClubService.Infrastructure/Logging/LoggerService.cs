@@ -305,4 +305,9 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     {
         logger.LogWarning("Message missing 'payload' or 'after' properties or 'after' is null: {Json}", jsonValue);
     }
+
+    public void LogEmailMessageRelayStop()
+    {
+        logger.LogInformation("EmailMessageRelay is stopping.");
+    }
 }
