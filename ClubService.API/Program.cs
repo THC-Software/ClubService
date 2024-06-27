@@ -1,3 +1,4 @@
+using ClubService.API;
 using ClubService.API.ApplicationConfigurations;
 using ClubService.Infrastructure.DbContexts;
 
@@ -13,8 +14,8 @@ builder.Services.AddExternalServiceConfigurations(builder.Configuration);
 builder.Services.AddApiVersioningConfigurations();
 builder.Services.AddSwaggerConfigurations();
 builder.Services.AddExceptionHandlerConfigurations();
-builder.Services.AddAuthenticationConfigurations(builder.Configuration);
 builder.Services.AddControllers();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 using var scope = app.Services.CreateScope();
@@ -39,9 +40,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
     await loginStoreDbContext.Database.EnsureCreatedAsync();
 }
 
+app.UseHttpsRedirection();
+
 app.UseExceptionHandler();
+app.UseMiddleware<JwtClaimsMiddleware>(); // Use custom middleware to extract JWT claims
 app.UseAuthorization();
+
 app.MapControllers();
+
 await app.RunAsync();
 
 // For integration tests

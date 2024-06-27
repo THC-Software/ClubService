@@ -22,8 +22,7 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Policy = "AdminPolicy")]
-    [Authorize(Policy = "MemberPolicy")]
+    [Authorize(Roles = "ADMIN,MEMBER")]
     public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -53,7 +52,7 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -70,7 +69,7 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Policy = "MemberPolicy")]
+    [Authorize(Roles = "MEMBER")]
     public async Task<ActionResult<Guid>> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -87,7 +86,7 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> DeleteMember(Guid id)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -103,7 +102,7 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> LockMember(Guid id)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
@@ -119,7 +118,7 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> UnlockMember(Guid id)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
