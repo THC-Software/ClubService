@@ -103,11 +103,8 @@ public class MemberController(
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> LockMember(Guid id)
     {
-        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
-
-        var lockedMemberId = await updateMemberService.LockMember(id, jwtUserId, jwtUserTennisClubId);
-
+        var lockedMemberId = await updateMemberService.LockMember(id, jwtUserTennisClubId);
         return Ok(lockedMemberId);
     }
 

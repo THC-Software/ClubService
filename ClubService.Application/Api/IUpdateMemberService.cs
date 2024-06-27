@@ -4,7 +4,7 @@ namespace ClubService.Application.Api;
 
 public interface IUpdateMemberService
 {
-    Task<Guid> LockMember(Guid id, string? jwtUserId, string? jwtTennisClubId);
+    Task<Guid> LockMember(Guid id, string? jwtTennisClubId);
     Task<Guid> UnlockMember(Guid id, string? jwtUserId, string? jwtTennisClubId);
 
     Task<Guid> UpdateMember(
