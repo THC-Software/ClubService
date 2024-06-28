@@ -31,7 +31,7 @@ public class MemberController(
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
         if (jwtUserTennisClubId == null || !jwtUserTennisClubId.Equals(id.ToString()))
         {
-            return Unauthorized("Authentication error.");
+            return Unauthorized("You do not have access to this resource.");
         }
 
         var memberReadModel = await memberReadModelRepository.GetMemberById(id);

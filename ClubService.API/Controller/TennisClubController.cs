@@ -56,7 +56,7 @@ public class TennisClubController(
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
         if (jwtRole != "SYSTEM_OPERATOR" && jwtUserTennisClubId != id.ToString())
         {
-            return Unauthorized("Authentication error.");
+            return Unauthorized("You do not have access to this resource.");
         }
 
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(id);
@@ -82,7 +82,7 @@ public class TennisClubController(
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
         if (jwtRole != "SYSTEM_OPERATOR" && jwtUserTennisClubId != id.ToString())
         {
-            return Unauthorized("Authentication error.");
+            return Unauthorized("You do not have access to this resource.");
         }
 
         var admins = await adminReadModelRepository.GetAdminsByTennisClubId(id);
@@ -101,7 +101,7 @@ public class TennisClubController(
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
         if (jwtUserTennisClubId != id.ToString())
         {
-            return Unauthorized("Authentication error.");
+            return Unauthorized("You do not have access to this resource.");
         }
 
         var members = await memberReadModelRepository.GetMembersByTennisClubId(id);
