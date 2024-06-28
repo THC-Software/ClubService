@@ -3,6 +3,7 @@ using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -22,6 +23,7 @@ public class AdminController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> RegisterAdmin(
         [FromBody] AdminRegisterCommand adminRegisterCommand)
     {
@@ -34,6 +36,7 @@ public class AdminController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> DeleteAdmin(Guid id)
     {
         var deletedAdminId = await deleteAdminService.DeleteAdmin(id);
@@ -45,6 +48,7 @@ public class AdminController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> UpdateAdmin(Guid id, [FromBody] AdminUpdateCommand adminUpdateCommand)
     {
         var updatedAdminId = await updateAdminService.ChangeFullName(
@@ -59,6 +63,7 @@ public class AdminController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN")]
     public async Task<ActionResult<AdminReadModel>> GetAdminById(Guid id)
     {
         var adminReadModel = await adminReadModelRepository.GetAdminById(id);
