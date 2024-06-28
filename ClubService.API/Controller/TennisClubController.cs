@@ -3,6 +3,7 @@ using ClubService.Application.Api;
 using ClubService.Application.Commands;
 using ClubService.Domain.ReadModel;
 using ClubService.Domain.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -22,7 +23,10 @@ public class TennisClubController(
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "SYSTEM_OPERATOR")]
     public async Task<ActionResult<List<TennisClubReadModel>>> GetAllTennisClubs(
         [FromQuery] int pageSize = 0,
         int pageNumber = 1)
@@ -41,8 +45,11 @@ public class TennisClubController(
 
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "ADMIN,MEMBER")]
     public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(Guid id)
     {
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(id);
@@ -57,8 +64,11 @@ public class TennisClubController(
 
     [HttpGet("{id:guid}/admins")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "SYSTEM_OPERATOR")]
     public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(Guid id)
     {
         var admins = await adminReadModelRepository.GetAdminsByTennisClubId(id);
@@ -67,8 +77,11 @@ public class TennisClubController(
 
     [HttpGet("{id:guid}/members")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(Guid id)
     {
         var members = await memberReadModelRepository.GetMembersByTennisClubId(id);
@@ -89,9 +102,12 @@ public class TennisClubController(
 
     [HttpPatch("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> UpdateTennisClub(
         Guid id,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
@@ -102,9 +118,12 @@ public class TennisClubController(
 
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN")]
     public async Task<ActionResult<Guid>> DeleteTennisClub(Guid id)
     {
         var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(id, "");
@@ -113,9 +132,12 @@ public class TennisClubController(
 
     [HttpPost("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "SYSTEM_OPERATOR")]
     public async Task<ActionResult<Guid>> LockTennisClub(Guid id)
     {
         var lockedTennisClubId = await updateTennisClubService.LockTennisClub(id);
@@ -124,9 +146,12 @@ public class TennisClubController(
 
     [HttpDelete("{id:guid}/lock")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "SYSTEM_OPERATOR")]
     public async Task<ActionResult<Guid>> UnlockTennisClub(Guid id)
     {
         var unlockedTennisClubId = await updateTennisClubService.UnlockTennisClub(id);

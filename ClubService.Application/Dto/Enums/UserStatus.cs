@@ -5,6 +5,4 @@ public enum UserStatus
     ACTIVE,
     LOCKED,
     DELETED
-    
-    
 }
