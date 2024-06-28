@@ -29,7 +29,7 @@ public class MemberController(
     public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
-        if (jwtUserTennisClubId == null)
+        if (jwtUserTennisClubId == null || !jwtUserTennisClubId.Equals(id.ToString()))
         {
             return Unauthorized("Authentication error.");
         }
@@ -77,10 +77,9 @@ public class MemberController(
     public async Task<ActionResult<Guid>> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
 
         var updatedMemberId =
-            await updateMemberService.UpdateMember(id, memberUpdateCommand, jwtUserId, jwtUserTennisClubId);
+            await updateMemberService.UpdateMember(id, memberUpdateCommand, jwtUserId);
 
         return Ok(updatedMemberId);
     }

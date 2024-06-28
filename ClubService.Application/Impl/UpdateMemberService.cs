@@ -22,21 +22,15 @@ public class UpdateMemberService(
     public async Task<Guid> UpdateMember(
         Guid id,
         MemberUpdateCommand memberUpdateCommand,
-        string? jwtUserId,
-        string? jwtTennisClubId)
+        string? jwtUserId)
     {
-        if (jwtUserId == null || jwtTennisClubId == null)
-        {
-            throw new AuthenticationException("Authentication error.");
-        }
+        loggerService.LogUpdateMember(id, memberUpdateCommand.FirstName, memberUpdateCommand.LastName,
+            memberUpdateCommand.Email);
 
-        if (!jwtUserId.Equals(id.ToString()))
+        if (jwtUserId == null || !jwtUserId.Equals(id.ToString()))
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
-
-        loggerService.LogUpdateMember(id, memberUpdateCommand.FirstName, memberUpdateCommand.LastName,
-            memberUpdateCommand.Email);
 
         if ((string.IsNullOrWhiteSpace(memberUpdateCommand.FirstName) ||
              string.IsNullOrWhiteSpace(memberUpdateCommand.LastName)) &&
@@ -61,11 +55,6 @@ public class UpdateMemberService(
         foreach (var domainEvent in existingMemberDomainEvents)
         {
             member.Apply(domainEvent);
-        }
-        
-        if (!jwtTennisClubId.Equals(member.TennisClubId.Id.ToString()))
-        {
-            throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
 
         var tennisClubDomainEvents =
@@ -127,12 +116,12 @@ public class UpdateMemberService(
         Guid id,
         string? jwtTennisClubId)
     {
+        loggerService.LogLockMember(id);
+
         if (jwtTennisClubId == null)
         {
             throw new AuthenticationException("Authentication error.");
         }
-
-        loggerService.LogLockMember(id);
 
         var memberId = new MemberId(id);
         var existingMemberDomainEvents =
@@ -149,12 +138,12 @@ public class UpdateMemberService(
         {
             member.Apply(domainEvent);
         }
-        
+
         if (!jwtTennisClubId.Equals(member.TennisClubId.Id.ToString()))
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
-        
+
         var tennisClubDomainEvents =
             await eventRepository.GetEventsForEntity<ITennisClubDomainEvent>(member.TennisClubId.Id,
                 EntityType.TENNIS_CLUB);
@@ -209,12 +198,12 @@ public class UpdateMemberService(
         Guid id,
         string? jwtTennisClubId)
     {
+        loggerService.LogUnlockMember(id);
+
         if (jwtTennisClubId == null)
         {
             throw new AuthenticationException("Authentication error.");
         }
-
-        loggerService.LogUnlockMember(id);
 
         var memberId = new MemberId(id);
         var existingMemberDomainEvents =
@@ -231,7 +220,7 @@ public class UpdateMemberService(
         {
             member.Apply(domainEvent);
         }
-        
+
         if (!jwtTennisClubId.Equals(member.TennisClubId.Id.ToString()))
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");
