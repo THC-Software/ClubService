@@ -29,7 +29,7 @@ public class MemberController(
     public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
-        if (jwtUserTennisClubId == null || !jwtUserTennisClubId.Equals(id.ToString()))
+        if (jwtUserTennisClubId == null)
         {
             return Unauthorized("You do not have access to this resource.");
         }
