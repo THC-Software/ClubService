@@ -49,9 +49,16 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "ADMIN,MEMBER")]
+    [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN,MEMBER")]
     public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(Guid id)
     {
+        var jwtRole = User.Claims.FirstOrDefault(c => c.Type == "groups")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+        if (jwtRole != "SYSTEM_OPERATOR" && jwtUserTennisClubId != id.ToString())
+        {
+            return Unauthorized("Authentication error.");
+        }
+
         var tennisClub = await tennisClubReadModelRepository.GetTennisClubById(id);
 
         if (tennisClub == null)
@@ -68,9 +75,16 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Authorize(Roles = "SYSTEM_OPERATOR")]
+    [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN")]
     public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(Guid id)
     {
+        var jwtRole = User.Claims.FirstOrDefault(c => c.Type == "groups")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+        if (jwtRole != "SYSTEM_OPERATOR" && jwtUserTennisClubId != id.ToString())
+        {
+            return Unauthorized("Authentication error.");
+        }
+
         var admins = await adminReadModelRepository.GetAdminsByTennisClubId(id);
         return Ok(admins);
     }
@@ -84,6 +98,12 @@ public class TennisClubController(
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(Guid id)
     {
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+        if (jwtUserTennisClubId != id.ToString())
+        {
+            return Unauthorized("Authentication error.");
+        }
+
         var members = await memberReadModelRepository.GetMembersByTennisClubId(id);
         return Ok(members);
     }
@@ -112,7 +132,9 @@ public class TennisClubController(
         Guid id,
         [FromBody] TennisClubUpdateCommand tennisClubUpdateCommand)
     {
-        var updatedTennisClubId = await updateTennisClubService.UpdateTennisClub(id, tennisClubUpdateCommand);
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+        var updatedTennisClubId =
+            await updateTennisClubService.UpdateTennisClub(id, tennisClubUpdateCommand, jwtUserTennisClubId);
         return Ok(updatedTennisClubId);
     }
 
@@ -126,7 +148,9 @@ public class TennisClubController(
     [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN")]
     public async Task<ActionResult<Guid>> DeleteTennisClub(Guid id)
     {
-        var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(id, "");
+        var jwtRole = User.Claims.FirstOrDefault(c => c.Type == "groups")?.Value;
+        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
+        var deletedTennisClubId = await deleteTennisClubService.DeleteTennisClub(id, jwtRole, jwtUserTennisClubId);
         return Ok(deletedTennisClubId);
     }
 

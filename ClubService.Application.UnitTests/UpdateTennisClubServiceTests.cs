@@ -204,7 +204,7 @@ public class UpdateTennisClubServiceTests
 
         // When
         _ = await _updateTennisClubService.UpdateTennisClub(tennisClubId.Id,
-            tennisClubUpdateCommand);
+            tennisClubUpdateCommand, tennisClubId.Id.ToString());
 
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -231,7 +231,7 @@ public class UpdateTennisClubServiceTests
 
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() =>
-            _updateTennisClubService.UpdateTennisClub(clubId, tennisClubUpdateCommand));
+            _updateTennisClubService.UpdateTennisClub(clubId, tennisClubUpdateCommand, clubId.ToString()));
     }
 
     [Test]
@@ -265,7 +265,7 @@ public class UpdateTennisClubServiceTests
 
         // When
         _ = await _updateTennisClubService.UpdateTennisClub(tennisClubId.Id,
-            tennisClubUpdateCommand);
+            tennisClubUpdateCommand, tennisClubId.Id.ToString());
 
         // Then
         _eventRepositoryMock.Verify(repo =>
@@ -292,6 +292,6 @@ public class UpdateTennisClubServiceTests
 
         // When ... Then
         Assert.ThrowsAsync<TennisClubNotFoundException>(() =>
-            _updateTennisClubService.UpdateTennisClub(clubId, tennisClubUpdateCommand));
+            _updateTennisClubService.UpdateTennisClub(clubId, tennisClubUpdateCommand, clubId.ToString()));
     }
 }
