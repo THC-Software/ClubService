@@ -47,7 +47,9 @@ public class DeleteTennisClubService(
 
                 foreach (var admin in adminsForTennisClub)
                 {
-                    await deleteAdminService.DeleteAdmin(admin.AdminId.Id);
+                    // Pass empty jwtUserId as DeleteAdmin itself checks that an admin does not delete its own account
+                    // With deleting the tennis club the admin deletes its own account which is ok in this case
+                    await deleteAdminService.DeleteAdmin(admin.AdminId.Id, "", tennisClubId.Id.ToString());
                 }
 
                 var tennisClub = new TennisClub();

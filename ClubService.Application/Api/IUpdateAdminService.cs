@@ -2,5 +2,5 @@
 
 public interface IUpdateAdminService
 {
-    Task<Guid> ChangeFullName(Guid id, string firstName, string lastName);
+    Task<Guid> ChangeFullName(Guid id, string firstName, string lastName, string? jwtUserId);
 }
