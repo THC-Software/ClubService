@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using ClubService.Application.Api;
 using ClubService.Application.Dto;
-using ClubService.Domain.Model.Entity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClubService.API.Controller;
@@ -25,12 +25,16 @@ public class UserController(ILoginService loginService, IUserService userService
 
     [HttpPatch("/changePassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "ADMIN,MEMBER")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
     {
-        await userService.ChangePassword(changePasswordDto);
+        var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+        await userService.ChangePassword(changePasswordDto, jwtUserId);
         return Ok();
     }
 }
