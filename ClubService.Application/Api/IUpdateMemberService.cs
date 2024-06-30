@@ -10,6 +10,5 @@ public interface IUpdateMemberService
     Task<Guid> UpdateMember(
         Guid id,
         MemberUpdateCommand memberUpdateCommand,
-        string? jwtUserId,
-        string? jwtTennisClubId);
+        string? jwtUserId);
 }

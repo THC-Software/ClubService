@@ -6,5 +6,5 @@ public interface IUpdateTennisClubService
 {
     Task<Guid> LockTennisClub(Guid id);
     Task<Guid> UnlockTennisClub(Guid id);
-    Task<Guid> UpdateTennisClub(Guid id, TennisClubUpdateCommand tennisClubUpdateCommand);
+    Task<Guid> UpdateTennisClub(Guid id, TennisClubUpdateCommand tennisClubUpdateCommand, string? jwtTennisClubId);
 }

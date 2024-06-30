@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event;
@@ -70,8 +71,10 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_LOCKED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubLockedEvent);
+        var jwtToken = JwtTokenHelper.GenerateJwtToken("", "", ["SYSTEM_OPERATOR"]);
 
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PostAsync($"{BaseUrl}/{clubIdExpected}/lock", null);
 
         // Then
@@ -105,8 +108,10 @@ public class TennisClubTests : TestBase
         var eventTypeExpected = EventType.TENNIS_CLUB_UNLOCKED;
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubUnlockedEvent);
+        var jwtToken = JwtTokenHelper.GenerateJwtToken("", "", ["SYSTEM_OPERATOR"]);
 
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected}/lock");
 
         // Then
@@ -145,7 +150,12 @@ public class TennisClubTests : TestBase
         var jsonContent = JsonConvert.SerializeObject(tennisClubUpdateCommand);
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+        var adminId = new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a");
+        var jwtToken =
+            JwtTokenHelper.GenerateJwtToken(adminId.ToString(), clubIdExpected.ToString(), ["ADMIN"]);
+
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
 
         // Then
@@ -188,7 +198,12 @@ public class TennisClubTests : TestBase
         var jsonContent = JsonConvert.SerializeObject(tennisClubUpdateCommand);
         var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+        var adminId = new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a");
+        var jwtToken =
+            JwtTokenHelper.GenerateJwtToken(adminId.ToString(), clubIdExpected.ToString(), ["ADMIN"]);
+
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.PatchAsync($"{BaseUrl}/{clubIdExpected}", content);
 
         // Then
@@ -228,7 +243,12 @@ public class TennisClubTests : TestBase
         var entityTypeExpected = EntityType.TENNIS_CLUB;
         var eventDataTypeExpected = typeof(TennisClubDeletedEvent);
 
+        var adminId = new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a");
+        var jwtToken =
+            JwtTokenHelper.GenerateJwtToken(adminId.ToString(), clubIdExpected.ToString(), ["ADMIN"]);
+
         // When
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
         var response = await HttpClient.DeleteAsync($"{BaseUrl}/{clubIdExpected}");
 
         // Then
