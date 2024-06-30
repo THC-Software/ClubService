@@ -21,12 +21,12 @@ public class DeleteMemberService(
         Guid id,
         string? jwtTennisClubId)
     {
+        loggerService.LogDeleteMember(id);
+
         if (jwtTennisClubId == null)
         {
             throw new AuthenticationException("Authentication error.");
         }
-
-        loggerService.LogDeleteMember(id);
 
         var memberId = new MemberId(id);
         var existingMemberDomainEvents =
@@ -43,7 +43,7 @@ public class DeleteMemberService(
         {
             member.Apply(domainEvent);
         }
-        
+
         if (!jwtTennisClubId.Equals(member.TennisClubId.Id.ToString()))
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");

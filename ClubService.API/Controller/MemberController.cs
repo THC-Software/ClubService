@@ -31,7 +31,7 @@ public class MemberController(
         var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
         if (jwtUserTennisClubId == null)
         {
-            return Unauthorized("Authentication error.");
+            return Unauthorized("You do not have access to this resource.");
         }
 
         var memberReadModel = await memberReadModelRepository.GetMemberById(id);
@@ -77,10 +77,9 @@ public class MemberController(
     public async Task<ActionResult<Guid>> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-        var jwtUserTennisClubId = User.Claims.FirstOrDefault(c => c.Type == "tennisClubId")?.Value;
 
         var updatedMemberId =
-            await updateMemberService.UpdateMember(id, memberUpdateCommand, jwtUserId, jwtUserTennisClubId);
+            await updateMemberService.UpdateMember(id, memberUpdateCommand, jwtUserId);
 
         return Ok(updatedMemberId);
     }

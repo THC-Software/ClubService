@@ -18,9 +18,15 @@ public class DeleteTennisClubService(
     ITransactionManager transactionManager,
     ILoggerService<DeleteTennisClubService> loggerService) : IDeleteTennisClubService
 {
-    public async Task<Guid> DeleteTennisClub(Guid id, string? jwtTennisClubId)
+    public async Task<Guid> DeleteTennisClub(Guid id, string? jwtRole, string? jwtTennisClubId)
     {
         loggerService.LogDeleteTennisClub(id);
+
+        if (jwtRole is not "SYSTEM_OPERATOR" && (jwtTennisClubId == null ||
+                                                 !jwtTennisClubId.Equals(id.ToString())))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
+        }
 
         var tennisClubId = new TennisClubId(id);
 

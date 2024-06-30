@@ -107,9 +107,17 @@ public class UpdateTennisClubService(
         return id;
     }
 
-    public async Task<Guid> UpdateTennisClub(Guid id, TennisClubUpdateCommand tennisClubUpdateCommand)
+    public async Task<Guid> UpdateTennisClub(
+        Guid id,
+        TennisClubUpdateCommand tennisClubUpdateCommand,
+        string? jwtTennisClubId)
     {
         loggerService.LogUpdateTennisClub(id, tennisClubUpdateCommand.Name, tennisClubUpdateCommand.SubscriptionTierId);
+
+        if (jwtTennisClubId == null || !jwtTennisClubId.Equals(id.ToString()))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
+        }
 
         if (string.IsNullOrWhiteSpace(tennisClubUpdateCommand.Name) &&
             tennisClubUpdateCommand.SubscriptionTierId == null)
