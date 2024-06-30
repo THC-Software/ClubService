@@ -25,6 +25,9 @@ public class RegisterMemberService(
         MemberRegisterCommand memberRegisterCommand,
         string? jwtTennisClubId)
     {
+        loggerService.LogRegisterMember(memberRegisterCommand.FirstName,
+            memberRegisterCommand.LastName, memberRegisterCommand.Email, memberRegisterCommand.TennisClubId);
+
         if (jwtTennisClubId == null)
         {
             throw new AuthenticationException("Authentication error.");
@@ -34,9 +37,6 @@ public class RegisterMemberService(
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
-
-        loggerService.LogRegisterMember(memberRegisterCommand.FirstName,
-            memberRegisterCommand.LastName, memberRegisterCommand.Email, memberRegisterCommand.TennisClubId);
 
         var tennisClubId = new TennisClubId(memberRegisterCommand.TennisClubId);
         var tennisClubReadModel = await tennisClubReadModelRepository.GetTennisClubById(tennisClubId.Id);
