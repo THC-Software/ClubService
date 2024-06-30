@@ -16,9 +16,14 @@ public class UpdateAdminService(
     ITransactionManager transactionManager,
     ILoggerService<UpdateAdminService> loggerService) : IUpdateAdminService
 {
-    public async Task<Guid> ChangeFullName(Guid id, string firstName, string lastName)
+    public async Task<Guid> ChangeFullName(Guid id, string firstName, string lastName, string? jwtUserId)
     {
         loggerService.LogAdminChangeFullName(id, firstName, lastName);
+
+        if (jwtUserId == null || !jwtUserId.Equals(id.ToString()))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
+        }
 
         var existingAdminDomainEvents =
             await eventRepository.GetEventsForEntity<IAdminDomainEvent>(id, EntityType.ADMIN);

@@ -205,6 +205,20 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                 )
             ),
             new(
+                new Guid("94b8e057-02a1-4d34-8bb1-b136c8ec3029"),
+                new Guid("4a2eb3dc-7f1e-4dac-851a-667594ca31ff"),
+                EventType.ADMIN_REGISTERED,
+                EntityType.ADMIN,
+                DateTime.UtcNow,
+                new AdminRegisteredEvent(
+                    new AdminId(new Guid("4a2eb3dc-7f1e-4dac-851a-667594ca31ff")),
+                    "marco_pressure",
+                    new FullName("Marco", "Pressure"),
+                    new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
+                    AdminStatus.ACTIVE
+                )
+            ),
+            new(
                 new Guid("4d3d8403-f0a3-4d8a-a610-af4dfeb77124"),
                 new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a"),
                 EventType.ADMIN_REGISTERED,
