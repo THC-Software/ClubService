@@ -12,6 +12,7 @@ namespace ClubService.Infrastructure.EventHandling;
 
 public class RedisEventReader : BackgroundService
 {
+    private const string AllEvents = "*";
     private readonly ILoggerService<RedisEventReader> _loggerService;
     private readonly int _pollingInterval;
     private readonly List<RedisStream> _redisStreams;
@@ -74,6 +75,17 @@ public class RedisEventReader : BackgroundService
                 }
 
                 var parsedEvent = EventParser.ParseEvent(after);
+
+                // Here we filter out the events we don't want.
+                // If the EventTypes list contains an asterisk we want all the events of that stream.
+                // Otherwise, we check if the event type of the parsedEvent is in the list of desired events.
+                var parsedEventType = parsedEvent.EventType.ToString();
+                if (!stream.DesiredEventTypes.Contains(AllEvents) &&
+                    !stream.DesiredEventTypes.Contains(parsedEventType, StringComparer.OrdinalIgnoreCase))
+                {
+                    await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
+                    continue;
+                }
 
                 using var scope = _services.CreateScope();
                 var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
