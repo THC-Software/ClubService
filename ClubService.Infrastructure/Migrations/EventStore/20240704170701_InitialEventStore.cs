@@ -1,9 +1,8 @@
-﻿using System;
+﻿#nullable disable
+
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
-namespace ClubService.Infrastructure.Migrations
+namespace ClubService.Infrastructure.Migrations.EventStore
 {
     /// <inheritdoc />
     public partial class InitialEventStore : Migration
@@ -22,10 +21,7 @@ namespace ClubService.Infrastructure.Migrations
                     timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     eventData = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pK_DomainEvent", x => x.eventId);
-                });
+                constraints: table => { table.PrimaryKey("pK_DomainEvent", x => x.eventId); });
         }
 
         /// <inheritdoc />
