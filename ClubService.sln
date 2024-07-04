@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
 		docker-compose.override.yml = docker-compose.override.yml
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\cd.yml = .github\workflows\cd.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E56459C7-70BB-4A4A-AD5D-6FF435800999}"
