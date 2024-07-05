@@ -14,6 +14,7 @@ public class LoginStoreDbContext(DbContextOptions<LoginStoreDbContext> options) 
         optionsBuilder.UseCamelCaseNamingConvention();
     }
 
+    // TODO: Seed login store with initial default system operator
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
