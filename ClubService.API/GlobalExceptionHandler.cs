@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Authentication;
 using ClubService.Application.Api.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,16 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         switch (exception)
         {
+            case AuthenticationException:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2";
+                problemDetails.Status = StatusCodes.Status401Unauthorized;
+                problemDetails.Title = "Unauthorized";
+                break;
+            case UnauthorizedAccessException:
+                problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.4";
+                problemDetails.Status = StatusCodes.Status403Forbidden;
+                problemDetails.Title = "Forbidden";
+                break;
             case TennisClubNotFoundException:
             case SubscriptionTierNotFoundException:
             case MemberNotFoundException:

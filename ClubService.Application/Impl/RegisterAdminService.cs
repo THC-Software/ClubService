@@ -20,10 +20,15 @@ public class RegisterAdminService(
     ITransactionManager transactionManager,
     ILoggerService<RegisterAdminService> loggerService) : IRegisterAdminService
 {
-    public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand)
+    public async Task<Guid> RegisterAdmin(AdminRegisterCommand adminRegisterCommand, string? jwtTennisClubId)
     {
         loggerService.LogRegisterAdmin(adminRegisterCommand.Username, adminRegisterCommand.FirstName,
             adminRegisterCommand.LastName, adminRegisterCommand.TennisClubId);
+
+        if (jwtTennisClubId == null || !jwtTennisClubId.Equals(adminRegisterCommand.TennisClubId.ToString()))
+        {
+            throw new UnauthorizedAccessException("You do not have access to this resource.");
+        }
 
         var tennisClubId = new TennisClubId(adminRegisterCommand.TennisClubId);
 

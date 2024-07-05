@@ -1,13 +1,11 @@
-﻿using System;
+﻿#nullable disable
+
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-#nullable disable
-
-namespace ClubService.Infrastructure.Migrations
+namespace ClubService.Infrastructure.Migrations.EventStore
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialEventStore : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,8 +14,6 @@ namespace ClubService.Infrastructure.Migrations
                 name: "DomainEvent",
                 columns: table => new
                 {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     eventId = table.Column<Guid>(type: "uuid", nullable: false),
                     entityId = table.Column<Guid>(type: "uuid", nullable: false),
                     eventType = table.Column<string>(type: "text", nullable: false),
@@ -25,10 +21,7 @@ namespace ClubService.Infrastructure.Migrations
                     timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     eventData = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pK_DomainEvent", x => x.id);
-                });
+                constraints: table => { table.PrimaryKey("pK_DomainEvent", x => x.eventId); });
         }
 
         /// <inheritdoc />
