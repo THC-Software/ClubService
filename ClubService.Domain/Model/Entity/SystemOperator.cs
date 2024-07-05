@@ -22,6 +22,7 @@ public class SystemOperator
             DateTime.UtcNow,
             systemOperatorRegisteredEvent
         );
+
         return [domainEnvelope];
     }
 

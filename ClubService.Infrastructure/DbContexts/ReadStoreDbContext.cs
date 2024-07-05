@@ -13,6 +13,7 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
     public DbSet<TournamentReadModel> Tournaments { get; init; }
     public DbSet<ProcessedEvent> ProcessedEvents { get; init; }
     public DbSet<EmailMessage> EmailOutbox { get; init; }
+    public DbSet<SystemOperatorReadModel> SystemOperators { get; init; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -30,5 +31,6 @@ public class ReadStoreDbContext(DbContextOptions<ReadStoreDbContext> options) : 
         modelBuilder.ApplyConfiguration(new TournamentReadModelConfiguration());
         modelBuilder.ApplyConfiguration(new ProcessedEventConfiguration());
         modelBuilder.ApplyConfiguration(new EmailOutboxConfiguration());
+        modelBuilder.ApplyConfiguration(new SystemOperatorReadModelConfiguration());
     }
 }
