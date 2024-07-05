@@ -3,6 +3,7 @@ using ClubService.Application.EventHandlers;
 using ClubService.Application.EventHandlers.AdminEventHandlers;
 using ClubService.Application.EventHandlers.MemberEventHandlers;
 using ClubService.Application.EventHandlers.SubscriptionTierEventHandlers;
+using ClubService.Application.EventHandlers.SystemOperatorEventHandlers;
 using ClubService.Application.EventHandlers.TennisClubEventHandlers;
 using ClubService.Application.EventHandlers.TournamentEventHandlers;
 
@@ -30,6 +31,7 @@ public static class EventHandlerExtensions
         services.AddScoped<IEventHandler, MemberEmailChangedEventHandler>();
         services.AddScoped<IEventHandler, TournamentConfirmedEventHandler>();
         services.AddScoped<IEventHandler, TournamentCanceledEventHandler>();
+        services.AddScoped<IEventHandler, SystemOperatorRegisteredEventHandler>();
         services.AddScoped<ChainEventHandler>();
     }
 }

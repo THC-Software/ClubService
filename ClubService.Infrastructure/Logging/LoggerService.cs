@@ -310,4 +310,9 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     {
         logger.LogInformation("EmailMessageRelay is stopping.");
     }
+
+    public void LogSystemOperatorRegistered(Guid id)
+    {
+        logger.LogInformation("Registered system operator with id '{id}'.", id);
+    }
 }
