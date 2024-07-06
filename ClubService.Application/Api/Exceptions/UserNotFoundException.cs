@@ -12,5 +12,10 @@ public class UserNotFoundException : Exception
         Message = $"User '{username}' not found.";
     }
 
+    public UserNotFoundException(Guid id)
+    {
+        Message = $"User with id: {id} not found";
+    }
+
     public override string Message { get; }
 }

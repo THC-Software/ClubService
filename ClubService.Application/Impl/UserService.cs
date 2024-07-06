@@ -20,7 +20,7 @@ public class UserService(
         var userPassword = await loginRepository.GetById(changePasswordCommand.UserId.Id);
         if (userPassword == null)
         {
-            throw new UserNotFoundException($"User with id: {changePasswordCommand.UserId} not found");
+            throw new UserNotFoundException(changePasswordCommand.UserId.Id);
         }
 
         userPassword.ChangePassword(changePasswordCommand.Password, passwordHasherService);

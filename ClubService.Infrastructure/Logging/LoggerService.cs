@@ -219,6 +219,11 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
             tennisClubId);
     }
 
+    public void LogLogin(string username)
+    {
+        logger.LogInformation("Login called for system operator with username '{username}'.", username);
+    }
+
     public void LogUserNotFound(Guid id)
     {
         logger.LogError("User with id '{id}' not found.", id);
