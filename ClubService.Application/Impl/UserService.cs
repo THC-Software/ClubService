@@ -1,6 +1,6 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
-using ClubService.Application.Dto;
+using ClubService.Application.Commands;
 using ClubService.Domain.Api;
 using ClubService.Domain.Repository;
 
@@ -10,20 +10,20 @@ public class UserService(
     ILoginRepository loginRepository,
     IPasswordHasherService passwordHasherService) : IUserService
 {
-    public async Task ChangePassword(ChangePasswordDto changePasswordDto, string? jwtUserId)
+    public async Task ChangePassword(ChangePasswordCommand changePasswordCommand, string? jwtUserId)
     {
-        if (jwtUserId == null || !jwtUserId.Equals(changePasswordDto.UserId.Id.ToString()))
+        if (jwtUserId == null || !jwtUserId.Equals(changePasswordCommand.UserId.Id.ToString()))
         {
             throw new UnauthorizedAccessException("You do not have access to this resource.");
         }
 
-        var userPassword = await loginRepository.GetById(changePasswordDto.UserId.Id);
+        var userPassword = await loginRepository.GetById(changePasswordCommand.UserId.Id);
         if (userPassword == null)
         {
-            throw new UserNotFoundException($"User with id: {changePasswordDto.UserId} not found");
+            throw new UserNotFoundException($"User with id: {changePasswordCommand.UserId} not found");
         }
 
-        userPassword.ChangePassword(changePasswordDto.Password, passwordHasherService);
+        userPassword.ChangePassword(changePasswordCommand.Password, passwordHasherService);
         await loginRepository.ChangePassword();
     }
 }

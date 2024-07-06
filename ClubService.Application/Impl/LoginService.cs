@@ -1,5 +1,6 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.Commands;
 using ClubService.Application.Dto;
 using ClubService.Application.Dto.Enums;
 using ClubService.Application.EventHandlers;
@@ -16,14 +17,15 @@ public class LoginService(
     ILoginRepository loginRepository,
     ILoggerService<LoginService> loggerService) : ILoginService
 {
-    public async Task<UserInformationDto> Login(LoginDto loginDto)
+    public async Task<UserInformationDto> Login(LoginCommand loginCommand)
     {
-        loggerService.LogLogin(loginDto.Username, loginDto.TennisClubId.Id);
+        loggerService.LogLogin(loginCommand.Username, loginCommand.TennisClubId.Id);
 
-        var admin = await adminReadModelRepository.GetAdminByTennisClubIdAndUsername(loginDto.TennisClubId.Id,
-            loginDto.Username);
+        var admin = await adminReadModelRepository.GetAdminByTennisClubIdAndUsername(loginCommand.TennisClubId.Id,
+            loginCommand.Username);
         var member = await
-            memberReadModelRepository.GetMemberByTennisClubIdAndUsername(loginDto.TennisClubId.Id, loginDto.Username);
+            memberReadModelRepository.GetMemberByTennisClubIdAndUsername(loginCommand.TennisClubId.Id,
+                loginCommand.Username);
 
         if (admin != null)
         {
@@ -34,7 +36,7 @@ public class LoginService(
                 throw new UserNotFoundException("User not present in Login Database");
             }
 
-            if (!passwordHasherService.VerifyPassword(userPassword.HashedPassword, loginDto.Password))
+            if (!passwordHasherService.VerifyPassword(userPassword.HashedPassword, loginCommand.Password))
             {
                 // again we are just allowed to throw this here as the user will not come in contact with it.
                 loggerService.LogLoginFailed(admin.AdminId.Id);
@@ -44,7 +46,7 @@ public class LoginService(
             loggerService.LogUserLoggedIn(admin.AdminId.Id, admin.Username, UserRole.ADMIN.ToString(),
                 admin.Status.ToString());
             return new UserInformationDto(new UserId(admin.AdminId.Id), admin.Username, UserRole.ADMIN, admin.Status
-                .ToUserStatus(), loginDto.TennisClubId);
+                .ToUserStatus(), loginCommand.TennisClubId);
         }
 
         if (member != null)
@@ -57,7 +59,7 @@ public class LoginService(
                 throw new UserNotFoundException("User not present in Login Database");
             }
 
-            if (!passwordHasherService.VerifyPassword(userPassword.HashedPassword, loginDto.Password))
+            if (!passwordHasherService.VerifyPassword(userPassword.HashedPassword, loginCommand.Password))
             {
                 // again we are just allowed to throw this here as the user will not come in contact with it.
                 loggerService.LogLoginFailed(member.MemberId.Id);
@@ -67,13 +69,13 @@ public class LoginService(
             loggerService.LogUserLoggedIn(member.MemberId.Id, member.Email, UserRole.MEMBER.ToString(),
                 member.Status.ToString());
             return new UserInformationDto(new UserId(member.MemberId.Id), member.Email, UserRole.MEMBER,
-                member.Status.ToUserStatus(), loginDto.TennisClubId);
+                member.Status.ToUserStatus(), loginCommand.TennisClubId);
         }
 
         // We are only allowed to return this exception here in our backend as this function is only called by the gateway
         // and the user will never see this exception. In the gateway we can't return the same exception as we do not want
         // the user to know if the username was wrong or just the password.
-        loggerService.LogUserNotFound(loginDto.Username);
-        throw new UserNotFoundException(loginDto.TennisClubId.Id, loginDto.Username);
+        loggerService.LogUserNotFound(loginCommand.Username);
+        throw new UserNotFoundException(loginCommand.TennisClubId.Id, loginCommand.Username);
     }
 }

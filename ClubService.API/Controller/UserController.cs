@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using ClubService.Application.Api;
+using ClubService.Application.Commands;
 using ClubService.Application.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,9 @@ public class UserController(ILoginService loginService, IUserService userService
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserInformationDto>> Login(
-        [FromBody] LoginDto loginDto)
+        [FromBody] LoginCommand loginCommand)
     {
-        var userInformationDto = await loginService.Login(loginDto);
+        var userInformationDto = await loginService.Login(loginCommand);
         return Ok(userInformationDto);
     }
 
@@ -31,10 +32,10 @@ public class UserController(ILoginService loginService, IUserService userService
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Authorize(Roles = "ADMIN,MEMBER")]
-    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordCommand changePasswordCommand)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-        await userService.ChangePassword(changePasswordDto, jwtUserId);
+        await userService.ChangePassword(changePasswordCommand, jwtUserId);
         return Ok();
     }
 }
