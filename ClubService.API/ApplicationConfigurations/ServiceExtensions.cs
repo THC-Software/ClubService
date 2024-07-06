@@ -20,5 +20,6 @@ public static class ServiceExtensions
         services.AddScoped<IUpdateAdminService, UpdateAdminService>();
         services.AddScoped<IPasswordHasherService, PasswordHasherService>();
         services.AddScoped<ILoginService, LoginService>();
+        services.AddScoped<IUserService, UserService>();
     }
 }
