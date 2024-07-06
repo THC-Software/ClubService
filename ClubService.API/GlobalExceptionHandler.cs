@@ -20,6 +20,7 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         switch (exception)
         {
+            case WrongPasswordException:
             case AuthenticationException:
                 problemDetails.Type = "https://datatracker.ietf.org/doc/html/rfc9110#section-15.5.2";
                 problemDetails.Status = StatusCodes.Status401Unauthorized;
@@ -30,6 +31,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Status = StatusCodes.Status403Forbidden;
                 problemDetails.Title = "Forbidden";
                 break;
+            case UserNotFoundException:
             case TennisClubNotFoundException:
             case SubscriptionTierNotFoundException:
             case MemberNotFoundException:
