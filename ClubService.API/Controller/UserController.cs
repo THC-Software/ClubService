@@ -9,7 +9,7 @@ namespace ClubService.API.Controller;
 
 [Route("api/v{version:apiVersion}/users")]
 [ApiController]
-[ApiVersion("1.0")]
+[ApiVersionNeutral]
 public class UserController(ILoginService loginService, IUserService userService) : ControllerBase
 {
     [HttpPost("login")]
