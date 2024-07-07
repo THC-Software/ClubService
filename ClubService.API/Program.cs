@@ -43,32 +43,42 @@ var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
 var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
 var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
 
-if (eventStoreDbContext.Database.GetPendingMigrations().Any())
+if (builder.Environment.IsProduction())
 {
-    eventStoreDbContext.Database.Migrate();
-}
+    if (eventStoreDbContext.Database.GetPendingMigrations().Any())
+    {
+        eventStoreDbContext.Database.Migrate();
+    }
 
-if (readStoreDbContext.Database.GetPendingMigrations().Any())
-{
-    readStoreDbContext.Database.Migrate();
-}
+    if (readStoreDbContext.Database.GetPendingMigrations().Any())
+    {
+        readStoreDbContext.Database.Migrate();
+    }
 
-if (loginStoreDbContext.Database.GetPendingMigrations().Any())
-{
-    loginStoreDbContext.Database.Migrate();
+    if (loginStoreDbContext.Database.GetPendingMigrations().Any())
+    {
+        loginStoreDbContext.Database.Migrate();
+    }
 }
-
-if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
+else if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
 {
     app.UseSwagger();
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
 
+    await eventStoreDbContext.Database.EnsureCreatedAsync();
     await eventStoreDbContext.SeedTestData();
+    
+    await readStoreDbContext.Database.EnsureDeletedAsync();
+    await readStoreDbContext.Database.EnsureCreatedAsync();
+    
+    await loginStoreDbContext.Database.EnsureDeletedAsync();
+    await loginStoreDbContext.Database.EnsureCreatedAsync();
 }
 
 app.UseExceptionHandler();
 app.UseMiddleware<JwtClaimsMiddleware>(); // Use custom middleware to extract JWT claims
 app.UseAuthorization();
+
 app.MapControllers();
 
 await app.RunAsync();
