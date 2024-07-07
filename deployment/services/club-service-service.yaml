@@ -4,7 +4,7 @@ metadata:
   name: club-service-service
 spec:
   selector:
-    app: club-service-service
+    app: club-service
   ports:
     - protocol: TCP
       port: 5000
