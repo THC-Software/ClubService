@@ -5,6 +5,13 @@ using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddJsonFile("appsettings.Production.json");
+    builder.Configuration.AddEnvironmentVariables();
+    builder.Configuration.AddSubstitution();
+}
+
 builder.Services.AddDatabaseConfigurations(builder.Configuration);
 builder.Services.AddLoggingConfigurations(builder.Configuration);
 builder.Services.AddRepositoryConfigurations();

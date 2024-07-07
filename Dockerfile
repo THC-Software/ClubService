@@ -37,7 +37,4 @@ ENV SMTP_HOST=localhost
 ENV SMTP_PORT=1025
 ENV SMTP_SENDER_EMAIL_ADDRESS=admin@thcdornbirn.at
 
-# Replace environment variables in appsettings.Production.json
-RUN envsubst < appsettings.Production.json > appsettings.Production.json.tmp && mv appsettings.Production.json.tmp appsettings.Production.json
-
 ENTRYPOINT ["dotnet", "ClubService.API.dll"]
