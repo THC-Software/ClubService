@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: club-service-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: club-service-postgres
+  template:
+    metadata:
+      labels:
+        app: club-service-postgres
+    spec:
+      containers:
+        - name: club-service-postgres
+          image: debezium/postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 54321
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: club-service-postgres-secret
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: club-service-postgres-secret
+                  key: postgres-password
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    app: club-service-postgres
+  ports:
+    - protocol: TCP
+      port: 54321
+      targetPort: 54321   
