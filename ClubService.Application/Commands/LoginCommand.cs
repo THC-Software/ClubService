@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using ClubService.Domain.Model.ValueObject;
 
-namespace ClubService.Application.Dto;
+namespace ClubService.Application.Commands;
 
-public class LoginDto(string username, string password, TennisClubId tennisClubId)
+public class LoginCommand(string username, string password, TennisClubId? tennisClubId)
 {
     [Required]
     public string Username { get; } = username;
@@ -11,7 +11,5 @@ public class LoginDto(string username, string password, TennisClubId tennisClubI
     [Required]
     public string Password { get; } = password;
 
-    [Required]
-    public TennisClubId TennisClubId { get; } = tennisClubId;
-    
+    public TennisClubId? TennisClubId { get; } = tennisClubId;
 }

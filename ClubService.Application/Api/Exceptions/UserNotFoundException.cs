@@ -4,13 +4,18 @@ public class UserNotFoundException : Exception
 {
     public UserNotFoundException(Guid id, string username)
     {
-        Message = $"User '{username}' not found in tennis club with id: {id}";
+        Message = $"User '{username}' not found in tennis club with id: {id}.";
     }
-    
-    public UserNotFoundException(string message)
+
+    public UserNotFoundException(string username)
     {
-        Message = message;
+        Message = $"User '{username}' not found.";
     }
-    
+
+    public UserNotFoundException(Guid id)
+    {
+        Message = $"User with id: {id} not found";
+    }
+
     public override string Message { get; }
 }

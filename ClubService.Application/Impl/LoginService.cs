@@ -1,5 +1,6 @@
 using ClubService.Application.Api;
 using ClubService.Application.Api.Exceptions;
+using ClubService.Application.Commands;
 using ClubService.Application.Dto;
 using ClubService.Application.Dto.Enums;
 using ClubService.Application.EventHandlers;
@@ -13,67 +14,83 @@ public class LoginService(
     IPasswordHasherService passwordHasherService,
     IAdminReadModelRepository adminReadModelRepository,
     IMemberReadModelRepository memberReadModelRepository,
+    ISystemOperatorReadModelRepository systemOperatorReadModelRepository,
     ILoginRepository loginRepository,
     ILoggerService<LoginService> loggerService) : ILoginService
 {
-    public async Task<UserInformationDto> Login(LoginDto loginDto)
+    public async Task<UserInformationDto> Login(LoginCommand loginCommand)
     {
-        loggerService.LogLogin(loginDto.Username, loginDto.TennisClubId.Id);
+        if (loginCommand.TennisClubId == null)
+        {
+            loggerService.LogLogin(loginCommand.Username);
+            return await LoginSystemOperator(loginCommand);
+        }
 
-        var admin = await adminReadModelRepository.GetAdminByTennisClubIdAndUsername(loginDto.TennisClubId.Id,
-            loginDto.Username);
-        var member = await
-            memberReadModelRepository.GetMemberByTennisClubIdAndUsername(loginDto.TennisClubId.Id, loginDto.Username);
+        loggerService.LogLogin(loginCommand.Username, loginCommand.TennisClubId.Id);
+        return await LoginAdminOrMember(loginCommand);
+    }
 
+    private async Task<UserInformationDto> LoginSystemOperator(LoginCommand loginCommand)
+    {
+        var systemOperator =
+            await systemOperatorReadModelRepository.GetSystemOperatorByUsername(loginCommand.Username);
+
+        if (systemOperator != null)
+        {
+            return await LoginUser(systemOperator.SystemOperatorId.Id, loginCommand.Username, loginCommand.Password,
+                UserRole.SYSTEM_OPERATOR, UserStatus.ACTIVE, null);
+        }
+
+        loggerService.LogUserNotFound(loginCommand.Username);
+        throw new UserNotFoundException(loginCommand.Username);
+    }
+
+    private async Task<UserInformationDto> LoginAdminOrMember(LoginCommand loginCommand)
+    {
+        var admin = await adminReadModelRepository.GetAdminByTennisClubIdAndUsername(loginCommand.TennisClubId!.Id,
+            loginCommand.Username);
         if (admin != null)
         {
-            var userPassword = await loginRepository.GetById(admin.AdminId.Id);
-            if (userPassword == null)
-            {
-                loggerService.LogUserNotFound(admin.AdminId.Id);
-                throw new UserNotFoundException("User not present in Login Database");
-            }
-
-            if (!passwordHasherService.VerifyPassword(userPassword.HashedPassword, loginDto.Password))
-            {
-                // again we are just allowed to throw this here as the user will not come in contact with it.
-                loggerService.LogLoginFailed(admin.AdminId.Id);
-                throw new WrongPasswordException();
-            }
-
-            loggerService.LogUserLoggedIn(admin.AdminId.Id, admin.Username, UserRole.ADMIN.ToString(),
-                admin.Status.ToString());
-            return new UserInformationDto(new UserId(admin.AdminId.Id), admin.Username, UserRole.ADMIN, admin.Status
-                .ToUserStatus(), loginDto.TennisClubId);
+            return await LoginUser(admin.AdminId.Id, loginCommand.Username, loginCommand.Password, UserRole.ADMIN,
+                admin.Status.ToUserStatus(), admin.TennisClubId);
         }
 
+        var member =
+            await memberReadModelRepository.GetMemberByTennisClubIdAndUsername(loginCommand.TennisClubId.Id,
+                loginCommand.Username);
         if (member != null)
         {
-            var userPassword = await loginRepository.GetById(member.MemberId.Id);
-
-            if (userPassword == null)
-            {
-                loggerService.LogUserNotFound(member.MemberId.Id);
-                throw new UserNotFoundException("User not present in Login Database");
-            }
-
-            if (!passwordHasherService.VerifyPassword(userPassword.HashedPassword, loginDto.Password))
-            {
-                // again we are just allowed to throw this here as the user will not come in contact with it.
-                loggerService.LogLoginFailed(member.MemberId.Id);
-                throw new WrongPasswordException();
-            }
-
-            loggerService.LogUserLoggedIn(member.MemberId.Id, member.Email, UserRole.MEMBER.ToString(),
-                member.Status.ToString());
-            return new UserInformationDto(new UserId(member.MemberId.Id), member.Email, UserRole.MEMBER,
-                member.Status.ToUserStatus(), loginDto.TennisClubId);
+            return await LoginUser(member.MemberId.Id, loginCommand.Username, loginCommand.Password, UserRole.MEMBER,
+                member.Status.ToUserStatus(), member.TennisClubId);
         }
 
-        // We are only allowed to return this exception here in our backend as this function is only called by the gateway
-        // and the user will never see this exception. In the gateway we can't return the same exception as we do not want
-        // the user to know if the username was wrong or just the password.
-        loggerService.LogUserNotFound(loginDto.Username);
-        throw new UserNotFoundException(loginDto.TennisClubId.Id, loginDto.Username);
+        loggerService.LogUserNotFound(loginCommand.Username);
+        throw new UserNotFoundException(loginCommand.TennisClubId.Id, loginCommand.Username);
+    }
+
+    private async Task<UserInformationDto> LoginUser(
+        Guid userId,
+        string username,
+        string password,
+        UserRole role,
+        UserStatus userStatus,
+        TennisClubId? tennisClubId)
+    {
+        var userPassword = await loginRepository.GetById(userId);
+        if (userPassword == null)
+        {
+            loggerService.LogUserNotFound(userId);
+            throw new UserNotFoundException("User not present in Login Database");
+        }
+
+        if (!passwordHasherService.VerifyPassword(userPassword.HashedPassword, password))
+        {
+            // again we are just allowed to throw this here as the user will not come in contact with it.
+            loggerService.LogLoginFailed(userId);
+            throw new WrongPasswordException();
+        }
+
+        loggerService.LogUserLoggedIn(userId, username, role.ToString(), userStatus.ToString());
+        return new UserInformationDto(new UserId(userId), username, role, userStatus, tennisClubId);
     }
 }

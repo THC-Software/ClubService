@@ -44,6 +44,7 @@ public interface ILoggerService<T>
     void LogSubscriptionTierCreated(Guid id);
     void LogSubscriptionTierNotFound(Guid id);
     void LogLogin(string username, Guid tennisClubId);
+    void LogLogin(string username);
     void LogUserNotFound(Guid id);
     void LogUserNotFound(string username);
     void LogLoginFailed(Guid id);

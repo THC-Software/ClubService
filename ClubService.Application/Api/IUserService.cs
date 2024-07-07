@@ -1,8 +1,8 @@
-using ClubService.Application.Dto;
+using ClubService.Application.Commands;
 
 namespace ClubService.Application.Api;
 
 public interface IUserService
 {
-    Task ChangePassword(ChangePasswordDto changePasswordDto, string? jwtUserId);
+    Task ChangePassword(ChangePasswordCommand changePasswordCommand, string? jwtUserId);
 }

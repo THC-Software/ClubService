@@ -42,6 +42,8 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
 
     public async Task SeedTestData()
     {
+        // We need to seed the test data like this so that the events are inserted in the right order into the db
+        // With HasData the order is not the same like in the code and then debezium fetches the events in the wrong order
         var domainEvents = new List<DomainEnvelope<IDomainEvent>>
         {
             // Subscription Tiers
@@ -133,8 +135,8 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                 DateTime.UtcNow,
                 new MemberRegisteredEvent(
                     new MemberId(new Guid("60831440-06d2-4017-9a7b-016e9cd0b2dc")),
-                    new FullName("Adrian", "Spiegel"),
-                    "adrianSpiegel@fhv.gorillaKaefig",
+                    new FullName("Adrian", "Essig"),
+                    "adrian.essig@fhv.gorillaKaefig",
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     MemberStatus.ACTIVE
                 )
@@ -211,8 +213,8 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                 DateTime.UtcNow,
                 new AdminRegisteredEvent(
                     new AdminId(new Guid("1dd88382-f781-4bf8-94e3-05e99d1434fe")),
-                    "adrian_spiegel",
-                    new FullName("Adrian", "Spiegel"),
+                    "adrian",
+                    new FullName("Adrian", "Essig"),
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     AdminStatus.ACTIVE
                 )
@@ -225,7 +227,7 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                 DateTime.UtcNow,
                 new AdminRegisteredEvent(
                     new AdminId(new Guid("4a2eb3dc-7f1e-4dac-851a-667594ca31ff")),
-                    "marco_pressure",
+                    "quarco",
                     new FullName("Marco", "Pressure"),
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     AdminStatus.ACTIVE
@@ -240,7 +242,7 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                 new AdminRegisteredEvent(
                     new AdminId(new Guid("5d2f1aec-1cc6-440a-b04f-ba8b3085a35a")),
                     "michael_essig",
-                    new FullName("Michael", "Essig"),
+                    new FullName("Michael", "Mirror"),
                     new TennisClubId(new Guid("1fc64a89-9e63-4e9f-96f7-e2120f0ca6c3")),
                     AdminStatus.ACTIVE
                 )
@@ -270,18 +272,5 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
             await DomainEvents.AddAsync(domainEvent);
             await SaveChangesAsync();
         }
-    }
-
-    public async Task ClearDatabase()
-    {
-        await Database.ExecuteSqlRawAsync(@"
-        DO $$
-        BEGIN
-            IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'DomainEvent') THEN
-                DELETE FROM ""DomainEvent"";
-            END IF;
-        END
-        $$;");
-        await SaveChangesAsync();
     }
 }

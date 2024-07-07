@@ -8,11 +8,11 @@ public class UserInformationDto(
     string username,
     UserRole userRole,
     UserStatus userStatus,
-    TennisClubId tennisClubId)
+    TennisClubId? tennisClubId)
 {
     public UserId UserId { get; } = userId;
     public string Username { get; } = username;
     public UserRole UserRole { get; } = userRole;
     public UserStatus UserStatus { get; } = userStatus;
-    public TennisClubId TennisClubId { get; } = tennisClubId;
+    public TennisClubId? TennisClubId { get; } = tennisClubId;
 }
