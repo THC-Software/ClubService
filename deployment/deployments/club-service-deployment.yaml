@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: club-service-deployment
+  labels:
+    app: club-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: club-service
+  template:
+    metadata:
+      labels:
+        app: club-service
+    spec:
+      containers:
+        - name: club-service
+          image: smighty/club-service:v1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+              
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: club-service-postgres-config
+                  key: postgres-host
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: club-service-postgres-config
+                  key: postgres-port
+            - name: EVENT_STORE_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: club-service-postgres-config
+                  key: postgres-event-store-db-name
+            - name: READ_STORE_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: club-service-postgres-config
+                  key: postgres-read-store-db-name
+            - name: LOGIN_STORE_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: club-service-postgres-config
+                  key: postgres-login-store-db-name
+                  
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: club-service-postgres-secret
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: club-service-postgres-secret
+                  key: postgres-password
+                  
+
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: redis-host
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: redis-port
+                  
+            - name: SMTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: club-service-mailhog-config
+                  key: mailhog-host
+            - name: SMTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: club-service-mailhog-config
+                  key: mailhog-smtp-port
+            - name: SMTP_SENDER_EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: club-service-mailhog-secret
+                  key: smtp-sender-email-address

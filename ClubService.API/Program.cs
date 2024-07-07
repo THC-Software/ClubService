@@ -31,22 +31,21 @@ var app = builder.Build();
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
+var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
+await eventStoreDbContext.Database.EnsureCreatedAsync();
+
+var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
+await readStoreDbContext.Database.EnsureCreatedAsync();
+
+var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
+await loginStoreDbContext.Database.EnsureCreatedAsync();
+
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
 {
     app.UseSwagger();
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
 
-    var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
-    await eventStoreDbContext.Database.EnsureCreatedAsync();
     await eventStoreDbContext.SeedTestData();
-
-    var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
-    await readStoreDbContext.Database.EnsureDeletedAsync();
-    await readStoreDbContext.Database.EnsureCreatedAsync();
-
-    var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
-    await loginStoreDbContext.Database.EnsureDeletedAsync();
-    await loginStoreDbContext.Database.EnsureCreatedAsync();
 }
 
 app.UseExceptionHandler();
