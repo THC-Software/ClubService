@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailhog-deployment
+  labels:
+    app: club-service-mailhog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: club-service-mailhog
+  template:
+    metadata:
+      labels:
+        app: club-service-mailhog
+    spec:
+      containers:
+        - name: club-service-mailhog
+          image: mailhog/mailhog:v1.0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1025
+            - containerPort: 8025
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailhog-service
+spec:
+  selector:
+    app: club-service-mailhog
+  ports:
+    - name: smtp
+      protocol: TCP
+      port: 1025
+      targetPort: 1025   
+    - name: web
+      protocol: TCP
+      port: 8025
+      targetPort: 8025
