@@ -2,8 +2,16 @@ using ClubService.API;
 using ClubService.API.ApplicationConfigurations;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddJsonFile("appsettings.Production.json");
+    builder.Configuration.AddEnvironmentVariables();
+    builder.Configuration.AddSubstitution();
+}
 
 builder.Services.AddDatabaseConfigurations(builder.Configuration);
 builder.Services.AddLoggingConfigurations(builder.Configuration);
@@ -31,20 +39,38 @@ var app = builder.Build();
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
-if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
+var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
+var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
+var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
+
+if (builder.Environment.IsProduction())
+{
+    if (eventStoreDbContext.Database.GetPendingMigrations().Any())
+    {
+        eventStoreDbContext.Database.Migrate();
+    }
+
+    if (readStoreDbContext.Database.GetPendingMigrations().Any())
+    {
+        readStoreDbContext.Database.Migrate();
+    }
+
+    if (loginStoreDbContext.Database.GetPendingMigrations().Any())
+    {
+        loginStoreDbContext.Database.Migrate();
+    }
+}
+else if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
 {
     app.UseSwagger();
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
 
-    var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
     await eventStoreDbContext.Database.EnsureCreatedAsync();
     await eventStoreDbContext.SeedTestData();
-
-    var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
+    
     await readStoreDbContext.Database.EnsureDeletedAsync();
     await readStoreDbContext.Database.EnsureCreatedAsync();
-
-    var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
+    
     await loginStoreDbContext.Database.EnsureDeletedAsync();
     await loginStoreDbContext.Database.EnsureCreatedAsync();
 }

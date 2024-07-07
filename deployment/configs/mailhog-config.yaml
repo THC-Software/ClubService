@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: club-service-mailhog-config
+data:
+  mailhog-host: "club-service-mailhog-service"
+  mailhog-smtp-port: "1025"
