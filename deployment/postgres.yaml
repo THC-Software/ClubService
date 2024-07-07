@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-deployment
+  name: club-service-postgres-deployment
   labels:
     app: club-service-postgres
 spec:
@@ -36,7 +36,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service
+  name: club-service-postgres-service
 spec:
   selector:
     app: club-service-postgres

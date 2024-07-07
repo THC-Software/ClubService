@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: club-service-postgres-config
+data:
+  postgres-host: "club-service-postgres-service"
+  postgres-port: "5432"
+  postgres-event-store-db-name: "club-service-event-store"
+  postgres-read-store-db-name: "club-service-read-store"
+  postgres-login-store-db-name: "club-service-login-store"

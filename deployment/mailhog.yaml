@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mailhog-deployment
+  name: club-service-mailhog-deployment
   labels:
     app: club-service-mailhog
 spec:
@@ -26,7 +26,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mailhog-service
+  name: club-service-mailhog-service
 spec:
   selector:
     app: club-service-mailhog
