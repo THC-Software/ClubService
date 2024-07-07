@@ -23,4 +23,26 @@ RUN dotnet publish "ClubService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publ
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+ENV EVENT_STORE_HOST=localhost
+ENV EVENT_STORE_PORT=5432
+ENV EVENT_STORE_USER=user
+ENV EVENT_STORE_PASSWORD=password
+ENV EVENT_STORE_DB=club-service-event-store
+ENV READ_STORE_HOST=localhost
+ENV READ_STORE_PORT=5432
+ENV READ_STORE_USER=user
+ENV READ_STORE_PASSWORD=password
+ENV READ_STORE_DB=club-service-read-store
+ENV LOGIN_STORE_HOST=localhost
+ENV LOGIN_STORE_PORT=5432
+ENV LOGIN_STORE_USER=user
+ENV LOGIN_STORE_PASSWORD=password
+ENV LOGIN_STORE_DB=club-service-login-store
+ENV REDIS_HOST=localhost
+ENV REDIS_PORT=6379
+ENV SMTP_HOST=localhost
+ENV SMTP_PORT=1025
+ENV SMTP_SENDER_EMAIL_ADDRESS=admin@thcdornbirn.at
+
 ENTRYPOINT ["dotnet", "ClubService.API.dll"]
