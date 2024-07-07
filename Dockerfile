@@ -38,7 +38,7 @@ ENV SMTP_PORT=1025
 ENV SMTP_SENDER_EMAIL_ADDRESS=admin@thcdornbirn.at
 
 # Install envsubst
-RUN apt-get update && apt-get install -y gettext-base
+RUN sudo apt-get update && sudo apt-get install -y gettext-base
 
 # Replace environment variables in appsettings.Production.json
 RUN envsubst < appsettings.Production.json > appsettings.Production.json.tmp && mv appsettings.Production.json.tmp appsettings.Production.json
