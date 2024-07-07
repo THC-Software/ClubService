@@ -19,15 +19,3 @@ spec:
           ports:
             - containerPort: 6379
       restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis
-spec:
-  selector:
-    app: redis
-  ports:
-    - protocol: TCP
-      port: 6379
-      targetPort: 6379

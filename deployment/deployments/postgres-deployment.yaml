@@ -31,16 +31,4 @@ spec:
                 secretKeyRef:
                   name: club-service-postgres-secret
                   key: postgres-password
-      restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: club-service-postgres-service
-spec:
-  selector:
-    app: club-service-postgres
-  ports:
-    - protocol: TCP
-      port: 54321
-      targetPort: 54321   
+      restartPolicy: Always  

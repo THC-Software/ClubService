@@ -65,16 +65,4 @@ spec:
       volumes:
         - name: club-service-debezium-config
           configMap:
-            name: club-service-debezium-config    
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: club-service-debezium-service
-spec:
-  selector:
-    app: club-service-debezium
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080   
+            name: club-service-debezium-config 
