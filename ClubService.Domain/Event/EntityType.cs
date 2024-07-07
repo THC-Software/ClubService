@@ -6,5 +6,6 @@ public enum EntityType
     MEMBER,
     ADMIN,
     SUBSCRIPTION_TIER,
-    TOURNAMENT
+    TOURNAMENT,
+    SYSTEM_OPERATOR
 }

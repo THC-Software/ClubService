@@ -2,6 +2,7 @@
 using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
+using ClubService.Domain.Event.SystemOperator;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Event.Tournament;
 using Newtonsoft.Json;
@@ -151,6 +152,14 @@ public static class EventDeserializer
                     tournamentCanceledEvent)
                 {
                     return tournamentCanceledEvent;
+                }
+
+                break;
+            case EventType.SYSTEM_OPERATOR_REGISTERED:
+                if (JsonConvert.DeserializeObject<SystemOperatorRegisteredEvent>(eventDataJson) is T
+                    systemOperatorRegisteredEvent)
+                {
+                    return systemOperatorRegisteredEvent;
                 }
 
                 break;

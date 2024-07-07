@@ -2,6 +2,7 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.Admin;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
+using ClubService.Domain.Event.SystemOperator;
 using ClubService.Domain.Event.TennisClub;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
@@ -25,9 +26,21 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new DomainEnvelopeConfiguration());
+
+        modelBuilder.Entity<DomainEnvelope<IDomainEvent>>().HasData(
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("ba4eeaa4-9707-4da0-8ee2-3684b4f7804f"),
+                new Guid("1588ec27-c932-4dee-a341-d18c8108a711"),
+                EventType.SYSTEM_OPERATOR_REGISTERED,
+                EntityType.SYSTEM_OPERATOR,
+                DateTime.UtcNow,
+                new SystemOperatorRegisteredEvent(
+                    new SystemOperatorId(new Guid("1588ec27-c932-4dee-a341-d18c8108a711")), "systemoperator")
+            )
+        );
     }
 
-    public async Task SeedData()
+    public async Task SeedTestData()
     {
         var domainEvents = new List<DomainEnvelope<IDomainEvent>>
         {

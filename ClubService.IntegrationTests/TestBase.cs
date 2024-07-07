@@ -25,7 +25,7 @@ public class TestBase
     {
         await IntegrationTestSetup.EventStoreDbContext.Database.EnsureCreatedAsync();
         IntegrationTestSetup.EventStoreDbContext.ChangeTracker.Clear();
-        await IntegrationTestSetup.EventStoreDbContext.SeedData();
+        await IntegrationTestSetup.EventStoreDbContext.SeedTestData();
     }
 
     [TearDown]
