@@ -2,6 +2,7 @@ using ClubService.API;
 using ClubService.API.ApplicationConfigurations;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,13 +40,23 @@ using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 
 var eventStoreDbContext = services.GetRequiredService<EventStoreDbContext>();
-await eventStoreDbContext.Database.EnsureCreatedAsync();
-
 var readStoreDbContext = services.GetRequiredService<ReadStoreDbContext>();
-await readStoreDbContext.Database.EnsureCreatedAsync();
-
 var loginStoreDbContext = services.GetRequiredService<LoginStoreDbContext>();
-await loginStoreDbContext.Database.EnsureCreatedAsync();
+
+if (eventStoreDbContext.Database.GetPendingMigrations().Any())
+{
+    eventStoreDbContext.Database.Migrate();
+}
+
+if (readStoreDbContext.Database.GetPendingMigrations().Any())
+{
+    readStoreDbContext.Database.Migrate();
+}
+
+if (loginStoreDbContext.Database.GetPendingMigrations().Any())
+{
+    loginStoreDbContext.Database.Migrate();
+}
 
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))
 {
@@ -58,7 +69,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDeve
 app.UseExceptionHandler();
 app.UseMiddleware<JwtClaimsMiddleware>(); // Use custom middleware to extract JWT claims
 app.UseAuthorization();
-
 app.MapControllers();
 
 await app.RunAsync();
