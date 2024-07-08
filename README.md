@@ -51,3 +51,51 @@ would also allow for individual branding.
 
 Once the credentials are sent to the backend, we check if it is an Admin or a Member and load the correct user form the database by 
 using the unique combination of username and tennis club Id. Once we loaded the correct user, we can verify the password in our login db.
+
+
+
+## Domain Driven Design
+
+DDD was used in this project. The following aggregates exist:
+- Member
+- Admin
+- SystemOperator
+- SubscriptionTier
+- TennisClub
+- UserPassword
+
+Additionally, Event Sourcing was used, therefore those Entities all provide a `process` and a `apply` method. 
+Process is used to create an Event from a Command, which can then be applied on this Entity. It's important that `apply` always
+works if `process` works. 
+
+## Event Sourcing
+
+To give an example of events, lets take a look at the member events.
+Each event for the member entities is prefixed with `Member`, all of those events implement the `IMemberDomainEvent` interface,
+which in turn implements the `IDomainEvent` interface, which is implemented by all event interfaces.
+Furthermore, we created a `DomainEnvelope`, which adds metadata to the Events such as a `Timestamp`, `EventType`, and `EntityType`.
+This is also what gets persisted in the database. Since event sourcing is used, the database is append only, events cannot be deleted.
+
+### Optimistic Locking
+
+We implemented optimistic locking directly in the insert sql query.
+```java
+   private const string InsertSqlQuery = @"
+        INSERT INTO ""DomainEvent""(""eventId"", ""entityId"", ""eventType"", ""entityType"", ""timestamp"", ""eventData"")
+        SELECT @eventId, @entityId, @eventType, @entityType, @timestamp, @eventData
+        WHERE (SELECT COUNT(*) FROM ""DomainEvent"" WHERE ""entityId"" = @entityId) = @expectedEventCount;
+    ";
+```
+This is done by counting the number of events before the insert, if the `expectedEventCount` is not correct the whole query fails.
+Therefore guaranteeing a consistent state.
+
+### Debezium
+
+Once an event gets persisted in the database Debezium publishes it to the redis stream.
+The event-data of the published message is located in `payload.after`. Debezium also guarantees that the order of the published
+messages is correct by using transaction log tailing.
+
+
+
+
+
