@@ -79,7 +79,7 @@ This is also what gets persisted in the database. Since event sourcing is used, 
 ### Optimistic Locking
 
 We implemented optimistic locking directly in the insert sql query.
-```java
+```c#
    private const string InsertSqlQuery = @"
         INSERT INTO ""DomainEvent""(""eventId"", ""entityId"", ""eventType"", ""entityType"", ""timestamp"", ""eventData"")
         SELECT @eventId, @entityId, @eventType, @entityType, @timestamp, @eventData
@@ -130,11 +130,28 @@ it to the `ChainEventHandler`
 
 #### Chain Event Handler
 
-We've implemented a chain event handler that ..
+We've implemented a chain event handler that has a list of event handlers. Each event handler corresponds to one event type.
+All events are passed to the chain event handler and it in turn passes them further to all of the event handlers that are registered with it.
+If the event is supported in the event handler that it is passed to, it will process that event (e.g. construct the readside or send an email)
 
 #### Duplicate Messages
 
-To guarantee idempotency, we track which events have already been handled. 
+To guarantee idempotency, we track which events have already been handled. This is also done in the chain event handler.
+The id of the processed event is saved in a `ProcessedEventRepository`. Both the handling of the event and the persisting of the
+processed event id happen in the same transaction therefore we can guarantee that no event is handled twice.
+
+```c#
+        await transactionManager.TransactionScope(async () =>
+        {
+            foreach (var eventHandler in eventHandlers)
+            {
+                await eventHandler.Handle(domainEnvelope);
+            }
+
+            var processedEvent = new ProcessedEvent(domainEnvelope.EventId);
+            await processedEventRepository.Add(processedEvent);
+        });
+```
 
 
 
