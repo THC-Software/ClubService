@@ -153,5 +153,13 @@ processed event id happen in the same transaction therefore we can guarantee tha
         });
 ```
 
+## Sagas
 
+we are just part of a Saga but did not have to implement one ourselves
+//TODO more on saga
 
+## Authorization
+
+The authentication is done in the API gateway, in the tennisclub service we only verify that the user is allowed to perform the action
+based on the tennis club they are part of and/or the account they have.
+Example: Member can only change details for his own account, Admin can only lock members that are part of same tennisclub and so on.
