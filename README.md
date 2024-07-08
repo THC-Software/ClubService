@@ -163,3 +163,75 @@ we are just part of a Saga but did not have to implement one ourselves
 The authentication is done in the API gateway, in the tennisclub service we only verify that the user is allowed to perform the action
 based on the tennis club they are part of and/or the account they have.
 Example: Member can only change details for his own account, Admin can only lock members that are part of same tennisclub and so on.
+
+## CI/CD + Development
+
+For the whole project we used Sonarcloud with a github runner pipeline that automatically runs sonarcloud + all of the tests.
+The main branch was locked and pull requests + code reviews were done for each merge to main. Furthermore, the pipeline had to 
+run and pass the quality gates set in sonarcloud.
+
+
+## Infrastructure
+
+The application consists of 5 containers:
+
+- Tennis Club Service
+- Postgresql
+- Debezium
+- Redis
+- Mailhog
+
+Of course Redis will only be running once in the whole microservice infrastructure.
+
+### Docker
+
+For the beginning of the project we deployed everything with docker. We created a dockerfile for our service:
+```dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["ClubService.API/ClubService.API.csproj", "ClubService.API/"]
+COPY ["ClubService.Application/ClubService.Application.csproj", "ClubService.Application/"]
+COPY ["ClubService.Domain/ClubService.Domain.csproj", "ClubService.Domain/"]
+COPY ["ClubService.Infrastructure/ClubService.Infrastructure.csproj", "ClubService.Infrastructure/"]
+RUN dotnet restore "ClubService.API/ClubService.API.csproj"
+COPY . .
+WORKDIR "/src/ClubService.API"
+RUN dotnet build "ClubService.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "ClubService.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+ENV POSTGRES_HOST=localhost
+ENV POSTGRES_PORT=5432
+ENV POSTGRES_USER=user
+ENV POSTGRES_PASSWORD=password
+ENV EVENT_STORE_DB=club-service-event-store
+ENV READ_STORE_DB=club-service-read-store
+ENV LOGIN_STORE_DB=club-service-login-store
+ENV REDIS_HOST=localhost
+ENV REDIS_PORT=6379
+ENV SMTP_HOST=localhost
+ENV SMTP_PORT=1025
+ENV SMTP_SENDER_EMAIL_ADDRESS=admin@thcdornbirn.at
+
+ENTRYPOINT ["dotnet", "ClubService.API.dll"]
+```
+A build container is used to build the software which is then deployed in the base container.
+This is then used in the docker-compose file to start the tennis club service and all of the other containers, making it
+easy to start the whole application.
+
+### Kubernetes
+
+## Sending Emails
