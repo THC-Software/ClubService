@@ -33,7 +33,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Migrations\EventStore\" />
         <Folder Include="Migrations\LoginStore\"/>
+        <Folder Include="Migrations\ReadStore\" />
     </ItemGroup>
 
 </Project>
