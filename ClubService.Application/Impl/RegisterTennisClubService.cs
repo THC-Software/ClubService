@@ -61,10 +61,10 @@ public class RegisterTennisClubService(
                 admin.Apply(domainEvent);
                 expectedEventCount = await eventRepository.Append(domainEvent, expectedEventCount);
             }
-
-            SaveLoginCredentials(admin.AdminId, tennisClubRegisterCommand.Password);
         });
-
+        
+        SaveLoginCredentials(admin.AdminId, tennisClubRegisterCommand.Password);
+        
         loggerService.LogTennisClubRegistered(tennisClub.TennisClubId.Id);
         loggerService.LogAdminRegistered(admin.AdminId.Id);
         return tennisClub.TennisClubId.Id;
