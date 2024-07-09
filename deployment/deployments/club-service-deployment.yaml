@@ -19,7 +19,7 @@ spec:
           image: smighty/club-service:v1.0.0
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5000
+            - containerPort: 8080
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: "Production"
