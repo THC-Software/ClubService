@@ -231,8 +231,91 @@ ENV SMTP_SENDER_EMAIL_ADDRESS=admin@thcdornbirn.at
 ENTRYPOINT ["dotnet", "ClubService.API.dll"]
 ```
 A build container is used to build the software which is then deployed in the base container.
-This is then used in the docker-compose file to start the tennis club service and all of the other containers, making it
-easy to start the whole application.
+This is then used in the `docker-compose.yml` file to start the tennis club service along with all other containers, except for Redis and Debezium-Postgres. 
+These two services are defined in the `docker-compose.override.yml` file.
+The idea behind this is that any other service can use our `docker-compose.yml` file without removing the redis and debezium-postgres services.
+
+The `docker-compose.yml` file consists of four services:
+```yml
+version: '3.9'
+
+services:
+  club-service:
+    image: club-service
+    container_name: "club-service"
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DockerDevelopment
+    depends_on:
+      - debezium-postgres
+      - mailhog
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    networks:
+      - tennis-club-network
+  
+  debezium-postgres:
+    image: debezium/postgres:16-alpine
+    container_name: "club-service-postgres"
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: club-service-event-store
+    networks:
+      - tennis-club-network
+  
+  debezium:
+    image: debezium/server
+    container_name: "club-service-debezium"
+    restart: always
+    ports:
+      - "54326:8080"
+    depends_on:
+      - debezium-postgres
+    volumes:
+      - ./debezium-conf:/debezium/conf
+    networks:
+      - tennis-club-network
+  
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: "club-service-mailhog"
+    restart: always
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - tennis-club-network
+
+networks:
+  tennis-club-network:
+    name: tennis-club-network
+    driver: bridge
+```
+
+The `docker-compose.override.yml` file consists of two services:
+```yml
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7.0-alpine
+    container_name: "club-service-redis"
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - tennis-club-network
+  
+  debezium-postgres:
+    ports:
+      - "5432:5432"
+```
 
 ### Kubernetes
 
