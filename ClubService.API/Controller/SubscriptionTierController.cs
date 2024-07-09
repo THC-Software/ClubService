@@ -24,6 +24,7 @@ public class SubscriptionTierController(ISubscriptionTierReadModelRepository sub
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("text/plain")]
     public async Task<ActionResult<TennisClubReadModel>> GetSubscriptionTierById(Guid id)
     {
         var subscriptionTier = await subscriptionTierReadModelRepository.GetSubscriptionTierById(id);
