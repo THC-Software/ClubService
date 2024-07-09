@@ -25,7 +25,6 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "ADMIN,MEMBER")]
     public async Task<ActionResult<MemberReadModel>> GetMemberById(Guid id)
     {
@@ -94,7 +93,6 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> DeleteMember(Guid id)
     {
@@ -111,7 +109,6 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> LockMember(Guid id)
     {
@@ -128,7 +125,6 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> UnlockMember(Guid id)
     {

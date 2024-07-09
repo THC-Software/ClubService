@@ -49,7 +49,6 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN,MEMBER")]
     public async Task<ActionResult<TennisClubReadModel>> GetTennisClubById(Guid id)
     {
@@ -76,7 +75,6 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN")]
     public async Task<ActionResult<List<AdminReadModel>>> GetAdminsByTennisClubId(Guid id)
     {
@@ -97,7 +95,6 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<List<MemberReadModel>>> GetMembersByTennisClubId(Guid id)
     {
@@ -150,7 +147,6 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN")]
     public async Task<ActionResult<Guid>> DeleteTennisClub(Guid id)
     {
@@ -167,7 +163,6 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "SYSTEM_OPERATOR")]
     public async Task<ActionResult<Guid>> LockTennisClub(Guid id)
     {
@@ -182,7 +177,6 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [Consumes("text/plain")]
     [Authorize(Roles = "SYSTEM_OPERATOR")]
     public async Task<ActionResult<Guid>> UnlockTennisClub(Guid id)
     {
