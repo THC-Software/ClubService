@@ -23,7 +23,7 @@ public class RedisEventReader : BackgroundService
         IOptions<RedisConfiguration> redisConfig,
         ILoggerService<RedisEventReader> loggerService)
     {
-        _pollingInterval = redisConfig.Value.PollingInterval;
+        _pollingInterval = redisConfig.Value.PollingIntervalMilliSeconds;
         _services = services;
         _loggerService = loggerService;
         _redisStreams = redisConfig.Value.Streams;

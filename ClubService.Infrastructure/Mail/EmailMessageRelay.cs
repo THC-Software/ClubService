@@ -23,7 +23,7 @@ public class EmailMessageRelay : BackgroundService
     {
         _serviceProvider = serviceProvider;
         _loggerService = loggerService;
-        _pollingInterval = smtpConfiguration.Value.PollingInterval;
+        _pollingInterval = smtpConfiguration.Value.PollingIntervalMilliSeconds;
         _senderEmailAddress = smtpConfiguration.Value.SenderEmailAddress;
         _smtpClient = new SmtpClient(smtpConfiguration.Value.Host, smtpConfiguration.Value.Port);
         _smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
