@@ -72,7 +72,11 @@ spec:
                 configMapKeyRef:
                   name: redis-config
                   key: redis-port
-                  
+            - name: REDIS_POLLING_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-config
+                  key: redis-polling-interval
             - name: SMTP_HOST
               valueFrom:
                 configMapKeyRef:

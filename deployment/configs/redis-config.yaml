@@ -5,3 +5,4 @@ metadata:
 data:
   redis-host: "redis"
   redis-port: "6379"
+  redis-polling-interval: "500"

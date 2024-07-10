@@ -56,7 +56,7 @@ public class EmailMessageRelay : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using PeriodicTimer timer = new(TimeSpan.FromSeconds(_pollingInterval));
+        using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(_pollingInterval));
 
         try
         {

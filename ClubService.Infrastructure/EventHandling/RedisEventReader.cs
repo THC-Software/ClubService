@@ -114,7 +114,7 @@ public class RedisEventReader : BackgroundService
             await EnsureStreamAndGroupExists(redisStream);
         }
 
-        using PeriodicTimer timer = new(TimeSpan.FromSeconds(_pollingInterval));
+        using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(_pollingInterval));
 
         try
         {
