@@ -65,4 +65,5 @@ public interface ILoggerService<T>
     void LogEmailMessageRelayStop();
     void LogSystemOperatorRegistered(Guid id);
     void LogInvalidEMailAddress(string emailAddress);
+    void LogDuplicateSeedData();
 }

@@ -325,4 +325,9 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     {
         logger.LogError("The following email address is invalid: {emailMessageRecipientEMailAddress}", emailAddress);
     }
+    
+    public void LogDuplicateSeedData()
+    {
+        logger.LogInformation("Seed data already seeded");
+    }
 }
