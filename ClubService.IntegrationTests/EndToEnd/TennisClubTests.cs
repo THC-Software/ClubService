@@ -3,8 +3,10 @@ using System.Text;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
+using Moq;
 using Newtonsoft.Json;
 
 namespace ClubService.IntegrationTests.EndToEnd;
@@ -32,6 +34,10 @@ public class TennisClubTests : TestBase
             adminUsername, adminPassword, adminFirstName, adminLastName);
         var httpContent = new StringContent(JsonConvert.SerializeObject(registerTennisClubCommand), Encoding.UTF8,
             "application/json");
+        
+        MockLoginRepository
+            .Setup(repo => repo.Add(It.IsAny<UserPassword>()))
+            .Returns(Task.CompletedTask);
 
         // When
         var response = await HttpClient.PostAsync(BaseUrl, httpContent);

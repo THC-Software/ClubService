@@ -4,6 +4,7 @@ using System.Text;
 using ClubService.Application.Commands;
 using ClubService.Domain.Event;
 using ClubService.Domain.Event.Admin;
+using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using Moq;
@@ -40,6 +41,10 @@ public class AdminTests : TestBase
         MockAdminReadModelRepository
             .Setup(repo => repo.GetAdminsByTennisClubId(It.IsAny<Guid>()))
             .ReturnsAsync([]);
+        
+        MockLoginRepository
+            .Setup(repo => repo.Add(It.IsAny<UserPassword>()))
+            .Returns(Task.CompletedTask);
 
         // When
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
