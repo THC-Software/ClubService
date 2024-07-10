@@ -20,7 +20,7 @@ public class WebAppFactory(
 
         // Redis Configuration
         ["RedisConfiguration:Host"] = "localhost:6379",
-        ["RedisConfiguration:PollingIntervalMilliSeconds"] = "1",
+        ["RedisConfiguration:PollingIntervalMilliSeconds"] = "1000",
         ["RedisConfiguration:Streams:0:StreamName"] = "club_service_events.public.DomainEvent",
         ["RedisConfiguration:Streams:0:ConsumerGroup"] = "club_service_events.domain.events.group",
         ["RedisConfiguration:Streams:1:StreamName"] = "tournament_service_events.public.DomainEvent",
@@ -30,7 +30,7 @@ public class WebAppFactory(
         ["SmtpConfiguration:Host"] = "localhost",
         ["SmtpConfiguration:Port"] = "1025",
         ["SmtpConfiguration:SenderEmailAddress"] = "admin@thcdornbirn.at",
-        ["SmtpConfiguration:PollingIntervalMilliSeconds"] = "10"
+        ["SmtpConfiguration:PollingIntervalMilliSeconds"] = "10000"
     };
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
