@@ -12,7 +12,7 @@ public class EmailMessageRelay : BackgroundService
 {
     private readonly ILoggerService<EmailMessageRelay> _loggerService;
     private readonly int _pollingInterval;
-    private readonly MailAddress _senderEmailAddress;
+    private readonly string _senderEmailAddress;
     private readonly IServiceProvider _serviceProvider;
     private readonly SmtpClient _smtpClient;
 
@@ -24,7 +24,7 @@ public class EmailMessageRelay : BackgroundService
         _serviceProvider = serviceProvider;
         _loggerService = loggerService;
         _pollingInterval = smtpConfiguration.Value.PollingInterval;
-        _senderEmailAddress = new MailAddress(smtpConfiguration.Value.SenderEmailAddress);
+        _senderEmailAddress = smtpConfiguration.Value.SenderEmailAddress;
         _smtpClient = new SmtpClient(smtpConfiguration.Value.Host, smtpConfiguration.Value.Port);
         _smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
     }
@@ -42,17 +42,28 @@ public class EmailMessageRelay : BackgroundService
             await transactionManager.TransactionScope(async () =>
             {
                 MailAddress recipientEmailAddress;
+                MailAddress senderMailAddress;
+                try
+                {
+                    senderMailAddress = new MailAddress(_senderEmailAddress);
+                }
+                catch (FormatException)
+                {
+                    _loggerService.LogInvalidEMailAddress(_senderEmailAddress);
+                    throw;
+                }
+
                 try
                 {
                     recipientEmailAddress = new MailAddress(emailMessage.RecipientEMailAddress);
                 }
-                catch (FormatException e)
+                catch (FormatException)
                 {
                     _loggerService.LogInvalidEMailAddress(emailMessage.RecipientEMailAddress);
                     throw;
                 }
 
-                var mailMessage = new MailMessage(_senderEmailAddress, recipientEmailAddress)
+                var mailMessage = new MailMessage(senderMailAddress, recipientEmailAddress)
                 {
                     Subject = emailMessage.Subject,
                     Body = emailMessage.Body
