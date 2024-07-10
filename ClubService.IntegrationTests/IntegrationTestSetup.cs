@@ -16,6 +16,7 @@ public static class IntegrationTestSetup
     public static HttpClient HttpClient { get; private set; } = null!;
     public static Mock<IAdminReadModelRepository> MockAdminReadModelRepository { get; private set; } = null!;
     public static Mock<IMemberReadModelRepository> MockMemberReadModelRepository { get; private set; } = null!;
+    public static Mock<ILoginRepository> MockLoginRepository { get; private set; } = null!;
 
     public static Mock<ISubscriptionTierReadModelRepository>
         MockSubscriptionTierReadModelRepository { get; private set; } = null!;
@@ -40,13 +41,15 @@ public static class IntegrationTestSetup
         MockSubscriptionTierReadModelRepository = new Mock<ISubscriptionTierReadModelRepository>();
         MockAdminReadModelRepository = new Mock<IAdminReadModelRepository>();
         MockMemberReadModelRepository = new Mock<IMemberReadModelRepository>();
+        MockLoginRepository = new Mock<ILoginRepository>();
 
         _webAppFactory = new WebAppFactory(
             _postgresContainer.GetConnectionString(),
             MockTennisClubReadModelRepository,
             MockSubscriptionTierReadModelRepository,
             MockAdminReadModelRepository,
-            MockMemberReadModelRepository
+            MockMemberReadModelRepository,
+            MockLoginRepository
         );
 
         HttpClient = _webAppFactory.CreateClient();
