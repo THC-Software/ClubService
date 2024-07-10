@@ -399,8 +399,8 @@ Afterwards the EmailMessageRelay checks the table in a fixed interval and proces
 Once they are processed it removes them. All of this happens one transaction, guaranteeing the at least once delivery.
 
 `ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentCanceledEventHandler.cs (Line 54 - 59)`\
-`ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentConfirmedEventHandler.cs (Line 42 - 48)`\
-`ClubService.Infrastructure/Mail/EmailMessageRelay.cs (Line 32 - 54)`
+`ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentConfirmedEventHandler.cs (Line 42 - 49)`\
+`ClubService.Infrastructure/Mail/EmailMessageRelay.cs (Line 32 - 65)`
 
 ### Mailhog
 
