@@ -37,6 +37,13 @@ namespace ClubService.Infrastructure.Migrations.LoginStore
                         .HasName("pK_UserPassword");
 
                     b.ToTable("UserPassword", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("1588ec27-c932-4dee-a341-d18c8108a711"),
+                            HashedPassword = "AQAAAAIAAYagAAAAEDUKJ7ReV2uEyekYGEB91VvXGmWH+HwRO9wfUHnqgb5QHs0NJTac+/OUJbiInt64zg=="
+                        });
                 });
 #pragma warning restore 612, 618
         }
