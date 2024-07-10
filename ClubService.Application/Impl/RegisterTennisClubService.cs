@@ -63,16 +63,16 @@ public class RegisterTennisClubService(
             }
         });
         
-        SaveLoginCredentials(admin.AdminId, tennisClubRegisterCommand.Password);
+        await SaveLoginCredentials(admin.AdminId, tennisClubRegisterCommand.Password);
         
         loggerService.LogTennisClubRegistered(tennisClub.TennisClubId.Id);
         loggerService.LogAdminRegistered(admin.AdminId.Id);
         return tennisClub.TennisClubId.Id;
     }
 
-    private void SaveLoginCredentials(AdminId adminId, string password)
+    private async Task SaveLoginCredentials(AdminId adminId, string password)
     {
         var userPassword = UserPassword.Create(adminId.Id, password, passwordHasherService);
-        loginRepository.Add(userPassword);
+        await loginRepository.Add(userPassword);
     }
 }

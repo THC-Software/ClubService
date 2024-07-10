@@ -1,4 +1,5 @@
 using ClubService.Domain.Repository;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 
 namespace ClubService.IntegrationTests;
@@ -13,6 +14,8 @@ public class TestBase
 
     protected readonly Mock<IMemberReadModelRepository> MockMemberReadModelRepository =
         IntegrationTestSetup.MockMemberReadModelRepository;
+
+    protected readonly Mock<ILoginRepository> MockLoginRepository = IntegrationTestSetup.MockLoginRepository;
 
     protected readonly Mock<ISubscriptionTierReadModelRepository> MockSubscriptionTierReadModelRepository =
         IntegrationTestSetup.MockSubscriptionTierReadModelRepository;

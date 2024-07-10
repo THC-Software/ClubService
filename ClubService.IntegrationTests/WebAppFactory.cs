@@ -12,7 +12,8 @@ public class WebAppFactory(
     Mock<ITennisClubReadModelRepository> mockTennisClubReadModelRepository,
     Mock<ISubscriptionTierReadModelRepository> mockSubscriptionTierReadModelRepository,
     Mock<IAdminReadModelRepository> mockAdminReadModelRepository,
-    Mock<IMemberReadModelRepository> mockMemberReadModelRepository) : WebApplicationFactory<Program>
+    Mock<IMemberReadModelRepository> mockMemberReadModelRepository,
+    Mock<ILoginRepository> mockLoginRepository) : WebApplicationFactory<Program>
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
     {
@@ -61,6 +62,7 @@ public class WebAppFactory(
             services.AddScoped(_ => mockSubscriptionTierReadModelRepository.Object);
             services.AddScoped(_ => mockAdminReadModelRepository.Object);
             services.AddScoped(_ => mockMemberReadModelRepository.Object);
+            services.AddScoped(_ => mockLoginRepository.Object);
         });
     }
 }

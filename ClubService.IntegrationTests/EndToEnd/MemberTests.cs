@@ -6,6 +6,7 @@ using ClubService.Domain.Event;
 using ClubService.Domain.Event.Member;
 using ClubService.Domain.Event.SubscriptionTier;
 using ClubService.Domain.Event.TennisClub;
+using ClubService.Domain.Model.Entity;
 using ClubService.Domain.Model.Enum;
 using ClubService.Domain.Model.ValueObject;
 using ClubService.Domain.ReadModel;
@@ -47,6 +48,10 @@ public class MemberTests : TestBase
         MockMemberReadModelRepository
             .Setup(repo => repo.GetMembersByTennisClubId(It.IsAny<Guid>()))
             .ReturnsAsync([]);
+        
+        MockLoginRepository
+            .Setup(repo => repo.Add(It.IsAny<UserPassword>()))
+            .Returns(Task.CompletedTask);
 
         var numberOfEventsExpected = 1;
         var eventTypeExpected = EventType.MEMBER_REGISTERED;

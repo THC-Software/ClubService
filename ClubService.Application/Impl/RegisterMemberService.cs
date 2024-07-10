@@ -100,7 +100,7 @@ public class RegisterMemberService(
                     }
                 });
                 
-                SaveLoginCredentials(member.MemberId, memberRegisterCommand.Password);
+                await SaveLoginCredentials(member.MemberId, memberRegisterCommand.Password);
 
                 loggerService.LogMemberRegistered(member.MemberId.Id);
                 return member.MemberId.Id;
@@ -113,9 +113,9 @@ public class RegisterMemberService(
         }
     }
 
-    private void SaveLoginCredentials(MemberId memberId, string password)
+    private async Task SaveLoginCredentials(MemberId memberId, string password)
     {
         var userPassword = UserPassword.Create(memberId.Id, password, passwordHasherService);
-        loginRepository.Add(userPassword);
+        await loginRepository.Add(userPassword);
     }
 }

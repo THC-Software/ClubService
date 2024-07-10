@@ -35,23 +35,22 @@ public class EmailMessageRelay : BackgroundService
         var emailOutboxRepository = scope.ServiceProvider.GetRequiredService<IEmailOutboxRepository>();
         var transactionManager = scope.ServiceProvider.GetRequiredService<ITransactionManager>();
 
-        await transactionManager.TransactionScope(async () =>
-        {
-            var emails = await emailOutboxRepository.GetAllEmails();
+        var emailMessages = await emailOutboxRepository.GetAllEmailMessages();
 
-            foreach (var email in emails)
+        foreach (var emailMessage in emailMessages)
+        {
+            await transactionManager.TransactionScope(async () =>
             {
-                var mailMessage = new MailMessage(_senderEmailAddress, email.RecipientEMailAddress)
+                var mailMessage = new MailMessage(_senderEmailAddress, emailMessage.RecipientEMailAddress)
                 {
-                    Subject = email.Subject,
-                    Body = email.Body
+                    Subject = emailMessage.Subject,
+                    Body = emailMessage.Body
                 };
 
                 await _smtpClient.SendMailAsync(mailMessage);
-            }
-
-            await emailOutboxRepository.RemoveEmails(emails);
-        });
+                await emailOutboxRepository.Delete(emailMessage);
+            });
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
