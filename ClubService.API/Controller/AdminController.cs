@@ -25,6 +25,7 @@ public class AdminController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> RegisterAdmin(
         [FromBody] AdminRegisterCommand adminRegisterCommand)
@@ -57,6 +58,7 @@ public class AdminController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> UpdateAdmin(Guid id, [FromBody] AdminUpdateCommand adminUpdateCommand)
     {

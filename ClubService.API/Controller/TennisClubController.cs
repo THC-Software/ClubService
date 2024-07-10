@@ -113,6 +113,7 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     public async Task<ActionResult<Guid>> RegisterTennisClub(
         [FromBody] TennisClubRegisterCommand tennisClubRegisterCommand)
     {
@@ -127,6 +128,7 @@ public class TennisClubController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> UpdateTennisClub(
         Guid id,

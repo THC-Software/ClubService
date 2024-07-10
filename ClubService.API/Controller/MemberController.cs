@@ -55,6 +55,7 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     [Authorize(Roles = "ADMIN")]
     public async Task<ActionResult<Guid>> RegisterMember([FromBody] MemberRegisterCommand memberRegisterCommand)
     {
@@ -73,8 +74,9 @@ public class MemberController(
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     [Authorize(Roles = "MEMBER")]
-    public async Task<ActionResult<Guid>> UpdateMember(Guid id, MemberUpdateCommand memberUpdateCommand)
+    public async Task<ActionResult<Guid>> UpdateMember(Guid id, [FromBody] MemberUpdateCommand memberUpdateCommand)
     {
         var jwtUserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
 
