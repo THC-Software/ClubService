@@ -1,5 +1,6 @@
 using ClubService.API;
 using ClubService.API.ApplicationConfigurations;
+using ClubService.Domain.Repository;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +67,16 @@ else if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docke
     app.UseSwaggerUI(options => { options.SwaggerEndpoint("/swagger/v1/swagger.json", "ClubServiceV1"); });
 
     await eventStoreDbContext.Database.EnsureCreatedAsync();
-    await eventStoreDbContext.SeedTestData();
+
+    try
+    {
+        await eventStoreDbContext.SeedTestData();
+    }
+    catch (DbUpdateException)
+    {
+        var logger = services.GetRequiredService<ILoggerService<Program>>();
+        logger.LogDuplicateSeedData();
+    }
     
     await readStoreDbContext.Database.EnsureDeletedAsync();
     await readStoreDbContext.Database.EnsureCreatedAsync();
