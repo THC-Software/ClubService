@@ -1,6 +1,7 @@
-﻿#nullable disable
-
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
 
 namespace ClubService.Infrastructure.Migrations.ReadStore
 {
@@ -21,7 +22,10 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                     tennisClubId = table.Column<Guid>(type: "uuid", nullable: false),
                     status = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("pK_Admin", x => x.adminId); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_Admin", x => x.adminId);
+                });
 
             migrationBuilder.CreateTable(
                 name: "EmailOutbox",
@@ -33,7 +37,10 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                     body = table.Column<string>(type: "text", nullable: false),
                     timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("pK_EmailOutbox", x => x.id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_EmailOutbox", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Member",
@@ -46,7 +53,10 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                     tennisClubId = table.Column<Guid>(type: "uuid", nullable: false),
                     status = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("pK_Member", x => x.memberId); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_Member", x => x.memberId);
+                });
 
             migrationBuilder.CreateTable(
                 name: "ProcessedEvent",
@@ -54,7 +64,10 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                 {
                     eventId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("pK_ProcessedEvent", x => x.eventId); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_ProcessedEvent", x => x.eventId);
+                });
 
             migrationBuilder.CreateTable(
                 name: "SubscriptionTier",
@@ -64,7 +77,22 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                     name = table.Column<string>(type: "text", nullable: false),
                     maxMemberCount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("pK_SubscriptionTier", x => x.subscriptionTierId); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_SubscriptionTier", x => x.subscriptionTierId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemOperator",
+                columns: table => new
+                {
+                    systemOperatorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    username = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_SystemOperator", x => x.systemOperatorId);
+                });
 
             migrationBuilder.CreateTable(
                 name: "TennisClub",
@@ -76,7 +104,10 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                     status = table.Column<string>(type: "text", nullable: false),
                     memberCount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("pK_TennisClub", x => x.tennisClubId); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_TennisClub", x => x.tennisClubId);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Tournament",
@@ -88,7 +119,10 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                     startDate = table.Column<DateOnly>(type: "date", nullable: false),
                     endDate = table.Column<DateOnly>(type: "date", nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("pK_Tournament", x => x.tournamentId); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("pK_Tournament", x => x.tournamentId);
+                });
         }
 
         /// <inheritdoc />
@@ -108,6 +142,9 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
 
             migrationBuilder.DropTable(
                 name: "SubscriptionTier");
+
+            migrationBuilder.DropTable(
+                name: "SystemOperator");
 
             migrationBuilder.DropTable(
                 name: "TennisClub");

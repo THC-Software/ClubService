@@ -36,40 +36,10 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                 DateTime.UtcNow,
                 new SystemOperatorRegisteredEvent(
                     new SystemOperatorId(new Guid("1588ec27-c932-4dee-a341-d18c8108a711")), "systemoperator")
-            )
-        );
-    }
-
-    public async Task SeedTestData()
-    {
-        // We need to seed the test data like this so that the events are inserted in the right order into the db
-        // With HasData the order is not the same like in the code and then debezium fetches the events in the wrong order
-        var domainEvents = new List<DomainEnvelope<IDomainEvent>>
-        {
+            ),
+            
             // Subscription Tiers
-            new(
-                new Guid("8d4d3eff-b77b-4e21-963b-e211366bb94b"),
-                new Guid("38888969-d579-46ec-9cd6-0208569a077e"),
-                EventType.SUBSCRIPTION_TIER_CREATED,
-                EntityType.SUBSCRIPTION_TIER,
-                DateTime.UtcNow,
-                new SubscriptionTierCreatedEvent(
-                    new SubscriptionTierId(new Guid("38888969-d579-46ec-9cd6-0208569a077e")),
-                    "Gorilla Subscription Tier",
-                    200)
-            ),
-            new(
-                new Guid("e335d85a-f844-4c7e-b608-035ef00af733"),
-                new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7"),
-                EventType.SUBSCRIPTION_TIER_CREATED,
-                EntityType.SUBSCRIPTION_TIER,
-                DateTime.UtcNow,
-                new SubscriptionTierCreatedEvent(
-                    new SubscriptionTierId(new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7")),
-                    "Bison Subscription Tier",
-                    250)
-            ),
-            new(
+            new DomainEnvelope<IDomainEvent>(
                 new Guid("36db98d7-8fea-4715-923c-74192b147752"),
                 new Guid("4c148d45-ebc8-4bbf-aa9a-d491eb185ad5"),
                 EventType.SUBSCRIPTION_TIER_CREATED,
@@ -80,7 +50,7 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                     "Guinea Pig Subscription Tier",
                     100)
             ),
-            new(
+            new DomainEnvelope<IDomainEvent>(
                 new Guid("3b591696-d9c9-4e30-a6a1-6a1439c5580b"),
                 new Guid("2bebd11c-bf8e-4448-886f-0cb8608af7ca"),
                 EventType.SUBSCRIPTION_TIER_CREATED,
@@ -91,7 +61,37 @@ public class EventStoreDbContext(DbContextOptions<EventStoreDbContext> options)
                     "Woolf Subscription Tier",
                     150)
             ),
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("8d4d3eff-b77b-4e21-963b-e211366bb94b"),
+                new Guid("38888969-d579-46ec-9cd6-0208569a077e"),
+                EventType.SUBSCRIPTION_TIER_CREATED,
+                EntityType.SUBSCRIPTION_TIER,
+                DateTime.UtcNow,
+                new SubscriptionTierCreatedEvent(
+                    new SubscriptionTierId(new Guid("38888969-d579-46ec-9cd6-0208569a077e")),
+                    "Gorilla Subscription Tier",
+                    200)
+            ),
+            new DomainEnvelope<IDomainEvent>(
+                new Guid("e335d85a-f844-4c7e-b608-035ef00af733"),
+                new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7"),
+                EventType.SUBSCRIPTION_TIER_CREATED,
+                EntityType.SUBSCRIPTION_TIER,
+                DateTime.UtcNow,
+                new SubscriptionTierCreatedEvent(
+                    new SubscriptionTierId(new Guid("d19073ba-f760-4a9a-abfa-f8215d96bec7")),
+                    "Bison Subscription Tier",
+                    250)
+            )
+        );
+    }
 
+    public async Task SeedTestData()
+    {
+        // We need to seed the test data like this so that the events are inserted in the right order into the db
+        // With HasData the order is not the same as in the code and then debezium fetches the events in the wrong order
+        var domainEvents = new List<DomainEnvelope<IDomainEvent>>
+        {
             // Tennis Clubs
             new(
                 new Guid("049af565-a42d-4f02-b213-793459e4873f"),

@@ -18,6 +18,7 @@ public class UserController(ILoginService loginService, IUserService userService
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     public async Task<ActionResult<UserInformationDto>> Login(
         [FromBody] LoginCommand loginCommand)
     {
@@ -32,6 +33,7 @@ public class UserController(ILoginService loginService, IUserService userService
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Consumes("application/json")]
     [Authorize(Roles = "SYSTEM_OPERATOR,ADMIN,MEMBER")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordCommand changePasswordCommand)
     {

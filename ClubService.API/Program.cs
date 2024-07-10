@@ -47,17 +47,17 @@ if (builder.Environment.IsProduction())
 {
     if (eventStoreDbContext.Database.GetPendingMigrations().Any())
     {
-        eventStoreDbContext.Database.Migrate();
+        await eventStoreDbContext.Database.MigrateAsync();
     }
 
     if (readStoreDbContext.Database.GetPendingMigrations().Any())
     {
-        readStoreDbContext.Database.Migrate();
+        await readStoreDbContext.Database.MigrateAsync();
     }
 
     if (loginStoreDbContext.Database.GetPendingMigrations().Any())
     {
-        loginStoreDbContext.Database.Migrate();
+        await loginStoreDbContext.Database.MigrateAsync();
     }
 }
 else if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("DockerDevelopment"))

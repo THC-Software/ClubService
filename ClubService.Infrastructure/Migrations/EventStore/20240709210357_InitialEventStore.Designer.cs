@@ -3,6 +3,7 @@ using System;
 using ClubService.Infrastructure.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ClubService.Infrastructure.Migrations.EventStore
 {
     [DbContext(typeof(EventStoreDbContext))]
-    partial class EventStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240709210357_InitialEventStore")]
+    partial class InitialEventStore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
