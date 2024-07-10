@@ -124,27 +124,29 @@ messages is correct by using transaction log tailing.
 The `RedisEventReader` is registered as background service, messages are polled in a 1s intervall.
 We define which streams and which messages of which streams are relevant for us in the appsettings.json
 ```json
-  "RedisConfiguration": {
-"Host": "localhost:6379",
-"PollingInterval": "1",
-"Streams": [
 {
-"StreamName": "club_service_events.public.DomainEvent",
-"ConsumerGroup": "club_service_events.domain.events.group",
-"DesiredEventTypes": [
-"*"
-]
-},
-{
-"StreamName": "tournament_events.public.technicaleventenvelope",
-"ConsumerGroup": "tournament_service_events.domain.events.group",
-"DesiredEventTypes": [
-"TOURNAMENT_CONFIRMED",
-"TOURNAMENT_CANCELED"
-]
+    "RedisConfiguration": {
+        "Host": "localhost:6379",
+        "PollingInterval": "1",
+        "Streams": [
+            {
+                "StreamName": "club_service_events.public.DomainEvent",
+                "ConsumerGroup": "club_service_events.domain.events.group",
+                "DesiredEventTypes": [
+                    "*"
+                ]
+            },
+            {
+                "StreamName": "tournament_events.public.technicaleventenvelope",
+                "ConsumerGroup": "tournament_service_events.domain.events.group",
+                "DesiredEventTypes": [
+                    "TOURNAMENT_CONFIRMED",
+                    "TOURNAMENT_CANCELED"
+                ]
+            }
+        ]
+    }
 }
-]
-},
 ```
 In our case we listen to all of our own events and additionally to the `TOURNAMENT_CONFIRMED` and `TOURNAMENT_CANCELLED`
 events of the tournament service. If the event that the stream provides us with is in the `DesiredEventTypes`, we hand
