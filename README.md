@@ -398,7 +398,7 @@ Once they are processed it removes them. All of this happens one transaction, gu
 
 ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentCanceledEventHandler.cs (Line 54 - 59)\
 ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentConfirmedEventHandler.cs (Line 42 - 48)\
-ClubService.Infrastructure/Mail/EmailMessageRelay.cs (Line 32 - 55)
+ClubService.Infrastructure/Mail/EmailMessageRelay.cs (Line 32 - 54)
 
 ### Mailhog
 

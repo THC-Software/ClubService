@@ -13,14 +13,14 @@ public class EmailOutboxRepository(ReadStoreDbContext readStoreDbContext) : IEma
         await readStoreDbContext.SaveChangesAsync();
     }
 
-    public async Task<List<EmailMessage>> GetAllEmails()
+    public async Task<List<EmailMessage>> GetAllEmailMessages()
     {
         return await readStoreDbContext.EmailOutbox.OrderBy(x => x.Timestamp).ToListAsync();
     }
 
-    public async Task RemoveEmails(List<EmailMessage> emails)
+    public async Task Delete(EmailMessage emailMessage)
     {
-        readStoreDbContext.EmailOutbox.RemoveRange(emails);
+        readStoreDbContext.EmailOutbox.Remove(emailMessage);
         await readStoreDbContext.SaveChangesAsync();
     }
 }
