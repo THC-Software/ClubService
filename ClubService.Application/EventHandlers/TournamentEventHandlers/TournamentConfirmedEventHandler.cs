@@ -27,11 +27,11 @@ public class TournamentConfirmedEventHandler(
 
         var tournamentConfirmedEvent = (TournamentConfirmedEvent)domainEnvelope.EventData;
         var tennisClubReadModel =
-            await tennisClubReadModelRepository.GetTennisClubById(tournamentConfirmedEvent.ClubId);
+            await tennisClubReadModelRepository.GetTennisClubById(tournamentConfirmedEvent.Tournament.ClubId);
 
         if (tennisClubReadModel == null)
         {
-            loggerService.LogTennisClubNotFound(tournamentConfirmedEvent.ClubId);
+            loggerService.LogTennisClubNotFound(tournamentConfirmedEvent.Tournament.ClubId);
             throw new TennisClubNotFoundException(domainEnvelope.EntityId);
         }
 
@@ -42,7 +42,8 @@ public class TournamentConfirmedEventHandler(
         foreach (var member in members)
         {
             var emailMessage = new EmailMessage(Guid.NewGuid(), member.Email,
-                tournamentConfirmedEvent.Name, tournamentConfirmedEvent.Description, DateTime.UtcNow);
+                tournamentConfirmedEvent.Tournament.Name, tournamentConfirmedEvent.Tournament.Description,
+                DateTime.UtcNow);
 
             await emailOutboxRepository.Add(emailMessage);
         }
