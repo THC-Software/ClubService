@@ -55,15 +55,14 @@ In our application we distinguish between `Members`, `Admins`, and `Supervisors`
 Members use their email address as login while Admins have a username. Since it's theoretically possible that a user would be
 member or admin of multiple tennis clubs, the login details (i.e. emails and usernames) only have to be unique within one tennis club.
 This means for a login we have to provide a username (which can be an actual username or an email) and the associated tennis club.
-In a real world the user wouldn't need to select the tennis club, as we imagined each tennis club to have it's own page, which
+In a real world the user wouldn't need to select the tennis club, as we imagined each tennis club to have its own page, which
 would also allow for individual branding.
 
 Once the credentials are sent to the backend, we check if it is an Admin or a Member and load the correct user form the database by
-using the unique combination of username and tennis club Id. Once we loaded the correct user, we can verify the password in our login db.
+using the unique combination of username and tennisClubId. Once we loaded the correct user, we can verify the password in our login db.
 
-Supervisors also have a username as login, they do not belong to any club as they are used to supervise all Tennisclubs.
-Therefore, if no TennisclubId is provided when logging in, we assume the user to be a Supervisor.
-
+Supervisors also have a username as login, they do not belong to any club as they are used to supervise all Tennis clubs.
+Therefore, if no TennisClubId is provided when logging in, we assume the user to be a Supervisor.
 
 ## Domain Driven Design
 
@@ -79,7 +78,7 @@ Additionally, Event Sourcing was used, therefore those Entities all provide a `p
 Process is used to create an Event from a Command, which can then be applied on this Entity. It's important that `apply` always
 works if `process` works.
 
-Files:
+Files:\
 DDD was used throughout the whole project.
 
 ## Event Sourcing
@@ -93,7 +92,7 @@ This is also what gets persisted in the database. Since event sourcing is used, 
 All Events can be found in: ClubService.Domain/Event\
 The Domain Envelope can be found here: ClubService.Domain/Event/DomainEnvelope.cs
 However, Event Sourcing encompasses much more and the whole project is structured to accommodate this approach, like creating 
-Domain Entitites with apply and process methods,...
+Domain Entities with apply and process methods,...
 
 ### Optimistic Locking
 
@@ -106,10 +105,10 @@ We implemented optimistic locking directly in the insert sql query.
     ";
 ```
 This is done by counting the number of events before the insert, if the `expectedEventCount` is not correct the whole query fails.
-Therefore guaranteeing a consistent state.
+Therefore, guaranteeing a consistent state.
 
 Files:\
-ClubService.Infrastructure/Repositories/PostgresEventRepository.cs (Line 21 - 25)
+`ClubService.Infrastructure/Repositories/PostgresEventRepository.cs (Line 21 - 25)`
 
 ### Debezium
 
@@ -121,8 +120,8 @@ messages is correct by using transaction log tailing.
 
 #### Redis Event Reader
 
-The `RedisEventReader` is registered as background service, messages are polled in a 1s intervall.
-We define which streams and which messages of which streams are relevant for us in the appsettings.json
+The `RedisEventReader` is registered as background service, messages are polled in a configurable interval.
+We define which streams and which messages of which streams are relevant for us in the `appsettings.json`
 ```json
 {
     "RedisConfiguration": {
@@ -155,8 +154,8 @@ it to the `ChainEventHandler`
 #### Chain Event Handler
 
 We've implemented a chain event handler that has a list of event handlers. Each event handler corresponds to one event type.
-All events are passed to the chain event handler and it in turn passes them further to all of the event handlers that are registered with it.
-If the event is supported in the event handler that it is passed to, it will process that event (e.g. construct the readside or send an email)
+All events are passed to the chain event handler and it in turn passes them further to all the event handlers that are registered with it.
+If the event is supported in the event handler that it is passed to, it will process that event (e.g. construct the read side or send an email).
 
 The following diagram shows the structure of the event handlers. In our case we split them up so that we have an 
 event handler for each event instead of for each aggregate but for the diagram we simplified it because otherwise it 
@@ -203,8 +202,9 @@ processed event id happen in the same transaction therefore we can guarantee tha
         });
 ```
 
-ClubService.Application/EventHandlers/ChainEventHandler.cs (Line 19 - 28)\
-ClubService.Domain/ReadModel/ProcessedEvent.cs
+Files:\
+`ClubService.Application/EventHandlers/ChainEventHandler.cs (Line 19 - 28)`\
+`ClubService.Domain/ReadModel/ProcessedEvent.cs`
 
 ## Sagas
 
@@ -212,21 +212,21 @@ We did not have to implement any sagas.
 
 ## Authorization
 
-The authentication is done in the API gateway, in the tennisclub service we only verify that the user is allowed to perform the action
+The authentication is done in the API gateway, in the tennis club service we only verify that the user is allowed to perform the action
 based on the tennis club they are part of and/or the account they have.
-Example: Member can only change details for his own account, Admin can only lock members that are part of same tennisclub and so on.
+Example: Member can only change details for his own account, Admin can only lock members that are part of same tennis club and so on.
 Since C# wants to always verify the JWT, e.g. expiration date, and the API Gateway already verifies that, we implemented our own
 middleware (ClubService.API/JwtClaimsMiddleware.cs), this allows us to change the behaviour of how the JWT is handled. 
 
 ## CI/CD + Development
 
-For the whole project we used Sonarcloud with a github runner pipeline that automatically runs sonarcloud + all of the tests.
+For the whole project we used Sonarcloud with a github runner pipeline that automatically runs sonarcloud + all the tests.
 The main branch was locked and pull requests + code reviews were done for each merge to main. Furthermore, the pipeline had to
 run and pass the quality gates set in sonarcloud. 
 
 Files:\
-.github/workflows/ci.yml\
-.github/workflows/cd.yml
+`.github/workflows/ci.yml`\
+`.github/workflows/cd.yml`
 
 ## Infrastructure
 
@@ -374,35 +374,36 @@ services:
 
 ### Kubernetes
 
-We split all of the Kubernetes files by kind (config, secrets, deployment, and services).
+We split all the Kubernetes files by kind (config, secrets, deployment, and services).
 The secrets contain for mailhog the sender email encoded in Base64 and for postgres the username and password also encoded in Base64.
-All of the configuration files can be applied using `kubectl apply -R -f deployments`
+All the configuration files can be applied using `kubectl apply -R -f deployments`.
 
-All of the files used to configure Kubernetes are located here:\
-deployment
+All the files used to configure Kubernetes are located here:\
+`deployment/`
 
 ### Environment Variables
 
 We don't use hardcoded values for deployment, instead we configured the dockerfile to accept custom environment variables.
 The used deployment solution in our case Kubernetes, sets the environment variables accordingly. In the program.cs (lines 9 - 14) we have some code
-that substitutes the placeholders in the appsettings.Production.json with the values of the environment variables passed by kubernetes.
-Therefore all of our environment variables are configured in the Kubernetes config files.
+that substitutes the placeholders in the `appsettings.Production.json` with the values of the environment variables passed by kubernetes.
+Therefore, all of our environment variables are configured in the Kubernetes config files.
 
 ## Sending Emails
 
-When the Tournament service publishes a TournamentConfirmed or TournamentCanceled event we send an email to each member of the Tennisclub.
+When the Tournament service publishes a TournamentConfirmed or TournamentCanceled event we email each member of the Tennis club.
 
 ### Outbox pattern
 
-The TournamentCanceledEventHandler & TournamentConfirmedEventHandler write the email with the memberId and MemberEmail into the outbox table of our readstore.
+The TournamentCanceledEventHandler & TournamentConfirmedEventHandler write the email with the memberId and MemberEmail into the outbox table of our read store.
 Afterwards the EmailMessageRelay checks the table in a fixed interval and processes all entries of this table.
-Once they are processed it removes them. All of this happens one transaction, guaranteeing a atleast once delivery.
+Once they are processed it removes them. All of this happens one transaction, guaranteeing the at least once delivery.
 
-ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentCanceledEventHandler.cs (Line 54 - 59)\
-ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentConfirmedEventHandler.cs (Line 42 - 48)\
-ClubService.Infrastructure/Mail/EmailMessageRelay.cs (Line 32 - 54)
+`ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentCanceledEventHandler.cs (Line 54 - 59)`\
+`ClubService.Application/EventHandlers/TournamentEventHandlers/TournamentConfirmedEventHandler.cs (Line 42 - 48)`\
+`ClubService.Infrastructure/Mail/EmailMessageRelay.cs (Line 32 - 54)`
 
 ### Mailhog
 
-We use Mailhog for testing the sending of the emails.
-SMTP Config for mailhog: ClubService.API/appsettings.DockerDevelopment.json (Line 28 - 32)
+We use mailhog for testing the sending of the emails.
+SMTP Config for mailhog:\
+`ClubService.API/appsettings.DockerDevelopment.json (Line 28 - 32)`
