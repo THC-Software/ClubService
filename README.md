@@ -1,5 +1,8 @@
 # ClubService
+[![CI](https://github.com/THC-Software/ClubService/actions/workflows/ci.yml/badge.svg)](https://github.com/THC-Software/ClubService/actions/workflows/ci.yml/badge.svg)
+[![CD](https://github.com/THC-Software/ClubService/actions/workflows/cd.yml/badge.svg)](https://github.com/THC-Software/ClubService/actions/workflows/cd.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=THC-Software_ClubService&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=THC-Software_ClubService)
+
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=THC-Software_ClubService&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=THC-Software_ClubService)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=THC-Software_ClubService&metric=bugs)](https://sonarcloud.io/summary/new_code?id=THC-Software_ClubService)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=THC-Software_ClubService&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=THC-Software_ClubService)
@@ -11,28 +14,34 @@ Microservice to manage Tennis Clubs and their members.
 ```mermaid
 classDiagram
 class TennisClub {
-    id
+    tennisClubId
     name
-    isLocked
+    status
 }
 
 class Member {
-    id
+    memberId
     name
     email
-    isLocked
+    status
 }
 
 class Admin {
-    id
+    adminId
     username
     name
+    status
 }
 
 class SubscriptionTier {
-    id
+    subscriptionTierId
     name
     maxMemberCount
+}
+
+class SystemOperator {
+    systemOperatorId
+    username
 }
 
 TennisClub "*" --> "1" SubscriptionTier
@@ -146,6 +155,32 @@ it to the `ChainEventHandler`
 We've implemented a chain event handler that has a list of event handlers. Each event handler corresponds to one event type.
 All events are passed to the chain event handler and it in turn passes them further to all of the event handlers that are registered with it.
 If the event is supported in the event handler that it is passed to, it will process that event (e.g. construct the readside or send an email)
+
+The following diagram shows the structure of the event handlers. In our case we split them up so that we have an 
+event handler for each event instead of for each aggregate but for the diagram we simplified it because otherwise it 
+would be too big.
+```mermaid
+classDiagram
+   class IEventHandler
+   class ChainEventHandler {
+      List~IEventHandler~ EventHandlers
+   }
+   class TennisClubEventHandler
+   class AdminEventHandler
+   class MemberEventHandler
+   class SubscriptionTierEventHandler
+   class SystemOperatorEventHandler
+   class TournamentEventHandler
+
+   IEventHandler "*" -- ChainEventHandler
+   IEventHandler <|.. ChainEventHandler
+   IEventHandler <|.. TennisClubEventHandler
+   IEventHandler <|.. AdminEventHandler
+   IEventHandler <|.. MemberEventHandler
+   IEventHandler <|.. SubscriptionTierEventHandler
+   IEventHandler <|.. SystemOperatorEventHandler
+   IEventHandler <|.. TournamentEventHandler
+```
 
 #### Duplicate Messages
 
