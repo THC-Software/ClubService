@@ -320,4 +320,9 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     {
         logger.LogInformation("Registered system operator with id '{id}'.", id);
     }
+    
+    public void LogDuplicateSeedData()
+    {
+        logger.LogInformation("Seed data already seeded");
+    }
 }

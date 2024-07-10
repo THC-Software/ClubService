@@ -64,4 +64,5 @@ public interface ILoggerService<T>
     void LogJsonMissingProperties(string jsonValue);
     void LogEmailMessageRelayStop();
     void LogSystemOperatorRegistered(Guid id);
+    void LogDuplicateSeedData();
 }
