@@ -141,6 +141,23 @@ namespace ClubService.Infrastructure.Migrations.ReadStore
                     b.ToTable("SubscriptionTier", (string)null);
                 });
 
+            modelBuilder.Entity("ClubService.Domain.ReadModel.SystemOperatorReadModel", b =>
+                {
+                    b.Property<Guid>("SystemOperatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("systemOperatorId");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("username");
+
+                    b.HasKey("SystemOperatorId")
+                        .HasName("pK_SystemOperator");
+
+                    b.ToTable("SystemOperator", (string)null);
+                });
+
             modelBuilder.Entity("ClubService.Domain.ReadModel.TennisClubReadModel", b =>
                 {
                     b.Property<Guid>("TennisClubId")
