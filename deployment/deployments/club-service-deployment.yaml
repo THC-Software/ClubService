@@ -85,6 +85,6 @@ spec:
                   key: mailhog-smtp-port
             - name: SMTP_SENDER_EMAIL_ADDRESS
               valueFrom:
-                secretKeyRef:
-                  name: club-service-mailhog-secret
+                configMapKeyRef:
+                  name: club-service-mailhog-config
                   key: smtp-sender-email-address

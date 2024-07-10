@@ -12,7 +12,7 @@ public class EmailMessageRelay : BackgroundService
 {
     private readonly ILoggerService<EmailMessageRelay> _loggerService;
     private readonly int _pollingInterval;
-    private readonly string _senderEmailAddress;
+    private readonly MailAddress _senderEmailAddress;
     private readonly IServiceProvider _serviceProvider;
     private readonly SmtpClient _smtpClient;
 
@@ -24,7 +24,7 @@ public class EmailMessageRelay : BackgroundService
         _serviceProvider = serviceProvider;
         _loggerService = loggerService;
         _pollingInterval = smtpConfiguration.Value.PollingInterval;
-        _senderEmailAddress = smtpConfiguration.Value.SenderEmailAddress;
+        _senderEmailAddress = new MailAddress(smtpConfiguration.Value.SenderEmailAddress);
         _smtpClient = new SmtpClient(smtpConfiguration.Value.Host, smtpConfiguration.Value.Port);
         _smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
     }
@@ -42,17 +42,6 @@ public class EmailMessageRelay : BackgroundService
             await transactionManager.TransactionScope(async () =>
             {
                 MailAddress recipientEmailAddress;
-                MailAddress senderMailAddress;
-                try
-                {
-                    senderMailAddress = new MailAddress(_senderEmailAddress);
-                }
-                catch (FormatException)
-                {
-                    _loggerService.LogInvalidEMailAddress(_senderEmailAddress);
-                    throw;
-                }
-
                 try
                 {
                     recipientEmailAddress = new MailAddress(emailMessage.RecipientEMailAddress);
@@ -63,7 +52,7 @@ public class EmailMessageRelay : BackgroundService
                     throw;
                 }
 
-                var mailMessage = new MailMessage(senderMailAddress, recipientEmailAddress)
+                var mailMessage = new MailMessage(_senderEmailAddress, recipientEmailAddress)
                 {
                     Subject = emailMessage.Subject,
                     Body = emailMessage.Body
