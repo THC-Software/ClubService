@@ -82,7 +82,7 @@ public class RegisterAdminService(
                     }
                 });
 
-                SaveLoginCredentials(admin.AdminId, adminRegisterCommand.Password);
+                await SaveLoginCredentials(admin.AdminId, adminRegisterCommand.Password);
                 
                 loggerService.LogAdminRegistered(admin.AdminId.Id);
                 return admin.AdminId.Id;
@@ -95,9 +95,9 @@ public class RegisterAdminService(
         }
     }
 
-    private void SaveLoginCredentials(AdminId adminId, string password)
+    private async Task SaveLoginCredentials(AdminId adminId, string password)
     {
         var userPassword = UserPassword.Create(adminId.Id, password, passwordHasherService);
-        loginRepository.Add(userPassword);
+        await loginRepository.Add(userPassword);
     }
 }
