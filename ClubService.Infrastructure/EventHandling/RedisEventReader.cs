@@ -73,19 +73,19 @@ public class RedisEventReader : BackgroundService
                     await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
                     continue;
                 }
-
-                var parsedEvent = EventParser.ParseEvent(after);
-
+                
                 // Here we filter out the events we don't want.
                 // If the EventTypes list contains an asterisk we want all the events of that stream.
                 // Otherwise, we check if the event type of the parsedEvent is in the list of desired events.
-                var parsedEventType = parsedEvent.EventType.ToString();
+                var parsedEventType = after.GetProperty("eventType").GetString();
                 if (!stream.DesiredEventTypes.Contains(AllEvents) &&
                     !stream.DesiredEventTypes.Contains(parsedEventType, StringComparer.OrdinalIgnoreCase))
                 {
                     await db.StreamAcknowledgeAsync(stream.StreamName, stream.ConsumerGroup, entry.Id);
                     continue;
                 }
+                
+                var parsedEvent = EventParser.ParseEvent(after);
 
                 using var scope = _services.CreateScope();
                 var chainEventHandler = scope.ServiceProvider.GetRequiredService<ChainEventHandler>();
