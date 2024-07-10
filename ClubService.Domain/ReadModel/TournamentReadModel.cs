@@ -21,13 +21,13 @@ public class TournamentReadModel
 
     public static TournamentReadModel FromDomainEvent(TournamentConfirmedEvent tournamentConfirmedEvent)
     {
-        var startDate = tournamentConfirmedEvent.Days.OrderBy(d => d.Day).First();
-        var endDate = tournamentConfirmedEvent.Days.OrderBy(d => d.Day).Last();
+        var startDate = tournamentConfirmedEvent.Tournament.Days.OrderBy(d => d.Day).First();
+        var endDate = tournamentConfirmedEvent.Tournament.Days.OrderBy(d => d.Day).Last();
 
         return new TournamentReadModel(
-            tournamentConfirmedEvent.Id,
-            tournamentConfirmedEvent.ClubId,
-            tournamentConfirmedEvent.Name,
+            tournamentConfirmedEvent.Tournament.Id,
+            tournamentConfirmedEvent.Tournament.ClubId,
+            tournamentConfirmedEvent.Tournament.Name,
             startDate.Day,
             endDate.Day
         );

@@ -1,30 +1,6 @@
-using ClubService.Domain.Model.Entity;
-using ClubService.Domain.Model.Enum;
-
 namespace ClubService.Domain.Event.Tournament;
 
-public class TournamentConfirmedEvent(
-    Guid id,
-    Guid clubId,
-    bool isCanceled,
-    string name,
-    string description,
-    int maximumParticipants,
-    HashSet<TournamentCourt> courts,
-    HashSet<TournamentDay> days,
-    HashSet<TournamentParticipant> participants,
-    int version,
-    TournamentStatus status) : ITournamentDomainEvent
+public class TournamentConfirmedEvent(Model.Entity.Tournament tournament) : ITournamentDomainEvent
 {
-    public Guid Id { get; } = id;
-    public Guid ClubId { get; } = clubId;
-    public bool IsCanceled { get; } = isCanceled;
-    public string Name { get; } = name;
-    public string Description { get; } = description;
-    public int MaximumParticipants { get; } = maximumParticipants;
-    public HashSet<TournamentCourt> Courts { get; } = courts;
-    public HashSet<TournamentDay> Days { get; } = days;
-    public HashSet<TournamentParticipant> Participants { get; } = participants;
-    public int Version { get; } = version;
-    public TournamentStatus Status { get; } = status;
+    public Model.Entity.Tournament Tournament { get; } = tournament;
 }

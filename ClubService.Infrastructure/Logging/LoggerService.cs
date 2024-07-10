@@ -320,6 +320,11 @@ public class LoggerService<T>(ILogger<T> logger) : ILoggerService<T>
     {
         logger.LogInformation("Registered system operator with id '{id}'.", id);
     }
+
+    public void LogInvalidEMailAddress(string emailAddress)
+    {
+        logger.LogError("The following email address is invalid: {emailMessageRecipientEMailAddress}", emailAddress);
+    }
     
     public void LogDuplicateSeedData()
     {

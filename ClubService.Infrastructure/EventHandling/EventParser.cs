@@ -26,8 +26,8 @@ public static class EventParser
 
         var eventId = Guid.Parse(eventIdStr);
         var entityId = Guid.Parse(entityIdStr);
-        var eventType = (EventType)Enum.Parse(typeof(EventType), eventTypeStr);
-        var entityType = (EntityType)Enum.Parse(typeof(EntityType), entityTypeStr);
+        var eventType = (EventType)Enum.Parse(typeof(EventType), eventTypeStr, true);
+        var entityType = (EntityType)Enum.Parse(typeof(EntityType), entityTypeStr, true);
         var timestamp = DateTime.Parse(timestampStr).ToUniversalTime();
         var deserializedEventData = EventDeserializer.DeserializeEventData<IDomainEvent>(eventType, eventData);
 

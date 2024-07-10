@@ -5,3 +5,4 @@ metadata:
 data:
   mailhog-host: "club-service-mailhog-service"
   mailhog-smtp-port: "1025"
+  smtp-sender-email-address: "admin@thc-dornbirn.at"
