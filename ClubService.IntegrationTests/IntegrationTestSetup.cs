@@ -12,6 +12,8 @@ public static class IntegrationTestSetup
     private static PostgreSqlContainer _postgresContainer = null!;
     private static WebAppFactory _webAppFactory = null!;
     public static EventStoreDbContext EventStoreDbContext { get; private set; } = null!;
+    public static ReadStoreDbContext ReadStoreDbContext { get; private set; } = null!;
+    public static LoginStoreDbContext LoginStoreDbContext { get; private set; } = null!;
     public static IEventRepository EventRepository { get; private set; } = null!;
     public static HttpClient HttpClient { get; private set; } = null!;
     public static Mock<IAdminReadModelRepository> MockAdminReadModelRepository { get; private set; } = null!;
@@ -29,7 +31,6 @@ public static class IntegrationTestSetup
             .WithImage("debezium/postgres:16-alpine")
             .WithUsername("user")
             .WithPassword("password")
-            .WithDatabase("club-service-test")
             .WithPortBinding(5432, true)
             .Build();
 
@@ -42,7 +43,7 @@ public static class IntegrationTestSetup
         MockMemberReadModelRepository = new Mock<IMemberReadModelRepository>();
 
         _webAppFactory = new WebAppFactory(
-            _postgresContainer.GetConnectionString(),
+            _postgresContainer.GetMappedPublicPort(5432),
             MockTennisClubReadModelRepository,
             MockSubscriptionTierReadModelRepository,
             MockAdminReadModelRepository,
@@ -52,6 +53,8 @@ public static class IntegrationTestSetup
         HttpClient = _webAppFactory.CreateClient();
 
         EventStoreDbContext = _webAppFactory.Services.GetRequiredService<EventStoreDbContext>();
+        ReadStoreDbContext = _webAppFactory.Services.GetRequiredService<ReadStoreDbContext>();
+        LoginStoreDbContext = _webAppFactory.Services.GetRequiredService<LoginStoreDbContext>();
         EventRepository = _webAppFactory.Services.GetRequiredService<IEventRepository>();
     }
 

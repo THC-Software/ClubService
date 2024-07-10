@@ -8,7 +8,7 @@ using Moq;
 namespace ClubService.IntegrationTests;
 
 public class WebAppFactory(
-    string connectionString,
+    int postgresPort,
     Mock<ITennisClubReadModelRepository> mockTennisClubReadModelRepository,
     Mock<ISubscriptionTierReadModelRepository> mockSubscriptionTierReadModelRepository,
     Mock<IAdminReadModelRepository> mockAdminReadModelRepository,
@@ -16,7 +16,12 @@ public class WebAppFactory(
 {
     private readonly Dictionary<string, string> _testAppSettings = new()
     {
-        ["ConnectionStrings:event-store-connection"] = connectionString,
+        ["ConnectionStrings:event-store-connection"] =
+            $"Host=localhost:{postgresPort};Username=user;Password=password;Database=club-service-event-store",
+        ["ConnectionStrings:read-store-connection"] =
+            $"Host=localhost:{postgresPort};Username=user;Password=password;Database=club-service-read-store",
+        ["ConnectionStrings:login-store-connection"] =
+            $"Host=localhost:{postgresPort};Username=user;Password=password;Database=club-service-login-store",
 
         // Redis Configuration
         ["RedisConfiguration:Host"] = "localhost:6379",

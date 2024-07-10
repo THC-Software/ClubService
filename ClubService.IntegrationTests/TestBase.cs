@@ -24,7 +24,13 @@ public class TestBase
     public async Task Setup()
     {
         await IntegrationTestSetup.EventStoreDbContext.Database.EnsureCreatedAsync();
+        await IntegrationTestSetup.ReadStoreDbContext.Database.EnsureCreatedAsync();
+        await IntegrationTestSetup.LoginStoreDbContext.Database.EnsureCreatedAsync();
+
         IntegrationTestSetup.EventStoreDbContext.ChangeTracker.Clear();
+        IntegrationTestSetup.ReadStoreDbContext.ChangeTracker.Clear();
+        IntegrationTestSetup.LoginStoreDbContext.ChangeTracker.Clear();
+
         await IntegrationTestSetup.EventStoreDbContext.SeedTestData();
     }
 
@@ -32,5 +38,7 @@ public class TestBase
     public async Task TearDown()
     {
         await IntegrationTestSetup.EventStoreDbContext.Database.EnsureDeletedAsync();
+        await IntegrationTestSetup.ReadStoreDbContext.Database.EnsureDeletedAsync();
+        await IntegrationTestSetup.LoginStoreDbContext.Database.EnsureDeletedAsync();
     }
 }
