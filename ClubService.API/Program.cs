@@ -77,10 +77,10 @@ else if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Docke
         var logger = services.GetRequiredService<ILoggerService<Program>>();
         logger.LogDuplicateSeedData();
     }
-    
+
     await readStoreDbContext.Database.EnsureDeletedAsync();
     await readStoreDbContext.Database.EnsureCreatedAsync();
-    
+
     await loginStoreDbContext.Database.EnsureDeletedAsync();
     await loginStoreDbContext.Database.EnsureCreatedAsync();
 }
