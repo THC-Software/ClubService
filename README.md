@@ -49,6 +49,30 @@ TennisClub "1" --> "*" Member
 Admin "*" --> "1" TennisClub
 ```
 
+## How to run
+
+### Docker-compose
+Navigate to project root and execute:\
+`docker compose build`\
+`docker compose up`
+
+The swagger-ui is available at:\
+`http://localhost:5000/swagger/index.html`
+
+### Kubernetes
+Navigate to project root and execute:\
+`kubectl apply -R -f deployments`
+
+To delete all instances execute:\
+`kubectl delete -R -f deployments`
+
+Our service is of course only available through the API Gateway (see documentation in API Gateway), to get the IP and Port 
+of the API gateway the following command can be executed:\
+`minikube service <api-gateway-service-name> --url`
+
+IP and Port can then be used to view the swagger-ui:\
+`http://<ip>:<port>/q/swagger-ui/#/`
+
 ## Login
 
 In our application we distinguish between `Members`, `Admins`, and `Supervisors`. All of them are accounts that users of the application can login with.
