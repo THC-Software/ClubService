@@ -35,29 +35,31 @@ public class TournamentCanceledEventHandler(
         var tennisClubReadModel =
             await tennisClubReadModelRepository.GetTennisClubById(tournamentReadModel.TennisClubId);
 
-        if (tennisClubReadModel == null)
+        if (tennisClubReadModel != null)
         {
+            var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubReadModel.TennisClubId.Id);
+            var mailSubject = $"Tournament {tournamentReadModel.Name} canceled";
+            var mailBody = $"""
+                            Unfortunately the tournament '{tournamentReadModel.Name}' that would have been taking 
+                            place from the {tournamentReadModel.StartDate} to the {tournamentReadModel.EndDate} has 
+                            been canceled.
+                            """;
+
+            foreach (var member in members)
+            {
+                var emailMessage = new EmailMessage(Guid.NewGuid(), member.Email, mailSubject, mailBody,
+                    DateTime.UtcNow);
+                await emailOutboxRepository.Add(emailMessage);
+            }
+        }
+        else
+        {
+             // We can't throw an exception here because deleting a tennis club triggers 
+            // that all associated tournaments are deleted.
             loggerService.LogTennisClubNotFound(tournamentReadModel.TennisClubId);
-            throw new TennisClubNotFoundException(domainEnvelope.EntityId);
         }
 
         await tournamentReadModelRepository.Delete(tournamentReadModel);
-
-        var members = await memberReadModelRepository.GetMembersByTennisClubId(tennisClubReadModel.TennisClubId.Id);
-        var mailSubject = $"Tournament {tournamentReadModel.Name} canceled";
-        var mailBody = $"""
-                        Unfortunately the tournament '{tournamentReadModel.Name}' that would have been taking 
-                        place from the {tournamentReadModel.StartDate} to the {tournamentReadModel.EndDate} has 
-                        been canceled.
-                        """;
-
-        foreach (var member in members)
-        {
-            var emailMessage = new EmailMessage(Guid.NewGuid(), member.Email, mailSubject, mailBody,
-                DateTime.UtcNow);
-            await emailOutboxRepository.Add(emailMessage);
-        }
-
         loggerService.LogTournamentCanceled(tournamentReadModel.TournamentId);
     }
 
