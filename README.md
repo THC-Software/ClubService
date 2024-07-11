@@ -375,7 +375,7 @@ services:
 ### Kubernetes
 
 We split all the Kubernetes files by kind (config, secrets, deployment, and services).
-The secrets contain for mailhog the sender email encoded in Base64 and for postgres the username and password also encoded in Base64.
+The secrets contain for postgres the username and password encoded in Base64.
 All the configuration files can be applied using `kubectl apply -R -f deployments`.
 
 All the files used to configure Kubernetes are located here:\
