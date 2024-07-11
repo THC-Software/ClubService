@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: club-service
-          image: smighty/club-service:v1.0.0
+          image: smighty/club-service:v1.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
